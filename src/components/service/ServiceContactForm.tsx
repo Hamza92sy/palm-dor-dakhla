@@ -2,15 +2,7 @@
 
 import { useState } from 'react'
 import { trackLead, trackWhatsApp } from '@/lib/tracking'
-
-type Service = 'accommodation' | 'restaurant' | 'cafe' | 'car_rental'
-
-const SERVICES: { value: Service; label: string }[] = [
-  { value: 'accommodation', label: 'Hébergement' },
-  { value: 'restaurant',    label: 'Restaurant' },
-  { value: 'cafe',          label: 'Café' },
-  { value: 'car_rental',    label: 'Location de voiture' },
-]
+import { SERVICE_LABELS, type ServiceType } from '@/lib/services'
 
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
@@ -19,10 +11,13 @@ const INPUT_CLASS = `
   disabled:opacity-50 disabled:cursor-not-allowed
 `.trim()
 
-export default function LeadForm() {
+interface Props {
+  service: ServiceType
+}
+
+export default function ServiceContactForm({ service }: Props) {
   const [name,    setName]    = useState('')
   const [phone,   setPhone]   = useState('')
-  const [service, setService] = useState<Service>('accommodation')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)
@@ -46,7 +41,6 @@ export default function LeadForm() {
         return
       }
 
-      // Lead enregistré → tracking → ouvrir WhatsApp
       trackLead()
       trackWhatsApp()
       window.location.href = data.whatsappUrl!
@@ -58,27 +52,30 @@ export default function LeadForm() {
   }
 
   return (
-    <section className="bg-palm-cream-dark py-20 md:py-28" id="reservation">
+    <section className="bg-palm-cream-dark py-16 md:py-24" id="contact">
       <div className="max-w-lg mx-auto px-5 sm:px-8">
 
         {/* Header */}
-        <div className="flex flex-col items-center text-center gap-3 mb-10">
+        <div className="flex flex-col items-center text-center gap-3 mb-8">
           <p className="text-[9px] tracking-[0.5em] uppercase text-palm-gold font-medium">
-            Réservation
+            Demande rapide
           </p>
-          <h2 className="font-display font-light italic text-4xl md:text-5xl text-palm-blue">
-            Faites votre demande
+          <h2 className="font-display font-light italic text-3xl md:text-4xl text-palm-blue">
+            Envoyez votre demande
           </h2>
-          <div className="w-8 h-px bg-palm-gold/50 mt-1" />
-          <p className="text-[10px] tracking-[0.2em] uppercase text-palm-blue/40">
-            Réponse rapide via WhatsApp
-          </p>
+          <div className="flex items-center gap-2 bg-palm-cream border border-palm-gold/20 rounded-full px-4 py-1.5 mt-1">
+            <span className="text-[10px] tracking-[0.2em] uppercase text-palm-blue/50 font-medium">
+              Service :
+            </span>
+            <span className="text-[10px] tracking-[0.15em] uppercase text-palm-gold font-medium">
+              {SERVICE_LABELS[service]}
+            </span>
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
-          {/* Name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Votre nom <span className="text-palm-gold">*</span>
@@ -95,7 +92,6 @@ export default function LeadForm() {
             />
           </div>
 
-          {/* Phone */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               WhatsApp / Téléphone <span className="text-palm-gold">*</span>
@@ -112,50 +108,27 @@ export default function LeadForm() {
             />
           </div>
 
-          {/* Service */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-              Service <span className="text-palm-gold">*</span>
-            </label>
-            <select
-              required
-              value={service}
-              onChange={e => setService(e.target.value as Service)}
-              disabled={loading}
-              className={`${INPUT_CLASS} cursor-pointer`}
-            >
-              {SERVICES.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Message */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Message{' '}
-              <span className="normal-case tracking-normal font-normal text-palm-blue/30">
-                (facultatif)
-              </span>
+              <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
             </label>
             <textarea
               rows={3}
               value={message}
               onChange={e => setMessage(e.target.value)}
               disabled={loading}
-              placeholder="Dates souhaitées, nombre de personnes…"
+              placeholder="Dates, nombre de personnes, questions…"
               className={`${INPUT_CLASS} resize-none`}
             />
           </div>
 
-          {/* Error */}
           {error && (
             <p role="alert" className="text-xs text-red-500/80 text-center tracking-wide py-1">
               {error}
             </p>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -199,13 +172,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 
 function Spinner() {
   return (
-    <svg
-      className="animate-spin w-4 h-4"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
+    <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
     </svg>

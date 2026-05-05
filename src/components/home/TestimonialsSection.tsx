@@ -2,24 +2,21 @@ import SectionLabel from '@/components/ui/SectionLabel'
 
 const reviews = [
   {
-    name: 'Marie D.',
-    origin: 'Paris',
     stars: 5,
-    text: 'Un endroit magique, avec une vue époustouflante sur la lagune. Service impeccable, cuisine raffinée. Un souvenir inoubliable.',
+    text: 'Très bon restaurant avec une excellente ambiance. Service au top. Je recommande vivement.',
+    author: 'Client Google',
+    date: 'Il y a 1 semaine',
+  },
+  {
+    stars: 4,
+    text: 'Appartement propre, bien situé et très confortable. Accueil chaleureux, on se sent bien.',
+    author: 'Client',
     date: 'Il y a 2 semaines',
   },
   {
-    name: 'Thomas B.',
-    origin: 'Marseille',
-    stars: 5,
-    text: 'Notre meilleure adresse à Dakhla. On y retourne chaque année. Les hébergements sont d\'un confort remarquable.',
-    date: 'Il y a 1 mois',
-  },
-  {
-    name: 'Sofia M.',
-    origin: 'Casablanca',
-    stars: 5,
-    text: 'Le café est un vrai coup de cœur. Cadre soigné, café d\'exception, et une équipe aux petits soins. À recommander sans hésitation.',
+    stars: 4,
+    text: 'Très bon accueil et cuisine délicieuse. Cadre agréable face à la lagune. Je recommande.',
+    author: 'Client Google',
     date: 'Il y a 3 semaines',
   },
 ]
@@ -54,7 +51,7 @@ export default function TestimonialsSection() {
         <div className="flex flex-col items-center text-center gap-3 mb-12">
           <SectionLabel>Avis clients</SectionLabel>
           <h2 className="font-display font-light italic text-4xl md:text-5xl text-palm-blue">
-            Ce qu&apos;ils en disent
+            Une expérience appréciée à Dakhla
           </h2>
 
           {/* Google rating badge */}
@@ -62,17 +59,17 @@ export default function TestimonialsSection() {
             <GoogleIcon />
             <div className="flex items-center gap-1.5">
               <span className="text-palm-gold">★</span>
-              <span className="text-sm font-medium text-palm-blue">4.8</span>
-              <span className="text-[11px] text-palm-blue/45">· 150+ avis Google</span>
+              <span className="text-sm font-medium text-palm-blue">4.2</span>
+              <span className="text-[11px] text-palm-blue/45">&middot; 87 avis Google</span>
             </div>
           </div>
         </div>
 
         {/* Review cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {reviews.map((review) => (
+          {reviews.map((review, i) => (
             <div
-              key={review.name}
+              key={i}
               className="bg-white/60 rounded-sm p-7 flex flex-col gap-4"
             >
               {/* Stars + Google */}
@@ -88,14 +85,9 @@ export default function TestimonialsSection() {
 
               {/* Reviewer */}
               <div className="flex items-center justify-between pt-2 border-t border-palm-cream-dark">
-                <div>
-                  <p className="text-[11px] font-medium tracking-wide text-palm-blue">
-                    {review.name}
-                  </p>
-                  <p className="text-[10px] tracking-[0.1em] text-palm-blue/40">
-                    {review.origin}
-                  </p>
-                </div>
+                <p className="text-[11px] font-medium tracking-wide text-palm-blue">
+                  {review.author}
+                </p>
                 <span className="text-[9px] tracking-[0.1em] text-palm-blue/30">
                   {review.date}
                 </span>

@@ -1,4 +1,5 @@
-import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY, WHATSAPP_URL } from '@/lib/config'
+import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY } from '@/lib/config'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -25,37 +26,37 @@ export default function FinalCTA() {
 
         {/* Heading */}
         <h2 className="font-display font-light italic text-5xl md:text-7xl text-white leading-tight">
-          Réservez votre <br className="hidden md:block" />
-          expérience
+          Réservez votre séjour <br className="hidden md:block" />
+          dès maintenant
         </h2>
 
         {/* Gold rule */}
         <div className="w-10 h-px bg-palm-gold/60" />
 
         {/* Subtext */}
-        <p className="text-xs tracking-[0.25em] uppercase text-white/45">
-          Dakhla &middot; Maroc &middot; Ouvert tous les jours
+        <p className="text-sm text-white/55 max-w-[38ch] leading-relaxed">
+          Contactez-nous sur WhatsApp pour vérifier la disponibilité et réserver rapidement.
         </p>
 
         {/* CTA button */}
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
+        <WhatsAppButton className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
             text-[11px] tracking-[0.18em] uppercase font-medium
             px-8 py-4 rounded-full transition-all duration-300 mt-2
-            shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
-        >
+            shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
           <WhatsAppIcon className="w-4 h-4 shrink-0 text-[#25D366] transition-transform duration-300 group-hover:scale-110" />
-          Réserver par WhatsApp
-        </a>
+          Réserver via WhatsApp
+        </WhatsAppButton>
+
+        {/* Micro copy */}
+        <p className="text-[10px] tracking-[0.2em] uppercase text-white/25">
+          Disponible 7j/7 &middot; Sans engagement &middot; Confirmation rapide
+        </p>
 
         {/* Phone */}
         {WHATSAPP_PHONE_DISPLAY && (
           <a
             href={telHref}
-            className="text-[11px] tracking-[0.2em] text-white/25 hover:text-white/50 transition-colors duration-200 mt-1"
+            className="text-[11px] tracking-[0.2em] text-white/20 hover:text-white/45 transition-colors duration-200"
           >
             {WHATSAPP_PHONE_DISPLAY}
           </a>

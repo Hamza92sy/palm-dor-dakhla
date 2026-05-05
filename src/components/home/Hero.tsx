@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { WHATSAPP_URL } from '@/lib/config'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -24,11 +24,11 @@ export default function Hero() {
         sizes="100vw"
       />
 
-      {/* Overlay — flat dark, no gradient */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-palm-blue/55" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center text-white px-5 gap-5 md:gap-6">
+      <div className="relative z-10 flex flex-col items-center text-center text-white px-5 gap-4 md:gap-5">
 
         {/* Location */}
         <p className="text-[9px] tracking-[0.6em] uppercase text-white/50 font-sans">
@@ -43,31 +43,38 @@ export default function Hero() {
         {/* Gold rule */}
         <div className="w-10 h-px bg-palm-gold opacity-80" />
 
-        {/* Tagline */}
-        <p className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/60 max-w-[22ch]">
-          Restaurant · Café · Hébergements
+        {/* Value proposition */}
+        <h2 className="font-display font-light italic text-2xl md:text-3xl text-white/90 leading-snug">
+          Votre séjour complet à Dakhla
+        </h2>
+
+        {/* Services */}
+        <p className="text-[10px] tracking-[0.25em] uppercase text-white/50">
+          Hébergement &middot; Restaurant &middot; Café &middot; Location de voitures
         </p>
+
+        {/* Google badge */}
+        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5">
+          <span className="text-yellow-400 text-sm leading-none">★</span>
+          <span className="text-[11px] text-white/85 font-medium">4.2 sur Google</span>
+          <span className="text-[10px] text-white/40">&middot; 87 avis</span>
+        </div>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
+          <WhatsAppButton className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
               text-[11px] tracking-[0.14em] uppercase font-medium
-              px-7 py-3.5 rounded-full transition-colors duration-300"
-          >
+              px-7 py-3.5 rounded-full transition-colors duration-300">
             <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-            Réserver
-          </a>
+            Réserver maintenant
+          </WhatsAppButton>
           <Link
-            href="#experience"
+            href="#reservation"
             className="flex items-center gap-2.5 border border-white/30 text-white/80 hover:border-white/60 hover:text-white
               text-[11px] tracking-[0.14em] uppercase font-medium
               px-7 py-3.5 rounded-full transition-all duration-300"
           >
-            Découvrir
+            Demander disponibilité
           </Link>
         </div>
       </div>

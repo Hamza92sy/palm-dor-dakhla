@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY, WHATSAPP_URL } from '@/lib/config'
+import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY } from '@/lib/config'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const navLinks = [
   { label: 'Restaurant',   href: '/restaurant' },
@@ -70,17 +71,12 @@ export default function Footer() {
                 </a>
               )}
             </div>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-2.5 border border-[#25D366]/70 text-[#6ee89d] hover:bg-[#25D366] hover:border-[#25D366] hover:text-white
+            <WhatsAppButton className="group flex items-center gap-2.5 border border-[#25D366]/70 text-[#6ee89d] hover:bg-[#25D366] hover:border-[#25D366] hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
-                px-5 py-3 rounded-full transition-all duration-300 w-fit mt-1"
-            >
+                px-5 py-3 rounded-full transition-all duration-300 w-fit mt-1">
               <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
               Réserver maintenant
-            </a>
+            </WhatsAppButton>
           </div>
         </div>
 

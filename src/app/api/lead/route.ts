@@ -7,30 +7,66 @@ const VALID_LANGUAGES = ['fr', 'en'] as const
 type Service  = (typeof VALID_SERVICES)[number]
 type Language = (typeof VALID_LANGUAGES)[number]
 
-const WA_MESSAGES: Record<Language, Record<Service, string>> = {
+const SERVICE_LABELS: Record<Language, Record<Service, string>> = {
   fr: {
-    accommodation: "Bonjour, je souhaite réserver un hébergement à Palm d'Or Dakhla.",
-    restaurant:    "Bonjour, je souhaite réserver une table au restaurant Palm d'Or Dakhla.",
-    cafe:          "Bonjour, je souhaite visiter le café Palm d'Or Dakhla.",
-    car_rental:    "Bonjour, je souhaite louer un véhicule via Palm d'Or Dakhla.",
+    accommodation: 'Hébergement',
+    restaurant:    'Restaurant',
+    cafe:          'Café',
+    car_rental:    'Location de voiture',
   },
   en: {
-    accommodation: "Hello, I would like to book accommodation at Palm d'Or Dakhla.",
-    restaurant:    "Hello, I would like to book a table at Palm d'Or Dakhla restaurant.",
-    cafe:          "Hello, I would like to visit Palm d'Or Dakhla café.",
-    car_rental:    "Hello, I would like to rent a car through Palm d'Or Dakhla.",
+    accommodation: 'Accommodation',
+    restaurant:    'Restaurant',
+    cafe:          'Café',
+    car_rental:    'Car rental',
   },
 }
 
+function buildWhatsAppMessage(
+  lang: Language,
+  svc: Service,
+  name: string,
+  phone: string,
+  msg: string | null
+): string {
+  const label = SERVICE_LABELS[lang][svc]
+
+  if (lang === 'fr') {
+    const parts = [
+      'Bonjour,',
+      '',
+      'Je souhaite faire une demande pour :',
+      `Service : ${label}`,
+      '',
+      `Nom : ${name}`,
+      `Téléphone : ${phone}`,
+    ]
+    if (msg) parts.push('', 'Message :', msg)
+    parts.push('', 'Merci de me confirmer la disponibilité.')
+    return parts.join('\n')
+  }
+
+  const parts = [
+    'Hello,',
+    '',
+    'I would like to request:',
+    `Service: ${label}`,
+    '',
+    `Name: ${name}`,
+    `Phone: ${phone}`,
+  ]
+  if (msg) parts.push('', 'Message:', msg)
+  parts.push('', 'Please confirm availability.')
+  return parts.join('\n')
+}
+
 export async function POST(req: NextRequest) {
-  // Guard: numéro WhatsApp obligatoire côté serveur
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
   if (!waNumber) {
     console.error('[api/lead] NEXT_PUBLIC_WHATSAPP_NUMBER non configuré')
     return NextResponse.json({ error: 'Service temporairement indisponible' }, { status: 503 })
   }
 
-  // Parse body
   let body: Record<string, unknown>
   try {
     body = await req.json()
@@ -40,7 +76,6 @@ export async function POST(req: NextRequest) {
 
   const { name, phone, service, message, language = 'fr' } = body
 
-  // Validation
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
     return NextResponse.json({ error: 'name est requis (min 2 caractères)' }, { status: 400 })
   }
@@ -65,13 +100,15 @@ export async function POST(req: NextRequest) {
 
   const lang = language as Language
   const svc  = service  as Service
+  const cleanName    = (name as string).trim()
+  const cleanPhone   = (phone as string).trim()
+  const cleanMessage = typeof message === 'string' ? message.trim() || null : null
 
-  // Insert lead — service_role bypasse RLS, lecture bloquée pour anon
   const { error } = await supabaseAdmin.from('leads').insert({
-    name:     name.trim(),
-    phone:    phone.trim(),
+    name:     cleanName,
+    phone:    cleanPhone,
     service:  svc,
-    message:  typeof message === 'string' ? message.trim() || null : null,
+    message:  cleanMessage,
     language: lang,
     source:   'website',
   })
@@ -81,7 +118,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Erreur lors de la sauvegarde' }, { status: 500 })
   }
 
-  const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(WA_MESSAGES[lang][svc])}`
+  const waText     = buildWhatsAppMessage(lang, svc, cleanName, cleanPhone, cleanMessage)
+  const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`
 
   return NextResponse.json({ success: true, whatsappUrl })
 }

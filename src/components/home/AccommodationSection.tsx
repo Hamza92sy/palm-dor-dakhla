@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import SectionLabel from '@/components/ui/SectionLabel'
-import { WHATSAPP_URL } from '@/lib/config'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const rooms = [
   {
@@ -90,17 +90,12 @@ export default function AccommodationSection() {
 
         {/* CTA */}
         <div className="flex justify-center">
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
+          <WhatsAppButton className="group flex items-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
               text-[11px] tracking-[0.14em] uppercase font-medium
-              px-7 py-3.5 rounded-full transition-all duration-300"
-          >
+              px-7 py-3.5 rounded-full transition-all duration-300">
             <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
             Demander une disponibilité
-          </a>
+          </WhatsAppButton>
         </div>
       </div>
     </section>

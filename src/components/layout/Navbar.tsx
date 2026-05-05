@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { WHATSAPP_URL } from '@/lib/config'
+import { trackWhatsApp } from '@/lib/tracking'
 
 const navLinks = [
+  { label: 'Hébergements', href: '/hebergements' },
   { label: 'Restaurant', href: '/restaurant' },
   { label: 'Café', href: '/cafe' },
-  { label: 'Hébergements', href: '/hebergements' },
+  { label: 'Location', href: '/location-voiture' },
   { label: 'Galerie', href: '/galerie' },
   { label: 'Contact', href: '/contact' },
 ]
@@ -83,6 +85,7 @@ export default function Navbar() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={trackWhatsApp}
               className="group flex items-center gap-2 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-5 py-2.5 rounded-full transition-all duration-300"
@@ -99,6 +102,7 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Réserver via WhatsApp"
+              onClick={trackWhatsApp}
               className="flex items-center justify-center w-9 h-9 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white rounded-full transition-all duration-300"
             >
               <WhatsAppIcon className="w-4 h-4" />
@@ -159,6 +163,7 @@ export default function Navbar() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={trackWhatsApp}
                 className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1DAF57] text-white
                   text-[11px] tracking-[0.12em] uppercase font-medium
                   px-5 py-2.5 rounded-full transition-colors duration-300"
