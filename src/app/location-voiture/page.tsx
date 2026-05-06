@@ -17,14 +17,10 @@ export default function LocationVoiturePage() {
         'Process simple, sans paperasse excessive',
         'Disponible rapidement sur demande',
       ]}
-      images={[
-        {
-          src: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1920&q=80',
-          alt: 'Location de voiture à Dakhla',
-        },
-      ]}
+      images={[]}
       service="car_rental"
       ctaLabel="Demander disponibilité"
+      heroNotice="Photos des véhicules disponibles prochainement"
     />
   )
 }

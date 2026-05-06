@@ -11,6 +11,7 @@ export interface ServicePageConfig {
   images: Array<{ src: string; alt: string }>
   service: ServiceType
   ctaLabel: string
+  heroNotice?: string
   menuSection?: ReactNode
 }
 
@@ -30,7 +31,16 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-export default function ServicePage({ title, subtitle, points, images, service, ctaLabel, menuSection }: ServicePageConfig) {
+export default function ServicePage({
+  title,
+  subtitle,
+  points,
+  images,
+  service,
+  ctaLabel,
+  heroNotice,
+  menuSection,
+}: ServicePageConfig) {
   const waUrl = getServiceWhatsAppUrl(service)
   const heroImage = images[0]
 
@@ -52,7 +62,11 @@ export default function ServicePage({ title, subtitle, points, images, service, 
             <div className="absolute inset-0 bg-palm-blue/60" />
           </>
         ) : (
-          <div className="absolute inset-0 bg-palm-blue" />
+          <>
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(28,58,40,0.96)_0%,rgba(28,58,40,0.9)_52%,rgba(237,229,213,0.24)_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(248,245,236,0.14),transparent_42%)]" />
+            <div className="absolute inset-0 bg-palm-blue/35" />
+          </>
         )}
 
         <div className="relative z-10 flex flex-col items-center text-center text-white px-5 gap-5 max-w-3xl">
@@ -66,6 +80,13 @@ export default function ServicePage({ title, subtitle, points, images, service, 
           <p className="text-[10px] md:text-xs tracking-[0.25em] uppercase text-white/55 max-w-[40ch]">
             {subtitle}
           </p>
+          {heroNotice && (
+            <div className="mt-1 rounded-full border border-white/15 bg-white/8 px-4 py-2 backdrop-blur-sm">
+              <p className="text-[10px] tracking-[0.14em] uppercase text-white/70">
+                {heroNotice}
+              </p>
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
             <WhatsAppButton
               href={waUrl}
