@@ -8,7 +8,7 @@
 - [x] Redirection WhatsApp avec messages dynamiques par service
 - [x] Structure tracking Meta Pixel + GA4
 - [x] Design premium mobile-first
-- [x] 5 appartements réels avec prix sur `/hebergements`
+- [x] 6 appartements réels, 3 configurations sur `/hebergements`
 - [x] Documentation projet (AGENTS.md, CLAUDE.md, docs/)
 
 ## V1.1 — Contenu réel (en cours)
@@ -29,12 +29,32 @@
 - [ ] Schema.org (LocalBusiness, LodgingBusiness)
 - [ ] Optimisation Core Web Vitals (images WebP, lazy load)
 
-## V2 — Gestion des leads (3–6 mois)
+## V2 — Gestion des réservations (3–6 mois)
 
-- [ ] Dashboard admin simple (lecture des leads Supabase)
-- [ ] Filtres par service / statut
-- [ ] Export CSV des leads
+Objectif : remplacer progressivement le fichier Excel manuel par un système simple dans Supabase.
+
+### Table `reservations` (à créer)
+
+Champs :
+
+- `id` — uuid
+- `apartment_type` — standard | 2-chambres | grande-capacite
+- `status` — pending | confirmed | cancelled | completed
+- `check_in` — date
+- `check_out` — date
+- `guest_name` — text
+- `guest_phone` — text
+- `source` — whatsapp | form | direct
+- `notes` — text (interne)
+- `created_at` — timestamp
+
+### Fonctionnalités
+
+- [ ] Dashboard admin simple (lecture Supabase — leads + réservations)
+- [ ] Filtres par appartement / statut / date
+- [ ] Export CSV/Excel des réservations
 - [ ] Notification email/WhatsApp sur nouveau lead
+- [ ] Import Excel ponctuel si nécessaire (migration données existantes)
 
 ## V3 — Automatisation (6–12 mois)
 

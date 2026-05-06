@@ -25,7 +25,7 @@ const rooms = [
 ]
 
 const amenities = [
-  { icon: '✦', label: 'Appartements complets' },
+  { icon: '✦', label: '6 appartements disponibles' },
   { icon: '✦', label: 'Cuisine équipée' },
   { icon: '✦', label: 'Dès 500 DH / nuit' },
   { icon: '✦', label: 'Réservation WhatsApp' },

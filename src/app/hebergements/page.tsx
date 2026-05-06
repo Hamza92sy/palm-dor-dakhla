@@ -7,52 +7,39 @@ import { getServiceWhatsAppUrl } from '@/lib/services'
 
 export const metadata: Metadata = {
   title: "Appartements à Dakhla — Palm d'Or",
-  description: "5 appartements entièrement équipés à Dakhla. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réponse rapide via WhatsApp.",
+  description: "6 appartements à Dakhla, 3 configurations. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réponse rapide via WhatsApp.",
   alternates: {
     canonical: '/hebergements',
   },
 }
 
-const apartments = [
+const APARTMENT_TYPES = [
   {
-    id: 1,
+    id: 'standard',
     name: 'Appartement Standard',
-    floor: '2e étage',
+    count: '1 appartement',
     price: 500,
+    capacity: 'Idéal 2 personnes',
     bedrooms: ['1 chambre avec grand lit'],
-    waMessage: "Bonjour, je suis intéressé(e) par l'Appartement Standard (500 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
+    waMessage: "Bonjour, je suis intéressé(e) par un Appartement Standard (500 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
   },
   {
-    id: 2,
+    id: '2-chambres',
     name: 'Appartement 2 chambres',
-    floor: '2e étage',
+    count: '3 appartements',
     price: 650,
-    bedrooms: ['1 chambre avec grand lit double', '1 chambre avec 2 lits simples'],
-    waMessage: "Bonjour, je suis intéressé(e) par l'Appartement 2 chambres au 2e étage (650 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
+    capacity: "Jusqu'à 4 personnes",
+    bedrooms: ['1 chambre avec grand lit', '1 chambre avec 2 lits simples'],
+    waMessage: "Bonjour, je suis intéressé(e) par un Appartement 2 chambres (650 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
   },
   {
-    id: 3,
-    name: 'Appartement Grande capacité',
-    floor: '3e étage',
+    id: 'grande-capacite',
+    name: 'Appartement grande capacité',
+    count: '2 appartements',
     price: 750,
-    bedrooms: ['1 chambre avec grand lit double', '1 chambre avec 3 lits séparés'],
-    waMessage: "Bonjour, je suis intéressé(e) par l'Appartement Grande capacité au 3e étage (750 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
-  },
-  {
-    id: 4,
-    name: 'Appartement 2 chambres',
-    floor: '4e étage',
-    price: 650,
-    bedrooms: ['1 chambre avec lit king-size', '1 chambre avec 2 lits simples'],
-    waMessage: "Bonjour, je suis intéressé(e) par l'Appartement 2 chambres au 4e étage (650 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
-  },
-  {
-    id: 5,
-    name: 'Appartement Grande capacité',
-    floor: '4e étage',
-    price: 750,
-    bedrooms: ['1 chambre avec grand lit double', '1 chambre avec 3 lits séparés'],
-    waMessage: "Bonjour, je suis intéressé(e) par l'Appartement Grande capacité au 4e étage (750 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
+    capacity: "Jusqu'à 5 personnes",
+    bedrooms: ['1 chambre avec grand lit', '1 chambre avec 3 lits séparés'],
+    waMessage: "Bonjour, je suis intéressé(e) par un Appartement grande capacité (750 DH/nuit) à Palm d'Or Dakhla. Pouvez-vous confirmer la disponibilité ?",
   },
 ]
 
@@ -104,7 +91,7 @@ export default function HebergementsPage() {
           </h1>
           <div className="w-10 h-px bg-palm-gold opacity-80" />
           <p className="text-[10px] md:text-xs tracking-[0.25em] uppercase text-white/55 max-w-[40ch]">
-            5 appartements complets · Idéal couples, familles et groupes
+            6 appartements · 3 configurations · Dès 500 DH / nuit
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
             <WhatsAppButton
@@ -133,10 +120,10 @@ export default function HebergementsPage() {
         <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              'Appartements entièrement équipés — salon, cuisine, salle à manger, salle de bain',
-              'Idéal pour couples, familles et groupes jusqu\'à 5 personnes',
-              'Réservation simple et rapide via WhatsApp',
-              'Disponible selon vos dates — réponse rapide garantie',
+              "Appartements entièrement équipés — salon, cuisine, salle à manger, salle de bain",
+              "Idéal pour couples, familles et groupes jusqu'à 5 personnes",
+              "Réservation simple et rapide via WhatsApp",
+              "Disponible selon vos dates — réponse rapide garantie",
             ].map((point) => (
               <div key={point} className="flex items-start gap-3">
                 <CheckIcon />
@@ -166,15 +153,15 @@ export default function HebergementsPage() {
           <div className="flex flex-col items-center text-center gap-3 mb-12">
             <SectionLabel>Nos appartements</SectionLabel>
             <h2 className="font-display font-light italic text-3xl md:text-4xl text-palm-blue">
-              5 appartements, 3 configurations
+              6 appartements, 3 configurations
             </h2>
             <p className="text-[10px] tracking-[0.2em] uppercase text-palm-blue/40">
               De 500 à 750 DH · La nuit
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {apartments.map((apt) => {
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {APARTMENT_TYPES.map((apt) => {
               const waUrl = getApartmentWAUrl(apt.waMessage)
               return (
                 <div
@@ -184,8 +171,8 @@ export default function HebergementsPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-[9px] tracking-[0.3em] uppercase text-palm-blue/40 mb-1">
-                        {apt.floor}
+                      <p className="text-[9px] tracking-[0.2em] uppercase text-palm-blue/30 mb-1">
+                        {apt.count}
                       </p>
                       <h3 className="font-display font-light italic text-xl md:text-2xl text-palm-blue leading-tight">
                         {apt.name}
@@ -212,6 +199,11 @@ export default function HebergementsPage() {
                   {/* Espaces communs */}
                   <p className="text-[10px] tracking-[0.12em] text-palm-blue/40 uppercase">
                     Salon · Salle à manger · Cuisine · Salle de bain
+                  </p>
+
+                  {/* Capacité */}
+                  <p className="text-[10px] tracking-[0.1em] text-palm-blue/35">
+                    {apt.capacity}
                   </p>
 
                   {/* CTA */}
