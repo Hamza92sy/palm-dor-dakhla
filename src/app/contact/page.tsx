@@ -15,7 +15,7 @@ import {
 } from '@/lib/config'
 
 export const metadata: Metadata = {
-  title: "Contact Palm d'Or Dakhla",
+  title: "Contact — Palm d'Or Dakhla",
   description:
     "Contactez Palm d'Or Dakhla, AV Al Walaa, Dakhla 73000. Résidence, restaurant, café et location de voiture. Réponse rapide via WhatsApp.",
   keywords: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     canonical: '/contact',
   },
   openGraph: {
-    title: "Contact Palm d'Or Dakhla",
+    title: "Contact — Palm d'Or Dakhla",
     description:
       "Adresse Palm d'Or Dakhla sur AV Al Walaa, Dakhla 73000. Contact rapide via WhatsApp pour la résidence, le restaurant et le café.",
     url: '/contact',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Contact Palm d'Or Dakhla",
+    title: "Contact — Palm d'Or Dakhla",
     description:
       "Adresse Palm d'Or Dakhla sur AV Al Walaa, Dakhla 73000. Contact rapide via WhatsApp.",
     images: ['/og-image.jpg'],

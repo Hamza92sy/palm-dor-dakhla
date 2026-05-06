@@ -1,3 +1,5 @@
+import { MENU_PDF_URL } from '@/lib/config'
+
 const dishes = [
   {
     name: "Salade Palm d'Or",
@@ -68,7 +70,7 @@ export default function MenuSection() {
         {/* CTA */}
         <div className="flex justify-center mt-10">
           <a
-            href="/assets/menu-palm-dor.pdf"
+            href={MENU_PDF_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue

@@ -6,8 +6,11 @@ import SectionLabel from '@/components/ui/SectionLabel'
 import { getServiceWhatsAppUrl } from '@/lib/services'
 
 export const metadata: Metadata = {
-  title: "Appartements à Dakhla | Palm d'Or",
+  title: "Appartements à Dakhla — Palm d'Or",
   description: "5 appartements entièrement équipés à Dakhla. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réponse rapide via WhatsApp.",
+  alternates: {
+    canonical: '/hebergements',
+  },
 }
 
 const apartments = [

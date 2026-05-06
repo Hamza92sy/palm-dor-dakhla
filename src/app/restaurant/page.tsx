@@ -3,8 +3,11 @@ import ServicePage from '@/components/service/ServicePage'
 import MenuSection from '@/components/restaurant/MenuSection'
 
 export const metadata: Metadata = {
-  title: "Restaurant à Dakhla | Palm d'Or",
+  title: "Restaurant à Dakhla — Palm d'Or",
   description: "Cuisine savoureuse dans une ambiance conviviale à Dakhla. Spécialités locales et internationales, produits frais, service rapide. Réservez votre table via WhatsApp.",
+  alternates: {
+    canonical: '/restaurant',
+  },
 }
 
 export default function RestaurantPage() {

@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import ServicePage from '@/components/service/ServicePage'
 
 export const metadata: Metadata = {
-  title: "Café & Petit-Déjeuner à Dakhla | Palm d'Or",
+  title: "Café & Petit-Déjeuner à Dakhla — Palm d'Or",
   description: "Commencez votre journée avec un café et un petit-déjeuner complet à Dakhla. Produits frais, ambiance calme, service rapide. Palm d'Or Café.",
+  alternates: {
+    canonical: '/cafe',
+  },
 }
 
 export default function CafePage() {

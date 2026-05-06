@@ -111,6 +111,8 @@ const localBusinessSchema = {
   knowsLanguage: ['fr', 'ar'],
   keywords: 'Dakhla, AV Al Walaa, résidence, restaurant, café',
   sameAs: [INSTAGRAM_URL],
+  priceRange: 'DH 500–750',
+  image: `${SITE_URL}/og-image.jpg`,
 }
 
 export default function RootLayout({

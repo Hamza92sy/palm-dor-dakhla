@@ -5,9 +5,12 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import { GALLERY_IMAGES } from '@/lib/gallery'
 
 export const metadata: Metadata = {
-  title: "Galerie Palm d'Or Dakhla",
+  title: "Galerie — Palm d'Or Dakhla",
   description:
     "Découvrez une première sélection de photos réelles Palm d'Or Dakhla : hébergements, chambres et petit-déjeuner.",
+  alternates: {
+    canonical: '/galerie',
+  },
 }
 
 const SERVICE_LABELS = {

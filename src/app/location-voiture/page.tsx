@@ -2,8 +2,11 @@ import type { Metadata } from 'next'
 import ServicePage from '@/components/service/ServicePage'
 
 export const metadata: Metadata = {
-  title: "Location de voitures à Dakhla | Palm d'Or",
+  title: "Location de voitures à Dakhla — Palm d'Or",
   description: "Louez une voiture propre et fiable à Dakhla. Location à la journée ou à la semaine. Process simple, disponible rapidement. Contactez Palm d'Or via WhatsApp.",
+  alternates: {
+    canonical: '/location-voiture',
+  },
 }
 
 export default function LocationVoiturePage() {
