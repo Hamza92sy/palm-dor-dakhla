@@ -86,7 +86,7 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackWhatsApp}
-              className="group flex items-center gap-2 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
+              className="group flex items-center gap-2 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-5 py-2.5 rounded-full transition-all duration-300"
             >

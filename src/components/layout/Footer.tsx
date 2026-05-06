@@ -16,7 +16,7 @@ export default function Footer() {
   return (
     <footer className="bg-palm-blue text-white">
       {/* Gold accent line */}
-      <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/60 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/70 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-16 md:py-24">
 
@@ -71,7 +71,7 @@ export default function Footer() {
                 </a>
               )}
             </div>
-            <WhatsAppButton className="group flex items-center gap-2.5 border border-[#25D366]/70 text-[#6ee89d] hover:bg-[#25D366] hover:border-[#25D366] hover:text-white
+            <WhatsAppButton className="group flex items-center gap-2.5 border border-palm-gold/50 text-palm-gold-muted hover:bg-palm-gold hover:border-palm-gold hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-5 py-3 rounded-full transition-all duration-300 w-fit mt-1">
               <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />

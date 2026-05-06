@@ -87,7 +87,7 @@ export default function ServicePage({ title, subtitle, points, images, service, 
       </section>
 
       {/* ── Benefits ─────────────────────────────────────────────────── */}
-      <section className="bg-palm-cream py-16 md:py-24">
+      <section className="bg-palm-cream py-16 md:py-24 border-t border-palm-gold/20">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {points.map((point) => (
@@ -102,7 +102,7 @@ export default function ServicePage({ title, subtitle, points, images, service, 
           <div className="flex justify-center mt-12">
             <WhatsAppButton
               href={waUrl}
-              className="group flex items-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
+              className="group flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-7 py-3.5 rounded-full transition-all duration-300"
             >
@@ -134,7 +134,7 @@ export default function ServicePage({ title, subtitle, points, images, service, 
 
       {/* ── CTA band ─────────────────────────────────────────────────── */}
       <section className="bg-palm-blue py-16 md:py-20">
-        <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/40 to-transparent mb-16" />
+        <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/50 to-transparent mb-16" />
         <div className="max-w-xl mx-auto px-5 flex flex-col items-center text-center gap-5">
           <h2 className="font-display font-light italic text-3xl md:text-4xl text-white">
             Prêt à réserver ?
@@ -159,6 +159,7 @@ export default function ServicePage({ title, subtitle, points, images, service, 
             ou envoyez un message ↓
           </a>
         </div>
+        <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/50 to-transparent mt-16" />
       </section>
 
       {/* ── Contact form ──────────────────────────────────────────────── */}

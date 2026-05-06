@@ -12,12 +12,12 @@
   --font-display: var(--font-cormorant);
 
   /* Brand palette */
-  --color-palm-blue:       #18364F;
-  --color-palm-blue-light: #264E6E;
+  --color-palm-blue:       #1C3A28;
+  --color-palm-blue-light: #2B4E38;
   --color-palm-gold:       #B8922E;
   --color-palm-gold-muted: #D4B880;
-  --color-palm-cream:      #F8F4ED;
-  --color-palm-cream-dark: #EBE3D4;
+  --color-palm-cream:      #F8F5EC;
+  --color-palm-cream-dark: #EDE5D5;
 }
 
 body {
