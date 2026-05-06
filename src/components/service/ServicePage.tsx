@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import Image from 'next/image'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import ServiceContactForm from '@/components/service/ServiceContactForm'
@@ -10,6 +11,7 @@ export interface ServicePageConfig {
   images: Array<{ src: string; alt: string }>
   service: ServiceType
   ctaLabel: string
+  menuSection?: ReactNode
 }
 
 function CheckIcon() {
@@ -28,7 +30,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-export default function ServicePage({ title, subtitle, points, images, service, ctaLabel }: ServicePageConfig) {
+export default function ServicePage({ title, subtitle, points, images, service, ctaLabel, menuSection }: ServicePageConfig) {
   const waUrl = getServiceWhatsAppUrl(service)
   const heroImage = images[0]
 
@@ -112,6 +114,9 @@ export default function ServicePage({ title, subtitle, points, images, service, 
           </div>
         </div>
       </section>
+
+      {/* ── Menu section (optionnel) ─────────────────────────────────── */}
+      {menuSection}
 
       {/* ── Gallery (si 2+ images) ───────────────────────────────────── */}
       {images.length >= 2 && (

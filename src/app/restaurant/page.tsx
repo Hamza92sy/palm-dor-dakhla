@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ServicePage from '@/components/service/ServicePage'
+import MenuSection from '@/components/restaurant/MenuSection'
 
 export const metadata: Metadata = {
   title: "Restaurant à Dakhla | Palm d'Or",
@@ -29,6 +30,7 @@ export default function RestaurantPage() {
       ]}
       service="restaurant"
       ctaLabel="Réserver une table"
+      menuSection={<MenuSection />}
     />
   )
 }
