@@ -7,20 +7,20 @@ const rooms = [
   {
     type: 'Appartement Standard',
     detail: '1 chambre · à partir de 500 DH / nuit',
-    image: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=900&q=80',
-    alt: 'Appartement standard Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (201).jpg',
+    alt: 'Chambre d\'un appartement standard Palm d\'Or Dakhla',
   },
   {
     type: 'Appartement 2 chambres',
     detail: '2 chambres · à partir de 650 DH / nuit',
-    image: 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=900&q=80',
-    alt: 'Appartement 2 chambres Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (200).jpg',
+    alt: 'Chambre principale d\'un appartement 2 chambres Palm d\'Or Dakhla',
   },
   {
     type: 'Grande capacité',
     detail: '2 chambres · à partir de 750 DH / nuit',
-    image: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=900&q=80',
-    alt: 'Appartement grande capacité Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (206).jpg',
+    alt: 'Chambre d\'un appartement grande capacité Palm d\'Or Dakhla',
   },
 ]
 

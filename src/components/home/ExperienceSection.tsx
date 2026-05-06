@@ -14,15 +14,15 @@ const experiences = [
     label: 'Café',
     tagline: 'Un espace de douceur et de saveurs',
     href: '/cafe',
-    image: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    alt: 'Café Palm d\'Or',
+    image: '/assets/photos-client/de (136).jpg',
+    alt: 'Petit-déjeuner servi au Café Palm d\'Or Dakhla',
   },
   {
     label: 'Hébergements',
     tagline: 'Appartements complets pour tous vos séjours',
     href: '/hebergements',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80',
-    alt: 'Appartement Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (175).jpg',
+    alt: 'Salon principal d\'un appartement Palm d\'Or Dakhla',
   },
 ]
 

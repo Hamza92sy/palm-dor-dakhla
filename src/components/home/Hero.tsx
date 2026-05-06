@@ -17,8 +17,8 @@ export default function Hero() {
 
       {/* Background image */}
       <Image
-        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1920&q=85"
-        alt="Résidence Palm d'Or Dakhla"
+        src="/assets/photos-client/de (175).jpg"
+        alt="Salon principal d'un appartement Palm d'Or Dakhla"
         fill
         priority
         className="object-cover object-center"

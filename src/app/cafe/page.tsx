@@ -19,8 +19,12 @@ export default function CafePage() {
       ]}
       images={[
         {
-          src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1920&q=80',
-          alt: 'Café Palm d\'Or Dakhla',
+          src: '/assets/photos-client/de (136).jpg',
+          alt: 'Petit-déjeuner servi au Café Palm d\'Or Dakhla',
+        },
+        {
+          src: '/assets/photos-client/de (130).jpg',
+          alt: 'Deuxième vue du petit-déjeuner au Café Palm d\'Or Dakhla',
         },
       ]}
       service="cafe"

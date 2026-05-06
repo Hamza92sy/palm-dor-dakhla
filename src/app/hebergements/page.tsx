@@ -83,8 +83,8 @@ export default function HebergementsPage() {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center min-h-[70vh] overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1920&q=80"
-          alt="Appartements Palm d'Or Dakhla"
+          src="/assets/photos-client/de (175).jpg"
+          alt="Salon principal d'un appartement Palm d'Or Dakhla"
           fill
           priority
           className="object-cover object-center"

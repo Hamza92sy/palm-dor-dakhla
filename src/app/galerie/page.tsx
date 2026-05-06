@@ -7,7 +7,7 @@ import { GALLERY_IMAGES } from '@/lib/gallery'
 export const metadata: Metadata = {
   title: "Galerie Palm d'Or Dakhla",
   description:
-    "Découvrez l'ambiance Palm d'Or Dakhla à travers une galerie simple et mobile-first. Hébergements, restaurant, café et location de voiture.",
+    "Découvrez une première sélection de photos réelles Palm d'Or Dakhla : hébergements, chambres et petit-déjeuner.",
 }
 
 const SERVICE_LABELS = {
@@ -36,8 +36,8 @@ export default function GaleriePage() {
               L&apos;ambiance Palm d&apos;Or Dakhla
             </h1>
             <p className="text-sm md:text-base text-palm-blue/70 leading-8 max-w-[58ch]">
-              Cette galerie utilise temporairement les visuels déjà présents dans le projet. La
-              structure est prête à accueillir les vraies photos client sans changer la page.
+              Cette galerie présente une première sélection de photos réelles déjà intégrées. La
+              structure reste prête à accueillir les prochains visuels client sans changer la page.
             </p>
           </div>
 
