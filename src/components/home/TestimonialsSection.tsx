@@ -1,23 +1,26 @@
 import SectionLabel from '@/components/ui/SectionLabel'
 
+const GOOGLE_RATING = 4.2
+const GOOGLE_REVIEW_COUNT = 87
+
 const reviews = [
   {
     stars: 5,
-    text: 'Très bon restaurant avec une excellente ambiance. Service au top. Je recommande vivement.',
-    author: 'Client Google',
-    date: 'Il y a 1 semaine',
+    text: 'À remplacer — coller ici le texte du 1er avis Google.',
+    author: 'Prénom Nom',
+    date: 'Date de l\'avis',
+  },
+  {
+    stars: 5,
+    text: 'À remplacer — coller ici le texte du 2e avis Google.',
+    author: 'Prénom Nom',
+    date: 'Date de l\'avis',
   },
   {
     stars: 4,
-    text: 'Appartement propre, bien situé et très confortable. Accueil chaleureux, on se sent bien.',
-    author: 'Client',
-    date: 'Il y a 2 semaines',
-  },
-  {
-    stars: 4,
-    text: 'Très bon accueil et cuisine délicieuse. Cadre agréable face à la lagune. Je recommande.',
-    author: 'Client Google',
-    date: 'Il y a 3 semaines',
+    text: 'À remplacer — coller ici le texte du 3e avis Google.',
+    author: 'Prénom Nom',
+    date: 'Date de l\'avis',
   },
 ]
 
@@ -59,8 +62,8 @@ export default function TestimonialsSection() {
             <GoogleIcon />
             <div className="flex items-center gap-1.5">
               <span className="text-palm-gold">★</span>
-              <span className="text-sm font-medium text-palm-blue">4.2</span>
-              <span className="text-[11px] text-palm-blue/45">&middot; 87 avis Google</span>
+              <span className="text-sm font-medium text-palm-blue">{GOOGLE_RATING}</span>
+              <span className="text-[11px] text-palm-blue/45">&middot; {GOOGLE_REVIEW_COUNT} avis Google</span>
             </div>
           </div>
         </div>

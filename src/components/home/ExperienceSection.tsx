@@ -19,10 +19,10 @@ const experiences = [
   },
   {
     label: 'Hébergements',
-    tagline: 'Suites & chambres avec vue sur la lagune',
+    tagline: 'Appartements complets pour tous vos séjours',
     href: '/hebergements',
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80',
-    alt: 'Hébergements Palm d\'Or',
+    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80',
+    alt: 'Appartement Palm d\'Or Dakhla',
   },
 ]
 
