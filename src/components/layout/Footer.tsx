@@ -1,5 +1,12 @@
 import Link from 'next/link'
-import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY } from '@/lib/config'
+import {
+  BUSINESS_ADDRESS_LINE_1,
+  BUSINESS_ADDRESS_LINE_2,
+  BUSINESS_COUNTRY,
+  GOOGLE_MAPS_URL,
+  WHATSAPP_NUMBER,
+  WHATSAPP_PHONE_DISPLAY,
+} from '@/lib/config'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const navLinks = [
@@ -61,7 +68,18 @@ export default function Footer() {
               Contact
             </p>
             <div className="flex flex-col gap-2 text-sm text-white/45">
-              <span>Dakhla, Maroc</span>
+              <a
+                href={GOOGLE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors duration-200 w-fit leading-7"
+              >
+                {BUSINESS_ADDRESS_LINE_1}
+                <br />
+                {BUSINESS_ADDRESS_LINE_2}
+                <br />
+                {BUSINESS_COUNTRY}
+              </a>
               {WHATSAPP_PHONE_DISPLAY && (
                 <a
                   href={telHref}

@@ -1,36 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import SectionLabel from '@/components/ui/SectionLabel'
-
-const images = [
-  {
-    src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=600&q=75',
-    alt: 'Salle du restaurant',
-    span: 'md:col-span-2 md:row-span-2',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=75',
-    alt: 'Salon appartement Palm d\'Or Dakhla',
-    span: '',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=75',
-    alt: 'Chambre Palm d\'Or Dakhla',
-    span: '',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=75',
-    alt: 'Café Palm d\'Or',
-    span: '',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=600&q=75',
-    alt: 'Appartement Palm d\'Or Dakhla',
-    span: '',
-  },
-]
+import { GALLERY_IMAGES } from '@/lib/gallery'
 
 export default function GallerySection() {
+  const images = GALLERY_IMAGES.slice(0, 5).map((image, index) => ({
+    src: image.src,
+    alt: image.alt,
+    span: index === 0 ? 'md:col-span-2 md:row-span-2' : '',
+  }))
+
   return (
     <section className="bg-palm-cream py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
