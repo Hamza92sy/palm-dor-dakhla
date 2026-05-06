@@ -1,33 +1,45 @@
 # Roadmap — Palm d'Or Dakhla
 
-## V1 — Site vitrine (livré)
+Dernière mise à jour : 2026-05-06
 
-- [x] Homepage optimisée conversion
+## V1 — Site vitrine ✅ Livré
+
+- [x] Homepage optimisée conversion (7 sections)
 - [x] Pages services : hébergements, restaurant, café, location voiture
 - [x] Formulaire leads → Supabase
 - [x] Redirection WhatsApp avec messages dynamiques par service
 - [x] Structure tracking Meta Pixel + GA4
 - [x] Design premium mobile-first
 - [x] 6 appartements réels, 3 configurations sur `/hebergements`
+- [x] Page `/galerie` avec photos client
+- [x] Page `/contact` avec carte Google Maps
 - [x] Documentation projet (AGENTS.md, CLAUDE.md, docs/)
 
 ## V1.1 — Contenu réel (en cours)
 
-- [ ] Remplacer toutes les images Unsplash par photos client
+- [x] Premières photos client intégrées (6 photos hébergement + café)
+- [x] Cross-links inter-services sur toutes les pages
+- [x] SEO local : titles, meta, OpenGraph, schema.org LodgingBusiness
+- [x] `sitemap.xml` et `robots.txt`
+- [x] Suppression PDF 85MB, CTA menu → WhatsApp
+- [ ] **Remplacer Unsplash restaurant** (ExperienceSection + /restaurant — 3 images)
+- [ ] **Photo façade/extérieur résidence** (hero homepage idéal + Google Business)
+- [ ] **Photo grand lit** (manquante pour Appartement Standard)
+- [ ] **Photo salle restaurant + plat signature**
+- [ ] **Photos véhicules** (location voiture)
+- [ ] Témoignages clients — confirmer note Google (5★ · 180+ affiché, à vérifier)
 - [ ] Activer Meta Pixel (ajouter ID dans `.env.local`)
 - [ ] Activer GA4 (ajouter ID dans `.env.local`)
-- [ ] Ajouter menu restaurant
-- [ ] Témoignages clients réels (remplacer placeholders)
-- [ ] Corriger les 404 nav (galerie, contact, /en)
 - [ ] Compléter fiche Google Business
 
 ## V1.2 — SEO et acquisition
 
-- [ ] Page `/galerie` avec toutes les photos
-- [ ] Page `/contact` avec carte Google Maps
-- [ ] `sitemap.xml` et `robots.txt`
-- [ ] Schema.org (LocalBusiness, LodgingBusiness)
-- [ ] Optimisation Core Web Vitals (images WebP, lazy load)
+- [x] Schema.org (LodgingBusiness + FoodEstablishment)
+- [x] OpenGraph sur toutes les pages
+- [ ] Optimisation Core Web Vitals (photos source en WebP/AVIF)
+- [ ] Google Business : minimum 7 photos, catégories, horaires
+- [ ] Backlinks locaux (annuaires Dakhla, guides voyage)
+- [ ] Vérification Google Search Console
 
 ## V2 — Gestion des réservations (3–6 mois)
 
