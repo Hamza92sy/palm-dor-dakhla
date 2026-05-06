@@ -1,4 +1,4 @@
-import { MENU_PDF_URL } from '@/lib/config'
+import { getServiceWhatsAppUrl } from '@/lib/services'
 
 const dishes = [
   {
@@ -27,6 +27,8 @@ const dishes = [
     price: "70 DH",
   },
 ]
+
+const waUrl = getServiceWhatsAppUrl('restaurant')
 
 export default function MenuSection() {
   return (
@@ -70,7 +72,7 @@ export default function MenuSection() {
         {/* CTA */}
         <div className="flex justify-center mt-10">
           <a
-            href={MENU_PDF_URL}
+            href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue
@@ -78,7 +80,7 @@ export default function MenuSection() {
               text-[11px] tracking-[0.18em] uppercase font-medium
               px-7 py-3.5 rounded-full transition-all duration-300"
           >
-            Voir le menu complet
+            Demander le menu complet
           </a>
         </div>
 

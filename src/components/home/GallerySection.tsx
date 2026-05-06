@@ -34,7 +34,7 @@ export default function GallerySection() {
                 alt={img.alt}
                 fill
                 className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
+                sizes={img.span ? "(max-width: 768px) 50vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
               />
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-palm-blue/0 group-hover:bg-palm-blue/20 transition-colors duration-500" />

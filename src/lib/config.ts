@@ -23,4 +23,3 @@ export const WHATSAPP_URL = WHATSAPP_NUMBER
 export const INSTAGRAM_URL    = 'https://www.instagram.com/palm_dor_dakhla'
 export const INSTAGRAM_HANDLE = '@palm_dor_dakhla'
 
-export const MENU_PDF_URL = '/assets/menu-palm-dor.pdf'
