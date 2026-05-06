@@ -19,3 +19,6 @@ export const WHATSAPP_PHONE_DISPLAY = WHATSAPP_NUMBER.length === 12
 export const WHATSAPP_URL = WHATSAPP_NUMBER
   ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour, je souhaite faire une réservation à Palm d'Or Dakhla.")}`
   : '#'
+
+export const INSTAGRAM_URL    = 'https://www.instagram.com/palm_dor_dakhla'
+export const INSTAGRAM_HANDLE = '@palm_dor_dakhla'

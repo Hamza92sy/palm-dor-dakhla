@@ -11,6 +11,7 @@ import {
   BUSINESS_LATITUDE,
   BUSINESS_LONGITUDE,
   GOOGLE_MAPS_URL,
+  INSTAGRAM_URL,
   SITE_URL,
   WHATSAPP_PHONE_DISPLAY,
 } from '@/lib/config'
@@ -109,6 +110,7 @@ const localBusinessSchema = {
   areaServed: 'Dakhla',
   knowsLanguage: ['fr', 'ar'],
   keywords: 'Dakhla, AV Al Walaa, résidence, restaurant, café',
+  sameAs: [INSTAGRAM_URL],
 }
 
 export default function RootLayout({
