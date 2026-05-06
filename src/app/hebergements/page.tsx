@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import ServiceContactForm from '@/components/service/ServiceContactForm'
 import SectionLabel from '@/components/ui/SectionLabel'
@@ -10,6 +11,21 @@ export const metadata: Metadata = {
   description: "6 appartements à Dakhla, 3 configurations. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réponse rapide via WhatsApp.",
   alternates: {
     canonical: '/hebergements',
+  },
+  openGraph: {
+    title: "Appartements à Dakhla — Palm d'Or",
+    description: "6 appartements à Dakhla, 3 configurations. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes.",
+    url: '/hebergements',
+    siteName: "Palm d'Or Dakhla",
+    locale: 'fr_MA',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: "Appartements Palm d'Or Dakhla" }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Appartements à Dakhla — Palm d'Or",
+    description: "6 appartements à Dakhla, 3 configurations. De 500 à 750 DH la nuit.",
+    images: ['/og-image.jpg'],
   },
 }
 
@@ -249,6 +265,34 @@ export default function HebergementsPage() {
           >
             ou envoyez un message ↓
           </a>
+        </div>
+      </section>
+
+      {/* ── Autres services ──────────────────────────────────────────── */}
+      <section className="bg-palm-cream border-t border-palm-gold/15 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-10 text-center">
+          <p className="text-[10px] tracking-[0.28em] uppercase text-palm-blue/40 mb-6">
+            Découvrez aussi
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { label: 'Restaurant', href: '/restaurant', detail: 'Cuisine locale & internationale' },
+              { label: 'Café', href: '/cafe', detail: 'Petit-déjeuner & boissons' },
+              { label: 'Location voiture', href: '/location-voiture', detail: 'À la journée ou à la semaine' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex flex-col gap-0.5 border border-palm-gold/25 rounded-sm px-5 py-3.5
+                  hover:border-palm-gold/60 hover:bg-palm-cream-dark transition-all duration-200 text-left"
+              >
+                <span className="text-[10px] tracking-[0.18em] uppercase text-palm-gold font-medium">
+                  {link.label}
+                </span>
+                <span className="text-xs text-palm-blue/60">{link.detail}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

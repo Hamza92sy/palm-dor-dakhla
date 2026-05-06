@@ -7,9 +7,24 @@ import { GALLERY_IMAGES } from '@/lib/gallery'
 export const metadata: Metadata = {
   title: "Galerie — Palm d'Or Dakhla",
   description:
-    "Découvrez une première sélection de photos réelles Palm d'Or Dakhla : hébergements, chambres et petit-déjeuner.",
+    "Photos réelles des appartements, chambres et café Palm d'Or Dakhla. Découvrez nos hébergements et services à Dakhla avant de réserver.",
   alternates: {
     canonical: '/galerie',
+  },
+  openGraph: {
+    title: "Galerie Photos — Palm d'Or Dakhla",
+    description: "Photos réelles des appartements, chambres et café Palm d'Or Dakhla.",
+    url: '/galerie',
+    siteName: "Palm d'Or Dakhla",
+    locale: 'fr_MA',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: "Galerie Palm d'Or Dakhla" }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Galerie Photos — Palm d'Or Dakhla",
+    description: "Photos réelles des appartements, chambres et café Palm d'Or Dakhla.",
+    images: ['/og-image.jpg'],
   },
 }
 

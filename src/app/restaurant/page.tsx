@@ -8,6 +8,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/restaurant',
   },
+  openGraph: {
+    title: "Restaurant à Dakhla — Palm d'Or",
+    description: "Cuisine savoureuse à Dakhla. Spécialités locales et internationales, produits frais. Réservation rapide via WhatsApp.",
+    url: '/restaurant',
+    siteName: "Palm d'Or Dakhla",
+    locale: 'fr_MA',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: "Restaurant Palm d'Or Dakhla" }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Restaurant à Dakhla — Palm d'Or",
+    description: "Cuisine savoureuse à Dakhla. Spécialités locales et internationales, produits frais.",
+    images: ['/og-image.jpg'],
+  },
 }
 
 export default function RestaurantPage() {

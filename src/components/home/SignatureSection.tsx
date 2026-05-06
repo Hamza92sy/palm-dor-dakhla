@@ -9,8 +9,8 @@ export default function SignatureSection() {
         {/* Image — left */}
         <div className="relative h-72 md:h-auto">
           <Image
-            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80"
-            alt="Atmosphère Palm d'Or Dakhla"
+            src="/assets/photos-client/de (171).jpg"
+            alt="Salon d'un appartement Palm d'Or Dakhla"
             fill
             className="object-cover object-center"
             sizes="(max-width: 768px) 100vw, 60vw"

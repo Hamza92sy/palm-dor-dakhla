@@ -7,6 +7,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/cafe',
   },
+  openGraph: {
+    title: "Café & Petit-Déjeuner à Dakhla — Palm d'Or",
+    description: "Café et petit-déjeuner complet à Dakhla. Produits frais, ambiance calme. Palm d'Or Café.",
+    url: '/cafe',
+    siteName: "Palm d'Or Dakhla",
+    locale: 'fr_MA',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: "Café Palm d'Or Dakhla" }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Café & Petit-Déjeuner à Dakhla — Palm d'Or",
+    description: "Café et petit-déjeuner complet à Dakhla. Produits frais, ambiance calme.",
+    images: ['/og-image.jpg'],
+  },
 }
 
 export default function CafePage() {

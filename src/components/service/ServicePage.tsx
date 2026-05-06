@@ -1,8 +1,32 @@
 import type { ReactNode } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import ServiceContactForm from '@/components/service/ServiceContactForm'
 import { type ServiceType, getServiceWhatsAppUrl } from '@/lib/services'
+
+const OTHER_SERVICES: Record<ServiceType, { label: string; href: string; detail: string }[]> = {
+  accommodation: [
+    { label: 'Restaurant', href: '/restaurant', detail: 'Cuisine locale & internationale' },
+    { label: 'Café', href: '/cafe', detail: 'Petit-déjeuner & boissons' },
+    { label: 'Location voiture', href: '/location-voiture', detail: 'À la journée ou à la semaine' },
+  ],
+  restaurant: [
+    { label: 'Hébergement', href: '/hebergements', detail: 'Appartements dès 500 DH/nuit' },
+    { label: 'Café', href: '/cafe', detail: 'Petit-déjeuner & boissons' },
+    { label: 'Location voiture', href: '/location-voiture', detail: 'À la journée ou à la semaine' },
+  ],
+  cafe: [
+    { label: 'Hébergement', href: '/hebergements', detail: 'Appartements dès 500 DH/nuit' },
+    { label: 'Restaurant', href: '/restaurant', detail: 'Cuisine locale & internationale' },
+    { label: 'Location voiture', href: '/location-voiture', detail: 'À la journée ou à la semaine' },
+  ],
+  car_rental: [
+    { label: 'Hébergement', href: '/hebergements', detail: 'Appartements dès 500 DH/nuit' },
+    { label: 'Restaurant', href: '/restaurant', detail: 'Cuisine locale & internationale' },
+    { label: 'Café', href: '/cafe', detail: 'Petit-déjeuner & boissons' },
+  ],
+}
 
 export interface ServicePageConfig {
   title: string
@@ -186,6 +210,30 @@ export default function ServicePage({
           </a>
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/50 to-transparent mt-16" />
+      </section>
+
+      {/* ── Autres services ──────────────────────────────────────────── */}
+      <section className="bg-palm-cream border-t border-palm-gold/15 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-10 text-center">
+          <p className="text-[10px] tracking-[0.28em] uppercase text-palm-blue/40 mb-6">
+            Découvrez aussi
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {OTHER_SERVICES[service].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex flex-col gap-0.5 border border-palm-gold/25 rounded-sm px-5 py-3.5
+                  hover:border-palm-gold/60 hover:bg-palm-cream-dark transition-all duration-200 text-left"
+              >
+                <span className="text-[10px] tracking-[0.18em] uppercase text-palm-gold font-medium">
+                  {link.label}
+                </span>
+                <span className="text-xs text-palm-blue/60">{link.detail}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ── Contact form ──────────────────────────────────────────────── */}

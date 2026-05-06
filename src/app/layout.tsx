@@ -88,7 +88,7 @@ const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
 const GA_ID    = process.env.NEXT_PUBLIC_GA_ID
 const localBusinessSchema = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
+  '@type': ['LodgingBusiness', 'FoodEstablishment'],
   name: BUSINESS_FULL_NAME,
   description:
     "Résidence, restaurant et café à Dakhla. Réservation et demandes via WhatsApp.",

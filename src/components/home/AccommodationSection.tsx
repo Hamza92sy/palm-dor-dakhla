@@ -7,20 +7,20 @@ const rooms = [
   {
     type: 'Appartement Standard',
     detail: '1 chambre · à partir de 500 DH / nuit',
-    image: '/assets/photos-client/de (201).jpg',
-    alt: 'Chambre d\'un appartement standard Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (175).jpg',
+    alt: 'Salon d\'un appartement Palm d\'Or Dakhla',
   },
   {
     type: 'Appartement 2 chambres',
     detail: '2 chambres · à partir de 650 DH / nuit',
-    image: '/assets/photos-client/de (200).jpg',
-    alt: 'Chambre principale d\'un appartement 2 chambres Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (199).jpg',
+    alt: 'Chambre avec 2 lits d\'un appartement Palm d\'Or Dakhla',
   },
   {
     type: 'Grande capacité',
     detail: '2 chambres · à partir de 750 DH / nuit',
-    image: '/assets/photos-client/de (206).jpg',
-    alt: 'Chambre d\'un appartement grande capacité Palm d\'Or Dakhla',
+    image: '/assets/photos-client/de (218).jpg',
+    alt: 'Chambre grande capacité d\'un appartement Palm d\'Or Dakhla',
   },
 ]
 
@@ -66,7 +66,7 @@ export default function AccommodationSection() {
                   alt={room.alt}
                   fill
                   className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 {/* Bottom label overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-palm-blue/70 to-transparent">
