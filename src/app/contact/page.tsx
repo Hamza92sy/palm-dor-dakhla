@@ -35,6 +35,21 @@ export const metadata: Metadata = {
     siteName: BUSINESS_FULL_NAME,
     locale: 'fr_MA',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: "Palm d'Or Dakhla — Résidence, Restaurant & Café à Dakhla",
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Contact Palm d'Or Dakhla",
+    description:
+      "Adresse Palm d'Or Dakhla sur AV Al Walaa, Dakhla 73000. Contact rapide via WhatsApp.",
+    images: ['/og-image.jpg'],
   },
 }
 
