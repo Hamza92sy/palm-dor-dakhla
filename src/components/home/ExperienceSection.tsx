@@ -5,7 +5,7 @@ import SectionLabel from '@/components/ui/SectionLabel'
 const experiences = [
   {
     label: 'Restaurant',
-    tagline: 'Cuisine gastronomique face à la lagune',
+    tagline: 'Cuisine savoureuse au cœur de Dakhla',
     href: '/restaurant',
     image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80',
     alt: 'Salle du restaurant Palm d\'Or',

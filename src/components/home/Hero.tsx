@@ -16,8 +16,8 @@ export default function Hero() {
 
       {/* Background image */}
       <Image
-        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=85"
-        alt="La lagune de Dakhla"
+        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1920&q=85"
+        alt="Résidence Palm d'Or Dakhla"
         fill
         priority
         className="object-cover object-center"

@@ -9,7 +9,7 @@ export default function SignatureSection() {
         {/* Image — left */}
         <div className="relative h-72 md:h-auto">
           <Image
-            src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80"
+            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80"
             alt="Atmosphère Palm d'Or Dakhla"
             fill
             className="object-cover object-center"
@@ -25,7 +25,7 @@ export default function SignatureSection() {
             <SectionLabel>Notre philosophie</SectionLabel>
 
             <h2 className="font-display font-light italic text-4xl md:text-5xl text-palm-blue leading-tight">
-              L&apos;art de recevoir, <br />au bord de la lagune
+              L&apos;art de recevoir, <br />au cœur de Dakhla
             </h2>
 
             {/* Gold rule */}

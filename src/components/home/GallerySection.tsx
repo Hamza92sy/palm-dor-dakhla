@@ -9,13 +9,13 @@ const images = [
     span: 'md:col-span-2 md:row-span-2',
   },
   {
-    src: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=75',
-    alt: 'Vue sur la lagune',
+    src: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=75',
+    alt: 'Salon appartement Palm d\'Or Dakhla',
     span: '',
   },
   {
     src: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=75',
-    alt: 'Chambre vue lagune',
+    alt: 'Chambre Palm d\'Or Dakhla',
     span: '',
   },
   {
@@ -24,8 +24,8 @@ const images = [
     span: '',
   },
   {
-    src: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=600&q=75',
-    alt: 'Ambiance dining',
+    src: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=600&q=75',
+    alt: 'Appartement Palm d\'Or Dakhla',
     span: '',
   },
 ]

@@ -22,7 +22,7 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "Palm d'Or Dakhla — Restaurant, Café & Hébergements",
   description:
-    "Palm d'Or Dakhla : restaurant gastronomique, café et hébergements face à la lagune atlantique. Réservez via WhatsApp.",
+    "Palm d'Or Dakhla : restaurant, café et appartements au cœur de Dakhla. Réservez via WhatsApp.",
 }
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID

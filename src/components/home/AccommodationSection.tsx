@@ -48,7 +48,7 @@ export default function AccommodationSection() {
         <div className="flex flex-col items-center text-center gap-3 mb-14">
           <SectionLabel>Hébergements</SectionLabel>
           <h2 className="font-display font-light italic text-4xl md:text-5xl text-palm-blue">
-            Votre résidence face à la lagune
+            Vos appartements au cœur de Dakhla
           </h2>
         </div>
 

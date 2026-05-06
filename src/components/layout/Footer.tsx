@@ -35,7 +35,7 @@ export default function Footer() {
             </Link>
             <p className="text-sm text-white/45 leading-[1.85] max-w-[260px]">
               Restaurant, café & hébergements au cœur de Dakhla.
-              Une expérience unique face à la lagune atlantique.
+              Une expérience chaleureuse au cœur de Dakhla.
             </p>
           </div>
 
