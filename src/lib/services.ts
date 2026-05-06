@@ -8,7 +8,7 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
 }
 
 const WA_MESSAGES: Record<ServiceType, string> = {
-  accommodation: "Bonjour, je souhaite vérifier la disponibilité d'un hébergement à Palm d'Or Dakhla.",
+  accommodation: "Bonjour, je souhaite connaître la disponibilité et les tarifs de vos appartements à Dakhla (Standard 500 DH, 2 chambres 650 DH, grande capacité 750 DH). Quelles dates sont disponibles ?",
   restaurant:    "Bonjour, je souhaite réserver une table au restaurant Palm d'Or Dakhla.",
   cafe:          "Bonjour, je souhaite venir au café Palm d'Or Dakhla.",
   car_rental:    "Bonjour, je souhaite louer une voiture via Palm d'Or Dakhla.",

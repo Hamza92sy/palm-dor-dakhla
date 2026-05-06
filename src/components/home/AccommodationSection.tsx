@@ -5,24 +5,30 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const rooms = [
   {
-    type: 'Chambre Supérieure',
-    detail: 'Vue lagune · Lit king-size',
+    type: 'Appartement Standard',
+    detail: '1 chambre · à partir de 500 DH / nuit',
     image: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=900&q=80',
-    alt: 'Chambre supérieure Palm d\'Or',
+    alt: 'Appartement standard Palm d\'Or Dakhla',
   },
   {
-    type: 'Suite Prestige',
-    detail: 'Terrasse privée · Vue panoramique',
+    type: 'Appartement 2 chambres',
+    detail: '2 chambres · à partir de 650 DH / nuit',
     image: 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=900&q=80',
-    alt: 'Suite Prestige Palm d\'Or',
+    alt: 'Appartement 2 chambres Palm d\'Or Dakhla',
+  },
+  {
+    type: 'Grande capacité',
+    detail: '2 chambres · à partir de 750 DH / nuit',
+    image: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=900&q=80',
+    alt: 'Appartement grande capacité Palm d\'Or Dakhla',
   },
 ]
 
 const amenities = [
-  { icon: '✦', label: 'Wi-Fi Premium' },
-  { icon: '✦', label: 'Petit-déjeuner' },
-  { icon: '✦', label: 'Vue sur la lagune' },
-  { icon: '✦', label: 'Service personnalisé' },
+  { icon: '✦', label: 'Appartements complets' },
+  { icon: '✦', label: 'Cuisine équipée' },
+  { icon: '✦', label: 'Dès 500 DH / nuit' },
+  { icon: '✦', label: 'Réservation WhatsApp' },
 ]
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -47,7 +53,7 @@ export default function AccommodationSection() {
         </div>
 
         {/* Room cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-14">
           {rooms.map((room) => (
             <Link
               key={room.type}
