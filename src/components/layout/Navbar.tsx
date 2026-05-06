@@ -103,14 +103,14 @@ export default function Navbar() {
               rel="noopener noreferrer"
               aria-label="Réserver via WhatsApp"
               onClick={trackWhatsApp}
-              className="flex items-center justify-center w-9 h-9 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white rounded-full transition-all duration-300"
+              className="flex items-center justify-center w-11 h-11 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white rounded-full transition-all duration-300"
             >
               <WhatsAppIcon className="w-4 h-4" />
             </a>
             <button
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-              className="flex items-center justify-center w-9 h-9 text-palm-blue/70 hover:text-palm-blue transition-colors duration-200"
+              className="flex items-center justify-center w-11 h-11 text-palm-blue/70 hover:text-palm-blue transition-colors duration-200"
             >
               {isOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
             </button>

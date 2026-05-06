@@ -16,6 +16,7 @@ const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
   text-sm text-palm-blue placeholder:text-palm-blue/25
   focus:outline-none focus:border-palm-gold/70 transition-colors duration-200
+  focus-visible:ring-2 focus-visible:ring-palm-gold/40 focus-visible:ring-offset-1
   disabled:opacity-50 disabled:cursor-not-allowed
 `.trim()
 
@@ -80,13 +81,15 @@ export default function LeadForm() {
 
           {/* Name */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+            <label htmlFor="lead-name" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Votre nom <span className="text-palm-gold">*</span>
             </label>
             <input
+              id="lead-name"
               type="text"
               required
               minLength={2}
+              autoComplete="name"
               value={name}
               onChange={e => setName(e.target.value)}
               disabled={loading}
@@ -97,13 +100,16 @@ export default function LeadForm() {
 
           {/* Phone */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+            <label htmlFor="lead-phone" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               WhatsApp / Téléphone <span className="text-palm-gold">*</span>
             </label>
             <input
+              id="lead-phone"
               type="tel"
               required
               minLength={8}
+              autoComplete="tel"
+              inputMode="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
               disabled={loading}
@@ -114,11 +120,13 @@ export default function LeadForm() {
 
           {/* Service */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+            <label htmlFor="lead-service" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Service <span className="text-palm-gold">*</span>
             </label>
             <select
+              id="lead-service"
               required
+              autoComplete="off"
               value={service}
               onChange={e => setService(e.target.value as Service)}
               disabled={loading}
@@ -132,14 +140,16 @@ export default function LeadForm() {
 
           {/* Message */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+            <label htmlFor="lead-message" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Message{' '}
               <span className="normal-case tracking-normal font-normal text-palm-blue/30">
                 (facultatif)
               </span>
             </label>
             <textarea
+              id="lead-message"
               rows={3}
+              autoComplete="off"
               value={message}
               onChange={e => setMessage(e.target.value)}
               disabled={loading}
