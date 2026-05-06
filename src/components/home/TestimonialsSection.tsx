@@ -1,28 +1,5 @@
 import SectionLabel from '@/components/ui/SectionLabel'
-
-const GOOGLE_RATING = 4.2
-const GOOGLE_REVIEW_COUNT = 87
-
-const reviews = [
-  {
-    stars: 5,
-    text: 'À remplacer — coller ici le texte du 1er avis Google.',
-    author: 'Prénom Nom',
-    date: 'Date de l\'avis',
-  },
-  {
-    stars: 5,
-    text: 'À remplacer — coller ici le texte du 2e avis Google.',
-    author: 'Prénom Nom',
-    date: 'Date de l\'avis',
-  },
-  {
-    stars: 4,
-    text: 'À remplacer — coller ici le texte du 3e avis Google.',
-    author: 'Prénom Nom',
-    date: 'Date de l\'avis',
-  },
-]
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT, GOOGLE_REVIEWS } from '@/lib/google-reviews'
 
 function Stars({ count }: { count: number }) {
   return (
@@ -70,10 +47,10 @@ export default function TestimonialsSection() {
 
         {/* Review cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {reviews.map((review, i) => (
+          {GOOGLE_REVIEWS.map((review, i) => (
             <div
               key={i}
-              className="bg-white/60 rounded-sm p-7 flex flex-col gap-4"
+              className="bg-white/60 rounded-sm p-6 md:p-7 flex flex-col gap-4 md:gap-5"
             >
               {/* Stars + Google */}
               <div className="flex items-center justify-between">
@@ -82,12 +59,12 @@ export default function TestimonialsSection() {
               </div>
 
               {/* Quote */}
-              <p className="text-sm text-palm-blue/65 leading-[1.85] flex-1">
+              <p className="text-sm md:text-[15px] text-palm-blue/65 leading-[1.9] flex-1">
                 &ldquo;{review.text}&rdquo;
               </p>
 
               {/* Reviewer */}
-              <div className="flex items-center justify-between pt-2 border-t border-palm-cream-dark">
+              <div className="flex flex-col items-start gap-1.5 pt-2 border-t border-palm-cream-dark sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-[11px] font-medium tracking-wide text-palm-blue">
                   {review.author}
                 </p>

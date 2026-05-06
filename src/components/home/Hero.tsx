@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from '@/lib/google-reviews'
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -56,8 +57,8 @@ export default function Hero() {
         {/* Google badge */}
         <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-1.5">
           <span className="text-yellow-400 text-sm leading-none">★</span>
-          <span className="text-[11px] text-white/85 font-medium">4.2 sur Google</span>
-          <span className="text-[10px] text-white/40">&middot; 87 avis</span>
+          <span className="text-[11px] text-white/85 font-medium">{GOOGLE_RATING} sur Google</span>
+          <span className="text-[10px] text-white/40">&middot; {GOOGLE_REVIEW_COUNT} avis</span>
         </div>
 
         {/* CTAs */}
