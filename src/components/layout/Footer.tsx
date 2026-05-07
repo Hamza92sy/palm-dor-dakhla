@@ -35,13 +35,22 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="flex flex-col gap-6">
-            <Link href="/" className="flex flex-col leading-none group w-fit">
-              <span className="font-display text-2xl font-light italic text-white group-hover:text-palm-gold-muted transition-colors duration-300">
-                Palm d&apos;Or
-              </span>
-              <span className="font-sans text-[9px] tracking-[0.45em] text-palm-gold uppercase mt-1 font-medium">
-                Dakhla
-              </span>
+            <Link href="/" className="flex items-center gap-3 group w-fit">
+              <img
+                src="/assets/logo-dark.svg"
+                alt="Palm d'Or Dakhla"
+                width={44}
+                height={44}
+                className="w-10 h-10 shrink-0 transition-opacity duration-300 group-hover:opacity-75"
+              />
+              <div className="flex flex-col leading-none">
+                <span className="font-display text-2xl font-light italic text-white group-hover:text-palm-gold-muted transition-colors duration-300">
+                  Palm d&apos;Or
+                </span>
+                <span className="font-sans text-[9px] tracking-[0.45em] text-palm-gold uppercase mt-1 font-medium">
+                  Dakhla
+                </span>
+              </div>
             </Link>
             <p className="text-sm text-white/45 leading-[1.85] max-w-[260px]">
               Restaurant, café & hébergements au cœur de Dakhla.

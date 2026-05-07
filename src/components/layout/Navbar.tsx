@@ -36,13 +36,22 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20 md:h-24">
 
           {/* Logo */}
-          <Link href="/" className="flex flex-col leading-none group shrink-0">
-            <span className="font-display text-xl md:text-2xl font-light italic tracking-wide text-palm-blue group-hover:text-palm-gold transition-colors duration-300">
-              Palm d&apos;Or
-            </span>
-            <span className="font-sans text-[9px] tracking-[0.45em] text-palm-gold uppercase mt-0.5 font-medium">
-              Dakhla
-            </span>
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <img
+              src="/assets/logo-light.svg"
+              alt="Palm d'Or Dakhla"
+              width={40}
+              height={40}
+              className="w-9 h-9 md:w-10 md:h-10 shrink-0 transition-opacity duration-300 group-hover:opacity-75"
+            />
+            <div className="flex flex-col leading-none">
+              <span className="font-display text-xl md:text-2xl font-light italic tracking-wide text-palm-blue group-hover:text-palm-gold transition-colors duration-300">
+                Palm d&apos;Or
+              </span>
+              <span className="font-sans text-[9px] tracking-[0.45em] text-palm-gold uppercase mt-0.5 font-medium">
+                Dakhla
+              </span>
+            </div>
           </Link>
 
           {/* Desktop nav */}
