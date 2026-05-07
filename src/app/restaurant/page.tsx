@@ -43,7 +43,19 @@ export default function RestaurantPage() {
         },
         {
           src: '/assets/photos-client/restaurant-seafood.jpg',
-          alt: 'Plateau de fruits de mer au restaurant Palm d\'Or Dakhla',
+          alt: 'Plateau de fruits de mer au restaurant Palm d\'Or Dakhla — crevettes et calamars',
+        },
+        {
+          src: '/assets/photos-client/restaurant-burger.jpg',
+          alt: 'Burger maison et frites au restaurant Palm d\'Or Dakhla',
+        },
+        {
+          src: '/assets/photos-client/restaurant-salade.jpg',
+          alt: 'Salade fraîche crevettes avocat mangue au restaurant Palm d\'Or Dakhla',
+        },
+        {
+          src: '/assets/photos-client/restaurant-table.jpg',
+          alt: 'Table dressée au restaurant Palm d\'Or Dakhla',
         },
       ]}
       service="restaurant"

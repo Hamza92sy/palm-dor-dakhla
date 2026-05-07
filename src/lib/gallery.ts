@@ -14,7 +14,12 @@ export const GALLERY_IMAGES: GalleryImage[] = [
   },
   {
     src: '/assets/photos-client/restaurant-seafood-gros-plan.jpg',
-    alt: "Fruits de mer frais au restaurant Palm d'Or Dakhla — crevettes et calamars",
+    alt: "Fruits de mer frais — crevettes et calamars grillés au restaurant Palm d'Or Dakhla",
+    service: 'restaurant',
+  },
+  {
+    src: '/assets/photos-client/restaurant-salade.jpg',
+    alt: "Salade crevettes avocat mangue au restaurant Palm d'Or Dakhla",
     service: 'restaurant',
   },
   {
@@ -23,8 +28,18 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     service: 'restaurant',
   },
   {
+    src: '/assets/photos-client/restaurant-burger.jpg',
+    alt: "Burger maison et frites au restaurant Palm d'Or Dakhla",
+    service: 'restaurant',
+  },
+  {
     src: '/assets/photos-client/de (136).jpg',
     alt: "Petit-déjeuner servi au Café Palm d'Or Dakhla",
+    service: 'cafe',
+  },
+  {
+    src: '/assets/photos-client/cafe-crepes.jpg',
+    alt: "Crêpes nutella et fruits frais au Café Palm d'Or Dakhla",
     service: 'cafe',
   },
   {

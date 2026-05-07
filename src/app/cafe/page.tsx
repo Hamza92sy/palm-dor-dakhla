@@ -44,6 +44,10 @@ export default function CafePage() {
           src: '/assets/photos-client/cafe-crepes.jpg',
           alt: 'Crêpes nutella et fruits frais au Café Palm d\'Or Dakhla',
         },
+        {
+          src: '/assets/photos-client/cafe-ambiance.jpg',
+          alt: 'Ambiance du Café Palm d\'Or Dakhla — espace lounge marocain',
+        },
       ]}
       service="cafe"
       ctaLabel="Nous contacter"

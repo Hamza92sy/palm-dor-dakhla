@@ -166,8 +166,10 @@ export default function ServicePage({
       {/* ── Gallery (si 2+ images) ───────────────────────────────────── */}
       {images.length >= 2 && (
         <section className="bg-palm-cream-dark py-12 md:py-16">
-          <div className="max-w-5xl mx-auto px-5 sm:px-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {images.slice(0, 2).map((img, i) => (
+          <div className={`max-w-5xl mx-auto px-5 sm:px-8 grid grid-cols-1 gap-4 ${
+            images.slice(1).length >= 2 ? 'md:grid-cols-2' : 'md:max-w-2xl md:mx-auto'
+          }`}>
+            {images.slice(1, 5).map((img, i) => (
               <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-sm">
                 <Image
                   src={img.src}

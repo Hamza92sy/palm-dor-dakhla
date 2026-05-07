@@ -14,8 +14,8 @@ const experiences = [
     label: 'Café',
     tagline: 'Un espace de douceur et de saveurs',
     href: '/cafe',
-    image: '/assets/photos-client/de (136).jpg',
-    alt: 'Petit-déjeuner servi au Café Palm d\'Or Dakhla',
+    image: '/assets/photos-client/cafe-crepes.jpg',
+    alt: 'Crêpes et desserts au Café Palm d\'Or Dakhla',
   },
   {
     label: 'Hébergements',
