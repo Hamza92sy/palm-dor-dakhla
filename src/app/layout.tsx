@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer'
 import {
   BUSINESS_ADDRESS_LINE_1,
   BUSINESS_ADDRESS_LINE_2,
+  BUSINESS_EMAIL,
   BUSINESS_FULL_NAME,
   BUSINESS_LATITUDE,
   BUSINESS_LONGITUDE,
@@ -94,6 +95,7 @@ const localBusinessSchema = {
     "Résidence, restaurant et café à Dakhla. Réservation et demandes via WhatsApp.",
   url: SITE_URL,
   telephone: WHATSAPP_PHONE_DISPLAY,
+  email: BUSINESS_EMAIL,
   address: {
     '@type': 'PostalAddress',
     streetAddress: BUSINESS_ADDRESS_LINE_1,

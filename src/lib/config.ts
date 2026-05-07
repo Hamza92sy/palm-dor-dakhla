@@ -23,3 +23,5 @@ export const WHATSAPP_URL = WHATSAPP_NUMBER
 export const INSTAGRAM_URL    = 'https://www.instagram.com/palm_dor_dakhla'
 export const INSTAGRAM_HANDLE = '@palm_dor_dakhla'
 
+export const BUSINESS_EMAIL = 'reservation@palmdordakhla.com'
+

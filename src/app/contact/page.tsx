@@ -6,6 +6,7 @@ import {
   BUSINESS_ADDRESS_LINE_1,
   BUSINESS_ADDRESS_LINE_2,
   BUSINESS_COUNTRY,
+  BUSINESS_EMAIL,
   BUSINESS_FULL_NAME,
   GOOGLE_MAPS_EMBED_URL,
   GOOGLE_MAPS_URL,
@@ -126,6 +127,18 @@ export default function ContactPage() {
                     Résidence, restaurant, café et location de voitures à Dakhla.
                   </p>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <p className="text-[10px] tracking-[0.28em] uppercase text-palm-blue/40 font-medium">
+                  Email
+                </p>
+                <a
+                  href={`mailto:${BUSINESS_EMAIL}`}
+                  className="text-sm text-palm-blue hover:text-palm-gold transition-colors duration-200 w-fit"
+                >
+                  {BUSINESS_EMAIL}
+                </a>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">

@@ -3,6 +3,7 @@ import {
   BUSINESS_ADDRESS_LINE_1,
   BUSINESS_ADDRESS_LINE_2,
   BUSINESS_COUNTRY,
+  BUSINESS_EMAIL,
   GOOGLE_MAPS_URL,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -90,6 +91,12 @@ export default function Footer() {
                   {WHATSAPP_PHONE_DISPLAY}
                 </a>
               )}
+              <a
+                href={`mailto:${BUSINESS_EMAIL}`}
+                className="hover:text-white transition-colors duration-200 w-fit"
+              >
+                {BUSINESS_EMAIL}
+              </a>
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"
