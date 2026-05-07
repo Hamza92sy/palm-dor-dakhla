@@ -4,6 +4,7 @@ import { Geist, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { GAPageTracker } from '@/components/analytics/GAPageTracker'
 import {
   BUSINESS_ADDRESS_LINE_1,
   BUSINESS_ADDRESS_LINE_2,
@@ -47,6 +48,9 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: '/',
+  },
+  verification: {
+    google: '4r6l05c_AQIeAeAm7K1OGJZ5gD8VZNGNa8wYNwoQHss',
   },
   openGraph: {
     title: "Palm d'Or Dakhla — Restaurant, Café & Hébergements",
@@ -143,6 +147,7 @@ export default function RootLayout({
           </noscript>
         )}
 
+        <GAPageTracker />
         <Navbar />
         <main className="flex-1 pt-20 md:pt-24">{children}</main>
         <Footer />

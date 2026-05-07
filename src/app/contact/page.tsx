@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import SectionLabel from '@/components/ui/SectionLabel'
 import LeadForm from '@/components/home/LeadForm'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
+import FAQSection from '@/components/ui/FAQSection'
+import { faqSchema } from '@/lib/schemas'
 import {
   BUSINESS_ADDRESS_LINE_1,
   BUSINESS_ADDRESS_LINE_2,
@@ -56,6 +58,29 @@ export const metadata: Metadata = {
   },
 }
 
+const FAQ_ITEMS = [
+  {
+    question: "Où se trouve Palm d'Or Dakhla ?",
+    answer: "Palm d'Or Dakhla est situé sur AV Al Walaa, Dakhla 73000, Maroc. Vous pouvez obtenir l'itinéraire complet directement via Google Maps.",
+  },
+  {
+    question: "Quel est le moyen le plus rapide de contacter Palm d'Or ?",
+    answer: "Le moyen le plus rapide est WhatsApp au +212 661 931 317. Vous pouvez aussi nous envoyer un email à reservation@palmdordakhla.com pour toute demande non urgente.",
+  },
+  {
+    question: "Quels services Palm d'Or Dakhla propose-t-il ?",
+    answer: "Palm d'Or Dakhla propose 4 services : hébergement en appartements meublés (6 appartements, 3 configurations), restaurant avec cuisine locale et internationale, café et petit-déjeuner, et location de voitures à la journée ou à la semaine.",
+  },
+  {
+    question: "Comment faire une demande de réservation ?",
+    answer: "Envoyez un message WhatsApp en précisant le service souhaité, vos dates et le nombre de personnes. Nous confirmons la disponibilité rapidement, sans démarche complexe.",
+  },
+  {
+    question: "Palm d'Or Dakhla est-il présent sur les réseaux sociaux ?",
+    answer: "Oui, retrouvez Palm d'Or Dakhla sur Instagram sous le compte @palm_dor_dakhla pour découvrir nos photos et nos dernières actualités.",
+  },
+]
+
 function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -75,6 +100,10 @@ function WhatsAppIcon({ className }: { className?: string }) {
 export default function ContactPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(FAQ_ITEMS)) }}
+      />
       <section className="bg-palm-cream py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10">
           <div className="max-w-2xl flex flex-col gap-4 mb-12 md:mb-14">
@@ -237,6 +266,9 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <FAQSection items={FAQ_ITEMS} />
 
       <LeadForm />
     </>

@@ -15,22 +15,34 @@ Dernière mise à jour : 2026-05-06
 - [x] Page `/contact` avec carte Google Maps
 - [x] Documentation projet (AGENTS.md, CLAUDE.md, docs/)
 
-## V1.1 — Contenu réel (en cours)
+## V1.1 — Contenu réel ✅ Livré
 
 - [x] Premières photos client intégrées (6 photos hébergement + café)
 - [x] Cross-links inter-services sur toutes les pages
 - [x] SEO local : titles, meta, OpenGraph, schema.org LodgingBusiness
 - [x] `sitemap.xml` et `robots.txt`
 - [x] Suppression PDF 85MB, CTA menu → WhatsApp
-- [ ] **Remplacer Unsplash restaurant** (ExperienceSection + /restaurant — 3 images)
-- [ ] **Photo façade/extérieur résidence** (hero homepage idéal + Google Business)
-- [ ] **Photo grand lit** (manquante pour Appartement Standard)
-- [ ] **Photo salle restaurant + plat signature**
-- [ ] **Photos véhicules** (location voiture)
-- [ ] Témoignages clients — confirmer note Google (5★ · 180+ affiché, à vérifier)
-- [ ] Activer Meta Pixel (ajouter ID dans `.env.local`)
-- [ ] Activer GA4 (ajouter ID dans `.env.local`)
-- [ ] Compléter fiche Google Business
+- [x] **Remplacer Unsplash restaurant** — 0 Unsplash, 100% photos client (2026-05-07)
+- [x] **Photos hébergement** — chambre-double, de (175), de (199), de (218) intégrées
+- [x] **Photos restaurant** — 7 photos client (salle, seafood, burger, salade, table)
+- [x] **Photos café** — 4 photos client (salle, crepes, terrasse, de 136)
+- [x] Galerie équilibrée 10 photos (hébergement + restaurant + café)
+
+## V1.2 — Infrastructure live (actions non-code)
+
+- [ ] **Vérifier variables ENV sur Vercel** — WHATSAPP, SUPABASE_* (bloquant fonctionnel)
+- [ ] **Connecter domaine** `palmdordakhla.com` + DNS (bloquant live)
+- [ ] Activer Meta Pixel (ajouter `NEXT_PUBLIC_META_PIXEL_ID` dans Vercel)
+- [ ] Activer GA4 (ajouter `NEXT_PUBLIC_GA_ID` dans Vercel)
+- [ ] Compléter fiche Google Business (catégories, horaires, 7 photos, lien site)
+- [ ] Confirmer note Google 5★ · 180+ avec client (`src/lib/google-reviews.ts`)
+- [ ] Soumettre à Google Search Console
+
+## V1.3 — Contenu manquant (client doit fournir)
+
+- [ ] **Photo façade/extérieur résidence** — hero homepage + Google Business
+- [ ] **Photos véhicules** — débloque hero `/location-voiture` (fond design system actuel)
+- [ ] PDF menu optimisé < 2MB (remplace CTA WhatsApp "Demander")
 
 ## V1.2 — SEO et acquisition
 

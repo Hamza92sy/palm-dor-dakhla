@@ -33,11 +33,15 @@ export default function LeadForm() {
     setLoading(true)
     setError(null)
 
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
+
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, service, message, language: 'fr' }),
+        signal: controller.signal,
       })
 
       const data: { success?: boolean; whatsappUrl?: string; error?: string } = await res.json()
@@ -47,13 +51,18 @@ export default function LeadForm() {
         return
       }
 
-      // Lead enregistré → tracking → ouvrir WhatsApp
-      trackLead()
-      trackWhatsApp()
-      window.location.href = data.whatsappUrl!
-    } catch {
-      setError('Connexion impossible. Vérifiez votre connexion et réessayez.')
+      // Fire tracking before opening WA (new tab keeps page alive → events flush)
+      trackLead(service)
+      trackWhatsApp('form')
+      window.open(data.whatsappUrl!, '_blank', 'noopener,noreferrer')
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('La requête a pris trop de temps. Vérifiez votre connexion et réessayez.')
+      } else {
+        setError('Connexion impossible. Vérifiez votre connexion et réessayez.')
+      }
     } finally {
+      clearTimeout(timeout)
       setLoading(false)
     }
   }

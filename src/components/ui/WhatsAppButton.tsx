@@ -16,7 +16,7 @@ export default function WhatsAppButton({ href, className, children }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       className={className}
-      onClick={trackWhatsApp}
+      onClick={() => trackWhatsApp('button')}
     >
       {children}
     </a>

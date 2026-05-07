@@ -85,7 +85,7 @@ export default function Navbar() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={trackWhatsApp}
+              onClick={() => trackWhatsApp('button')}
               className="group flex items-center gap-2 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-5 py-2.5 rounded-full transition-all duration-300"
@@ -102,7 +102,7 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Réserver via WhatsApp"
-              onClick={trackWhatsApp}
+              onClick={() => trackWhatsApp('button')}
               className="flex items-center justify-center w-11 h-11 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white rounded-full transition-all duration-300"
             >
               <WhatsAppIcon className="w-4 h-4" />
@@ -163,7 +163,7 @@ export default function Navbar() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={trackWhatsApp}
+                onClick={() => trackWhatsApp('button')}
                 className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1DAF57] text-white
                   text-[11px] tracking-[0.12em] uppercase font-medium
                   px-5 py-2.5 rounded-full transition-colors duration-300"

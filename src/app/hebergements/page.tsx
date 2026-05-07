@@ -5,6 +5,8 @@ import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import ServiceContactForm from '@/components/service/ServiceContactForm'
 import SectionLabel from '@/components/ui/SectionLabel'
 import { getServiceWhatsAppUrl } from '@/lib/services'
+import FAQSection from '@/components/ui/FAQSection'
+import { lodgingSchema, faqSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: "Appartements à Dakhla — Palm d'Or",
@@ -81,11 +83,47 @@ function CheckIcon() {
   )
 }
 
+const FAQ_ITEMS = [
+  {
+    question: "Combien d'appartements sont disponibles à Palm d'Or Dakhla ?",
+    answer: "Nous disposons de 6 appartements meublés à Dakhla, répartis en 3 configurations : 1 Appartement Standard (500 DH/nuit), 3 Appartements 2 chambres (650 DH/nuit) et 2 Appartements grande capacité (750 DH/nuit).",
+  },
+  {
+    question: "Combien de personnes peuvent séjourner dans un appartement ?",
+    answer: "L'Appartement Standard accueille idéalement 2 personnes. L'Appartement 2 chambres jusqu'à 4 personnes. L'Appartement grande capacité peut accueillir jusqu'à 5 personnes.",
+  },
+  {
+    question: "Les appartements sont-ils entièrement équipés ?",
+    answer: "Oui, chaque appartement comprend un salon, une salle à manger, une cuisine équipée et une salle de bain. Tout le nécessaire est en place pour un séjour confortable à Dakhla.",
+  },
+  {
+    question: "Comment réserver un appartement meublé à Dakhla ?",
+    answer: "La réservation se fait simplement via WhatsApp. Envoyez un message avec vos dates souhaitées, le nombre de personnes et le type d'appartement. Nous confirmons la disponibilité rapidement.",
+  },
+  {
+    question: "Quels sont les tarifs des appartements à Dakhla ?",
+    answer: "Les tarifs sont de 500 DH/nuit pour l'Appartement Standard, 650 DH/nuit pour l'Appartement 2 chambres, et 750 DH/nuit pour l'Appartement grande capacité.",
+  },
+  {
+    question: "Où se trouve la résidence Palm d'Or à Dakhla ?",
+    answer: "La résidence Palm d'Or est située sur AV Al Walaa à Dakhla 73000, au Maroc. Vous pouvez retrouver l'itinéraire précis sur Google Maps.",
+  },
+]
+
 export default function HebergementsPage() {
   const generalWAUrl = getServiceWhatsAppUrl('accommodation')
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(FAQ_ITEMS)) }}
+      />
+
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center min-h-[70vh] overflow-hidden">
         <Image
@@ -295,6 +333,9 @@ export default function HebergementsPage() {
           </div>
         </div>
       </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <FAQSection items={FAQ_ITEMS} />
 
       {/* ── Contact form ──────────────────────────────────────────────── */}
       <ServiceContactForm service="accommodation" />

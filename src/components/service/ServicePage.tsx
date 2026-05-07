@@ -37,6 +37,7 @@ export interface ServicePageConfig {
   ctaLabel: string
   heroNotice?: string
   menuSection?: ReactNode
+  faqSection?: ReactNode
 }
 
 function CheckIcon() {
@@ -64,6 +65,7 @@ export default function ServicePage({
   ctaLabel,
   heroNotice,
   menuSection,
+  faqSection,
 }: ServicePageConfig) {
   const waUrl = getServiceWhatsAppUrl(service)
   const heroImage = images[0]
@@ -237,6 +239,9 @@ export default function ServicePage({
           </div>
         </div>
       </section>
+
+      {/* ── FAQ (optional) ───────────────────────────────────────────── */}
+      {faqSection}
 
       {/* ── Contact form ──────────────────────────────────────────────── */}
       <ServiceContactForm service={service} />

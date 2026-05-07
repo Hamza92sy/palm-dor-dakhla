@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { assertServerEnv } from '@/lib/env'
 
 const VALID_SERVICES  = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
 const VALID_LANGUAGES = ['fr', 'en'] as const
@@ -61,11 +62,14 @@ function buildWhatsAppMessage(
 }
 
 export async function POST(req: NextRequest) {
-  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
-  if (!waNumber) {
-    console.error('[api/lead] NEXT_PUBLIC_WHATSAPP_NUMBER non configuré')
+  try {
+    assertServerEnv()
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e)
     return NextResponse.json({ error: 'Service temporairement indisponible' }, { status: 503 })
   }
+
+  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER!
 
   let body: Record<string, unknown>
   try {

@@ -8,7 +8,7 @@ Palm d'Or Dakhla est une résidence multi-services à Dakhla, Maroc.
 
 Services :
 
-- **Hébergement** — 5 appartements meublés, de 500 à 750 DH/nuit
+- **Hébergement** — 6 appartements meublés (3 configs : Standard 500, 2ch 650, Grande capa 750 DH/nuit)
 - **Restaurant** — cuisine locale et internationale
 - **Café** — petit-déjeuner et boissons
 - **Location de voitures** — véhicules à la journée ou semaine
@@ -25,7 +25,7 @@ Google → Site → WhatsApp → Réservation confirmée
 
 ## Contexte actuel
 
-Le site est **live et opérationnel**. Voir `docs/current-state.md` pour l'état détaillé.
+Le site est **live et opérationnel**. Voir `docs/PROJECT_RESTART_AUDIT.md` pour l'état technique complet et `docs/PROJECT_ALIGNMENT_REPORT.md` pour l'audit post-lancement.
 
 ## Stack technique
 
@@ -50,21 +50,23 @@ Le site est **live et opérationnel**. Voir `docs/current-state.md` pour l'état
 
 ```text
 /                    Homepage (7 sections)
-/hebergements        5 appartements avec prix
+/hebergements        6 appartements, 3 configurations avec prix
 /restaurant          Page service
 /cafe                Page service
 /location-voiture    Page service
-/proposition         Page interne
+/galerie             10 photos client
+/contact             Adresse + Maps + formulaire
 /api/lead            API Supabase (POST)
 ```
 
 ## Fichiers de référence
 
 - Offres et prix : `docs/services.md`
-- État du projet : `docs/current-state.md`
+- État technique complet : `docs/PROJECT_RESTART_AUDIT.md`
+- Audit post-lancement : `docs/PROJECT_ALIGNMENT_REPORT.md`
+- Roadmap post-lancement : `docs/POST_LAUNCH_ROADMAP.md`
 - Schéma base de données : `docs/db-schema.md`
 - Parcours utilisateur : `docs/user-flows.md`
-- Actifs manquants : `docs/assets-needed.md`
 - Roadmap : `docs/roadmap.md`
 
 ## Règles absolues
