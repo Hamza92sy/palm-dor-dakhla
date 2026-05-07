@@ -7,8 +7,8 @@ const rooms = [
   {
     type: 'Appartement Standard',
     detail: '1 chambre · à partir de 500 DH / nuit',
-    image: '/assets/photos-client/de (175).jpg',
-    alt: 'Salon d\'un appartement Palm d\'Or Dakhla',
+    image: '/assets/photos-client/chambre-double.jpg',
+    alt: 'Chambre avec grand lit — Appartement Standard Palm d\'Or Dakhla',
   },
   {
     type: 'Appartement 2 chambres',

@@ -38,12 +38,12 @@ export default function RestaurantPage() {
       ]}
       images={[
         {
-          src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1920&q=80',
-          alt: 'Restaurant Palm d\'Or Dakhla — plats',
+          src: '/assets/photos-client/restaurant-salle.jpg',
+          alt: 'Salle du restaurant Palm d\'Or Dakhla',
         },
         {
-          src: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=900&q=80',
-          alt: 'Petit-déjeuner Palm d\'Or Dakhla',
+          src: '/assets/photos-client/restaurant-seafood.jpg',
+          alt: 'Plateau de fruits de mer au restaurant Palm d\'Or Dakhla',
         },
       ]}
       service="restaurant"

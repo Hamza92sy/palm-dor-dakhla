@@ -41,8 +41,8 @@ export default function CafePage() {
           alt: 'Petit-déjeuner servi au Café Palm d\'Or Dakhla',
         },
         {
-          src: '/assets/photos-client/de (130).jpg',
-          alt: 'Deuxième vue du petit-déjeuner au Café Palm d\'Or Dakhla',
+          src: '/assets/photos-client/cafe-crepes.jpg',
+          alt: 'Crêpes nutella et fruits frais au Café Palm d\'Or Dakhla',
         },
       ]}
       service="cafe"

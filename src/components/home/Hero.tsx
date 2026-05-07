@@ -17,8 +17,8 @@ export default function Hero() {
 
       {/* Background image */}
       <Image
-        src="/assets/photos-client/de (175).jpg"
-        alt="Salon principal d'un appartement Palm d'Or Dakhla"
+        src="/assets/photos-client/restaurant-palmdor.jpg"
+        alt="Salle du restaurant Palm d'Or Dakhla — ambiance et branding"
         fill
         priority
         className="object-cover object-center"
