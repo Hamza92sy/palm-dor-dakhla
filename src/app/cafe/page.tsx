@@ -37,16 +37,16 @@ export default function CafePage() {
       ]}
       images={[
         {
+          src: '/assets/photos-client/cafe-salle.jpg',
+          alt: 'Intérieur du Café Palm d\'Or Dakhla — salon fauteuils velours verts',
+        },
+        {
           src: '/assets/photos-client/de (136).jpg',
           alt: 'Petit-déjeuner servi au Café Palm d\'Or Dakhla',
         },
         {
           src: '/assets/photos-client/cafe-crepes.jpg',
           alt: 'Crêpes nutella et fruits frais au Café Palm d\'Or Dakhla',
-        },
-        {
-          src: '/assets/photos-client/cafe-ambiance.jpg',
-          alt: 'Ambiance du Café Palm d\'Or Dakhla — espace lounge marocain',
         },
       ]}
       service="cafe"
