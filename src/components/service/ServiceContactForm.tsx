@@ -4,6 +4,13 @@ import { useState } from 'react'
 import { trackLead, trackWhatsApp } from '@/lib/tracking'
 import { SERVICE_LABELS, type ServiceType } from '@/lib/services'
 
+const APARTMENT_TYPES = [
+  { value: '',                label: 'Type non précisé'               },
+  { value: 'standard',        label: 'Standard — 500 DH/nuit'        },
+  { value: '2-chambres',      label: '2 Chambres — 650 DH/nuit'      },
+  { value: 'grande-capacite', label: 'Grande capacité — 750 DH/nuit' },
+]
+
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
   text-sm text-palm-blue placeholder:text-palm-blue/25
@@ -17,11 +24,17 @@ interface Props {
 }
 
 export default function ServiceContactForm({ service }: Props) {
-  const [name,    setName]    = useState('')
-  const [phone,   setPhone]   = useState('')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
+  const [name,          setName]          = useState('')
+  const [phone,         setPhone]         = useState('')
+  const [message,       setMessage]       = useState('')
+  const [checkIn,       setCheckIn]       = useState('')
+  const [checkOut,      setCheckOut]      = useState('')
+  const [apartmentType, setApartmentType] = useState('')
+  const [loading,       setLoading]       = useState(false)
+  const [error,         setError]         = useState<string | null>(null)
+
+  const today = new Date().toISOString().split('T')[0]
+  const isAccommodation = service === 'accommodation'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -33,9 +46,20 @@ export default function ServiceContactForm({ service }: Props) {
 
     try {
       const res = await fetch('/api/lead', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, service, message, language: 'fr' }),
+        body: JSON.stringify({
+          name,
+          phone,
+          service,
+          message,
+          language: 'fr',
+          ...(isAccommodation && {
+            check_in:       checkIn       || null,
+            check_out:      checkOut      || null,
+            apartment_type: apartmentType || null,
+          }),
+        }),
         signal: controller.signal,
       })
 
@@ -124,6 +148,70 @@ export default function ServiceContactForm({ service }: Props) {
             />
           </div>
 
+          {/* Accommodation-specific fields */}
+          {isAccommodation && (
+            <div className="flex flex-col gap-4 border-t border-palm-gold/15 pt-4">
+              <p className="text-[9px] tracking-[0.4em] uppercase text-palm-gold/70 font-medium -mb-1">
+                Détails du séjour
+              </p>
+
+              {/* Apartment type */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="contact-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                  Type d&apos;appartement{' '}
+                  <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+                </label>
+                <select
+                  id="contact-apt-type"
+                  autoComplete="off"
+                  value={apartmentType}
+                  onChange={e => setApartmentType(e.target.value)}
+                  disabled={loading}
+                  className={`${INPUT_CLASS} cursor-pointer`}
+                >
+                  {APARTMENT_TYPES.map(t => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Check-in / Check-out */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Arrivée
+                  </label>
+                  <input
+                    id="contact-check-in"
+                    type="date"
+                    min={today}
+                    value={checkIn}
+                    onChange={e => {
+                      setCheckIn(e.target.value)
+                      if (checkOut && e.target.value > checkOut) setCheckOut('')
+                    }}
+                    disabled={loading}
+                    className={INPUT_CLASS}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-check-out" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Départ
+                  </label>
+                  <input
+                    id="contact-check-out"
+                    type="date"
+                    min={checkIn || today}
+                    value={checkOut}
+                    onChange={e => setCheckOut(e.target.value)}
+                    disabled={loading}
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5">
             <label htmlFor="contact-message" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
               Message{' '}
@@ -136,7 +224,7 @@ export default function ServiceContactForm({ service }: Props) {
               value={message}
               onChange={e => setMessage(e.target.value)}
               disabled={loading}
-              placeholder="Dates, nombre de personnes, questions…"
+              placeholder={isAccommodation ? 'Nombre de personnes, questions…' : 'Dates, nombre de personnes, questions…'}
               className={`${INPUT_CLASS} resize-none`}
             />
           </div>
@@ -171,7 +259,7 @@ export default function ServiceContactForm({ service }: Props) {
             )}
           </button>
 
-          <p className="text-center text-[10px] text-palm-blue/25 tracking-[0.1em]">
+          <p className="text-center text-[10px] text-palm-blue/25 tracking-widest">
             Nous vous répondons rapidement pour confirmer votre demande.
           </p>
         </form>

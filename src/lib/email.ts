@@ -1,9 +1,12 @@
 export interface LeadNotification {
-  name:     string
-  phone:    string
-  service:  string
-  message:  string | null
-  language: string
+  name:            string
+  phone:           string
+  service:         string
+  message:         string | null
+  language:        string
+  check_in?:       string | null
+  check_out?:      string | null
+  apartment_type?: string | null
 }
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -11,6 +14,12 @@ const SERVICE_LABELS: Record<string, string> = {
   restaurant:    'Restaurant',
   cafe:          'Café',
   car_rental:    'Location de voiture',
+}
+
+const APARTMENT_LABELS: Record<string, string> = {
+  'standard':        'Standard (500 DH/nuit)',
+  '2-chambres':      '2 Chambres (650 DH/nuit)',
+  'grande-capacite': 'Grande capacité (750 DH/nuit)',
 }
 
 // Fire-and-forget — caller must .catch() this.
@@ -32,6 +41,8 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
   )
   const waUrl = `https://wa.me/${waPhone}?text=${waText}`
 
+  const hasBookingDetails = lead.check_in || lead.check_out || lead.apartment_type
+
   await resend.emails.send({
     from:    fromEmail,
     to:      adminEmail,
@@ -43,7 +54,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
         </h2>
         <table style="border-collapse:collapse;width:100%;">
           <tr>
-            <td style="padding:6px 0;color:#555;width:110px;">Nom</td>
+            <td style="padding:6px 0;color:#555;width:130px;">Nom</td>
             <td style="padding:6px 0;font-weight:600;">${lead.name}</td>
           </tr>
           <tr>
@@ -58,6 +69,25 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
             <td style="padding:6px 0;color:#555;">Langue</td>
             <td style="padding:6px 0;">${lead.language.toUpperCase()}</td>
           </tr>
+          ${hasBookingDetails ? `
+          <tr><td colspan="2" style="padding:10px 0 4px;"><hr style="border:none;border-top:1px solid #e5dcc3;margin:0;"/></td></tr>
+          ${lead.apartment_type ? `
+          <tr>
+            <td style="padding:6px 0;color:#555;">Appartement</td>
+            <td style="padding:6px 0;">${APARTMENT_LABELS[lead.apartment_type] ?? lead.apartment_type}</td>
+          </tr>` : ''}
+          ${lead.check_in ? `
+          <tr>
+            <td style="padding:6px 0;color:#555;">Arrivée</td>
+            <td style="padding:6px 0;font-weight:600;">${lead.check_in}</td>
+          </tr>` : ''}
+          ${lead.check_out ? `
+          <tr>
+            <td style="padding:6px 0;color:#555;">Départ</td>
+            <td style="padding:6px 0;font-weight:600;">${lead.check_out}</td>
+          </tr>` : ''}
+          <tr><td colspan="2" style="padding:4px 0 10px;"><hr style="border:none;border-top:1px solid #e5dcc3;margin:0;"/></td></tr>
+          ` : ''}
           <tr>
             <td style="padding:6px 0;color:#555;vertical-align:top;">Message</td>
             <td style="padding:6px 0;">${lead.message ?? '<em style="color:#999;">—</em>'}</td>

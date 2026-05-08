@@ -12,6 +12,13 @@ const SERVICES: { value: Service; label: string }[] = [
   { value: 'car_rental',    label: 'Location de voiture' },
 ]
 
+const APARTMENT_TYPES = [
+  { value: '',                label: 'Type non précisé'               },
+  { value: 'standard',        label: 'Standard — 500 DH/nuit'        },
+  { value: '2-chambres',      label: '2 Chambres — 650 DH/nuit'      },
+  { value: 'grande-capacite', label: 'Grande capacité — 750 DH/nuit' },
+]
+
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
   text-sm text-palm-blue placeholder:text-palm-blue/25
@@ -21,12 +28,26 @@ const INPUT_CLASS = `
 `.trim()
 
 export default function LeadForm() {
-  const [name,    setName]    = useState('')
-  const [phone,   setPhone]   = useState('')
-  const [service, setService] = useState<Service>('accommodation')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
+  const [name,          setName]          = useState('')
+  const [phone,         setPhone]         = useState('')
+  const [service,       setService]       = useState<Service>('accommodation')
+  const [message,       setMessage]       = useState('')
+  const [checkIn,       setCheckIn]       = useState('')
+  const [checkOut,      setCheckOut]      = useState('')
+  const [apartmentType, setApartmentType] = useState('')
+  const [loading,       setLoading]       = useState(false)
+  const [error,         setError]         = useState<string | null>(null)
+
+  const today = new Date().toISOString().split('T')[0]
+
+  function handleServiceChange(next: Service) {
+    setService(next)
+    if (next !== 'accommodation') {
+      setCheckIn('')
+      setCheckOut('')
+      setApartmentType('')
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,9 +59,20 @@ export default function LeadForm() {
 
     try {
       const res = await fetch('/api/lead', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, service, message, language: 'fr' }),
+        body: JSON.stringify({
+          name,
+          phone,
+          service,
+          message,
+          language: 'fr',
+          ...(service === 'accommodation' && {
+            check_in:       checkIn       || null,
+            check_out:      checkOut      || null,
+            apartment_type: apartmentType || null,
+          }),
+        }),
         signal: controller.signal,
       })
 
@@ -137,7 +169,7 @@ export default function LeadForm() {
               required
               autoComplete="off"
               value={service}
-              onChange={e => setService(e.target.value as Service)}
+              onChange={e => handleServiceChange(e.target.value as Service)}
               disabled={loading}
               className={`${INPUT_CLASS} cursor-pointer`}
             >
@@ -146,6 +178,70 @@ export default function LeadForm() {
               ))}
             </select>
           </div>
+
+          {/* Accommodation-specific fields */}
+          {service === 'accommodation' && (
+            <div className="flex flex-col gap-4 border-t border-palm-gold/15 pt-4">
+              <p className="text-[9px] tracking-[0.4em] uppercase text-palm-gold/70 font-medium -mb-1">
+                Détails du séjour
+              </p>
+
+              {/* Apartment type */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="lead-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                  Type d&apos;appartement{' '}
+                  <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+                </label>
+                <select
+                  id="lead-apt-type"
+                  autoComplete="off"
+                  value={apartmentType}
+                  onChange={e => setApartmentType(e.target.value)}
+                  disabled={loading}
+                  className={`${INPUT_CLASS} cursor-pointer`}
+                >
+                  {APARTMENT_TYPES.map(t => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Check-in / Check-out */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="lead-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Arrivée
+                  </label>
+                  <input
+                    id="lead-check-in"
+                    type="date"
+                    min={today}
+                    value={checkIn}
+                    onChange={e => {
+                      setCheckIn(e.target.value)
+                      if (checkOut && e.target.value > checkOut) setCheckOut('')
+                    }}
+                    disabled={loading}
+                    className={INPUT_CLASS}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="lead-check-out" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Départ
+                  </label>
+                  <input
+                    id="lead-check-out"
+                    type="date"
+                    min={checkIn || today}
+                    value={checkOut}
+                    onChange={e => setCheckOut(e.target.value)}
+                    disabled={loading}
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Message */}
           <div className="flex flex-col gap-1.5">
@@ -162,7 +258,11 @@ export default function LeadForm() {
               value={message}
               onChange={e => setMessage(e.target.value)}
               disabled={loading}
-              placeholder="Dates souhaitées, nombre de personnes…"
+              placeholder={
+                service === 'accommodation'
+                  ? 'Nombre de personnes, questions…'
+                  : 'Dates souhaitées, nombre de personnes…'
+              }
               className={`${INPUT_CLASS} resize-none`}
             />
           </div>
@@ -199,7 +299,7 @@ export default function LeadForm() {
             )}
           </button>
 
-          <p className="text-center text-[10px] text-palm-blue/25 tracking-[0.1em]">
+          <p className="text-center text-[10px] text-palm-blue/25 tracking-widest">
             Nous vous répondons rapidement pour confirmer votre demande.
           </p>
         </form>
