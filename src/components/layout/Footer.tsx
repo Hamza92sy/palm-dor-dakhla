@@ -54,7 +54,7 @@ export default function Footer() {
             </Link>
             <p className="text-sm text-white/45 leading-[1.85] max-w-[260px]">
               Restaurant, café & hébergements au cœur de Dakhla.
-              Une expérience chaleureuse au cœur de Dakhla.
+              Réservation simple et rapide via WhatsApp.
             </p>
           </div>
 

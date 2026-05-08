@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { assertServerEnv } from '@/lib/env'
+import { sendLeadNotification } from '@/lib/email'
 
 const VALID_SERVICES  = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
 const VALID_LANGUAGES = ['fr', 'en'] as const
@@ -121,6 +122,10 @@ export async function POST(req: NextRequest) {
     console.error('[api/lead] insert error:', error.message)
     return NextResponse.json({ error: 'Erreur lors de la sauvegarde' }, { status: 500 })
   }
+
+  // Fire-and-forget — email failure never blocks the lead or the redirect
+  sendLeadNotification({ name: cleanName, phone: cleanPhone, service: svc, message: cleanMessage, language: lang })
+    .catch((err: unknown) => console.error('[api/lead] email notification failed:', err))
 
   const waText     = buildWhatsAppMessage(lang, svc, cleanName, cleanPhone, cleanMessage)
   const whatsappUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waText)}`

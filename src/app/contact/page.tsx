@@ -219,6 +219,13 @@ export default function ContactPage() {
                 Envoyez votre demande si vous souhaitez être rappelé ou orienté vers le bon
                 service avant de poursuivre sur WhatsApp.
               </p>
+              <a
+                href="#reservation"
+                className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.2em] uppercase text-palm-gold hover:text-palm-blue transition-colors duration-200 w-fit mt-1"
+              >
+                Accéder au formulaire
+                <span aria-hidden="true">↓</span>
+              </a>
             </div>
           </div>
         </div>

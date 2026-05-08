@@ -5,24 +5,27 @@
 
 ## Hébergement
 
-### Appartements disponibles : 5
+### Appartements disponibles : 6
 
 Tous les appartements incluent : salon, salle à manger, cuisine, salle de bain.
 
-| ID | Étage    | Type                 | Chambres                                       | Prix       |
-| -- | -------- | -------------------- | ---------------------------------------------- | ---------- |
-| 1  | 2e étage | Standard             | 1 chambre avec grand lit                       | 500 DH/nuit|
-| 2  | 2e étage | 2 chambres           | 1 chambre grand lit double + 1 ch. 2 lits simples | 650 DH/nuit|
-| 3  | 3e étage | Grande capacité      | 1 chambre grand lit double + 1 ch. 3 lits séparés | 750 DH/nuit|
-| 4  | 4e étage | 2 chambres           | 1 chambre lit king-size + 1 ch. 2 lits simples | 650 DH/nuit|
-| 5  | 4e étage | Grande capacité      | 1 chambre grand lit double + 1 ch. 3 lits séparés | 750 DH/nuit|
+| ID | Étage    | Type            | Chambres                                           | Prix        |
+| -- | -------- | --------------- | -------------------------------------------------- | ----------- |
+| 1  | 2e étage | Standard        | 1 chambre avec grand lit                           | 500 DH/nuit |
+| 2  | 2e étage | 2 chambres      | 1 chambre grand lit double + 1 ch. 2 lits simples  | 650 DH/nuit |
+| 3  | 3e étage | Grande capacité | 1 chambre grand lit double + 1 ch. 3 lits séparés  | 750 DH/nuit |
+| 4  | 4e étage | 2 chambres      | 1 chambre lit king-size + 1 ch. 2 lits simples     | 650 DH/nuit |
+| 5  | 4e étage | Grande capacité | 1 chambre grand lit double + 1 ch. 3 lits séparés  | 750 DH/nuit |
+| 6  | —        | 2 chambres      | À préciser (étage non confirmé)                    | 650 DH/nuit |
+
+> Source de vérité code : `src/app/hebergements/page.tsx` (APARTMENT_TYPES) — 6 apparts confirmés. L'ID 6 est le 3e appart "2 chambres" ; son étage est à confirmer avec le client.
 
 ### Catégories homepage (AccommodationSection)
 
 Pour la homepage, les appartements sont regroupés en 3 catégories :
 
 - **Appartement Standard** — à partir de 500 DH/nuit (1 appartement)
-- **Appartement 2 chambres** — à partir de 650 DH/nuit (2 appartements)
+- **Appartement 2 chambres** — à partir de 650 DH/nuit (3 appartements)
 - **Grande capacité** — à partir de 750 DH/nuit (2 appartements)
 
 ### Capacités estimées
