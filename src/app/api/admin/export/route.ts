@@ -14,9 +14,25 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Annulé',
 }
 
+const APARTMENT_LABELS: Record<string, string> = {
+  'standard':        'Standard',
+  '2-chambres':      '2 Chambres',
+  'grande-capacite': 'Grande capacité',
+}
+
 function csvCell(val: string | null | undefined): string {
   const s = (val ?? '').replace(/"/g, '""')
   return `"${s}"`
+}
+
+function formatDate(d: string | null | undefined): string {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('fr-FR', {
+    timeZone: 'Africa/Casablanca',
+    day:      '2-digit',
+    month:    '2-digit',
+    year:     'numeric',
+  })
 }
 
 export async function GET() {
@@ -29,7 +45,10 @@ export async function GET() {
     return new Response(`Erreur Supabase: ${error.message}`, { status: 500 })
   }
 
-  const header = ['Date', 'Nom', 'Téléphone', 'Service', 'Message', 'Statut', 'Langue']
+  const header = [
+    'Date', 'Nom', 'Téléphone', 'Service', 'Message', 'Statut', 'Langue',
+    'Appartement', 'Arrivée', 'Départ', 'Notes',
+  ]
 
   const rows = (leads ?? []).map(lead => [
     new Date(lead.created_at).toLocaleString('fr-FR', {
@@ -46,6 +65,10 @@ export async function GET() {
     lead.message ?? '',
     STATUS_LABELS[lead.status]   ?? lead.status,
     lead.language.toUpperCase(),
+    lead.apartment_type ? (APARTMENT_LABELS[lead.apartment_type] ?? lead.apartment_type) : '',
+    formatDate(lead.check_in),
+    formatDate(lead.check_out),
+    lead.notes ?? '',
   ]
     .map(csvCell)
     .join(','))

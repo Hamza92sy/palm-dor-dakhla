@@ -2,25 +2,22 @@ import { Suspense } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/server'
-import StatusSelect from './components/StatusSelect'
 import AdminFilters from './components/AdminFilters'
-
-const SERVICE_LABELS: Record<string, string> = {
-  accommodation: 'Hébergement',
-  restaurant:    'Restaurant',
-  cafe:          'Café',
-  car_rental:    'Location',
-}
+import LeadRow from './components/LeadRow'
 
 type Lead = {
-  id:         string
-  created_at: string
-  name:       string
-  phone:      string
-  service:    string
-  message:    string | null
-  status:     string
-  language:   string
+  id:             string
+  created_at:     string
+  name:           string
+  phone:          string
+  service:        string
+  message:        string | null
+  status:         string
+  language:       string
+  notes:          string | null
+  check_in:       string | null
+  check_out:      string | null
+  apartment_type: string | null
 }
 
 async function logout() {
@@ -135,85 +132,9 @@ export default async function AdminPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {leads.map((lead, i) => {
-                    const waPhone = lead.phone.replace(/\D/g, '')
-                    const waText  = encodeURIComponent(
-                      `Bonjour ${lead.name}, suite à votre demande Palm d'Or Dakhla, nous vous confirmons...`
-                    )
-                    return (
-                      <tr
-                        key={lead.id}
-                        className={`border-t border-palm-gold/10 transition-colors hover:bg-palm-gold/5
-                          ${i % 2 === 0 ? 'bg-white/50' : 'bg-white/25'}`}
-                      >
-                        {/* Date */}
-                        <td className="px-4 py-3 text-palm-blue/50 text-[11px] whitespace-nowrap">
-                          {new Date(lead.created_at).toLocaleDateString('fr-FR', {
-                            day:    '2-digit',
-                            month:  '2-digit',
-                            year:   '2-digit',
-                          })}
-                          <br />
-                          <span className="text-palm-blue/30">
-                            {new Date(lead.created_at).toLocaleTimeString('fr-FR', {
-                              hour:   '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        </td>
-
-                        {/* Nom */}
-                        <td className="px-4 py-3 text-palm-blue font-medium">
-                          {lead.name}
-                        </td>
-
-                        {/* Téléphone */}
-                        <td className="px-4 py-3 text-palm-blue/65 whitespace-nowrap text-[12px]">
-                          {lead.phone}
-                        </td>
-
-                        {/* Service */}
-                        <td className="px-4 py-3">
-                          <span className="text-[10px] tracking-[0.1em] uppercase text-palm-gold font-medium">
-                            {SERVICE_LABELS[lead.service] ?? lead.service}
-                          </span>
-                        </td>
-
-                        {/* Message */}
-                        <td className="px-4 py-3 max-w-[180px]">
-                          {lead.message ? (
-                            <span
-                              className="text-[12px] text-palm-blue/55 block truncate"
-                              title={lead.message}
-                            >
-                              {lead.message}
-                            </span>
-                          ) : (
-                            <span className="text-[11px] text-palm-blue/20 italic">—</span>
-                          )}
-                        </td>
-
-                        {/* Statut */}
-                        <td className="px-4 py-3">
-                          <StatusSelect id={lead.id} currentStatus={lead.status} />
-                        </td>
-
-                        {/* Action WhatsApp */}
-                        <td className="px-4 py-3">
-                          <a
-                            href={`https://wa.me/${waPhone}?text=${waText}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[11px] tracking-[0.08em] uppercase font-medium
-                              text-[#1a9e51] hover:text-[#25D366]
-                              transition-colors whitespace-nowrap"
-                          >
-                            Contacter
-                          </a>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {leads.map((lead, i) => (
+                    <LeadRow key={lead.id} lead={lead} index={i} />
+                  ))}
                 </tbody>
               </table>
             </div>
