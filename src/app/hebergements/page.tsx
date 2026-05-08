@@ -260,15 +260,26 @@ export default function HebergementsPage() {
                     {apt.capacity}
                   </p>
 
-                  {/* CTA */}
-                  <WhatsAppButton
-                    href={waUrl}
-                    className="group flex items-center justify-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
+                  {/* CTA primary: scroll to form with pre-fill */}
+                  <a
+                    href={`?apt=${apt.id}#contact`}
+                    className="flex items-center justify-center
+                      border border-palm-blue/25 text-palm-blue hover:bg-palm-blue hover:text-white
                       text-[11px] tracking-[0.14em] uppercase font-medium
                       px-7 py-3.5 rounded-full transition-all duration-300 mt-auto"
                   >
-                    <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                    Vérifier disponibilité
+                    Réserver cet appartement
+                  </a>
+
+                  {/* CTA secondary: WA direct */}
+                  <WhatsAppButton
+                    href={waUrl}
+                    className="flex items-center justify-center gap-1.5
+                      text-[10px] text-[#1a9e51] hover:text-[#25D366]
+                      tracking-widest uppercase transition-colors duration-200"
+                  >
+                    <WhatsAppIcon className="w-3 h-3 shrink-0" />
+                    ou WhatsApp direct
                   </WhatsAppButton>
                 </div>
               )

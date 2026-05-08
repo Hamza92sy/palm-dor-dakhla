@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { trackLead, trackWhatsApp } from '@/lib/tracking'
 import { SERVICE_LABELS, type ServiceType } from '@/lib/services'
+
+const VALID_APT_PARAMS = ['standard', '2-chambres', 'grande-capacite']
 
 const APARTMENT_TYPES = [
   { value: '',                label: 'Type non précisé'               },
@@ -35,6 +37,15 @@ export default function ServiceContactForm({ service }: Props) {
 
   const today = new Date().toISOString().split('T')[0]
   const isAccommodation = service === 'accommodation'
+
+  useEffect(() => {
+    if (!isAccommodation) return
+    const params = new URLSearchParams(window.location.search)
+    const apt = params.get('apt')
+    if (apt && VALID_APT_PARAMS.includes(apt)) {
+      setApartmentType(apt)
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
