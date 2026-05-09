@@ -12,6 +12,8 @@ const STATUS_LABELS: Record<string, string> = {
   contacted: 'Contacté',
   confirmed: 'Confirmé',
   cancelled: 'Annulé',
+  accepted:  'Accepté',
+  rejected:  'Refusé',
 }
 
 const APARTMENT_LABELS: Record<string, string> = {
@@ -46,8 +48,8 @@ export async function GET() {
   }
 
   const header = [
-    'Date', 'Nom', 'Téléphone', 'Service', 'Message', 'Statut', 'Langue',
-    'Appartement', 'Arrivée', 'Départ', 'Notes',
+    'Date', 'Nom', 'Téléphone', 'Email', 'Service', 'Message', 'Statut', 'Langue',
+    'Appartement', 'Arrivée', 'Départ', 'Notes', 'Décision', 'Date décision',
   ]
 
   const rows = (leads ?? []).map(lead => [
@@ -61,6 +63,7 @@ export async function GET() {
     }),
     lead.name,
     lead.phone,
+    lead.email ?? '',
     SERVICE_LABELS[lead.service] ?? lead.service,
     lead.message ?? '',
     STATUS_LABELS[lead.status]   ?? lead.status,
@@ -69,6 +72,8 @@ export async function GET() {
     formatDate(lead.check_in),
     formatDate(lead.check_out),
     lead.notes ?? '',
+    lead.decision_note ?? '',
+    lead.decision_at ? formatDate(lead.decision_at) : '',
   ]
     .map(csvCell)
     .join(','))

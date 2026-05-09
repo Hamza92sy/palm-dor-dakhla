@@ -5,6 +5,7 @@ import StatusSelect    from './StatusSelect'
 import LeadNotes       from './LeadNotes'
 import DateRangePicker from './DateRangePicker'
 import ApartmentSelect from './ApartmentSelect'
+import DecisionPanel   from './DecisionPanel'
 
 const SERVICE_LABELS: Record<string, string> = {
   accommodation: 'Hébergement',
@@ -22,10 +23,13 @@ type Lead = {
   message:        string | null
   status:         string
   language:       string
+  email:          string | null
   notes:          string | null
   check_in:       string | null
   check_out:      string | null
   apartment_type: string | null
+  decision_at:    string | null
+  decision_note:  string | null
 }
 
 type Props = {
@@ -96,7 +100,17 @@ export default function LeadRow({ lead, index }: Props) {
 
         {/* Statut */}
         <td className="px-4 py-3">
-          <StatusSelect id={lead.id} currentStatus={lead.status} />
+          {lead.status === 'accepted' ? (
+            <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-green-50 text-green-700">
+              Accepté
+            </span>
+          ) : lead.status === 'rejected' ? (
+            <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-red-50 text-red-600">
+              Refusé
+            </span>
+          ) : (
+            <StatusSelect id={lead.id} currentStatus={lead.status} />
+          )}
         </td>
 
         {/* Actions */}
@@ -126,20 +140,40 @@ export default function LeadRow({ lead, index }: Props) {
       {expanded && (
         <tr className={`border-t border-palm-gold/10 ${index % 2 === 0 ? 'bg-white/50' : 'bg-white/25'}`}>
           <td colSpan={7} className="px-4 py-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+            <div className="flex flex-col gap-4 max-w-2xl">
+
+              {/* Accommodation-specific fields */}
               {lead.service === 'accommodation' && (
-                <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <ApartmentSelect id={lead.id} initialType={lead.apartment_type} />
                   <DateRangePicker
                     id={lead.id}
                     initialCheckIn={lead.check_in}
                     initialCheckOut={lead.check_out}
                   />
-                </>
+                </div>
               )}
-              <div className={lead.service === 'accommodation' ? 'sm:col-span-2' : 'sm:col-span-2'}>
-                <LeadNotes id={lead.id} initialNotes={lead.notes} />
-              </div>
+
+              {/* Email client (read-only) */}
+              {lead.email && (
+                <div className="space-y-0.5">
+                  <span className="text-[10px] tracking-[0.15em] uppercase text-palm-blue/40 font-medium">
+                    Email client
+                  </span>
+                  <p className="text-[12px] text-palm-blue/70">{lead.email}</p>
+                </div>
+              )}
+
+              {/* Decision */}
+              <DecisionPanel
+                leadId={lead.id}
+                leadEmail={lead.email}
+                currentStatus={lead.status}
+                initialNote={lead.decision_note}
+              />
+
+              {/* Internal notes */}
+              <LeadNotes id={lead.id} initialNotes={lead.notes} />
             </div>
           </td>
         </tr>

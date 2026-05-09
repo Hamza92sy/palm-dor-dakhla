@@ -14,10 +14,13 @@ type Lead = {
   message:        string | null
   status:         string
   language:       string
+  email:          string | null
   notes:          string | null
   check_in:       string | null
   check_out:      string | null
   apartment_type: string | null
+  decision_at:    string | null
+  decision_note:  string | null
 }
 
 async function logout() {

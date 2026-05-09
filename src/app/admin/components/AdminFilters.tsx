@@ -17,6 +17,8 @@ const STATUSES = [
   { value: 'contacted', label: 'Contacté' },
   { value: 'confirmed', label: 'Confirmé' },
   { value: 'cancelled', label: 'Annulé' },
+  { value: 'accepted',  label: 'Accepté' },
+  { value: 'rejected',  label: 'Refusé' },
 ]
 
 export default function AdminFilters() {
@@ -63,6 +65,7 @@ export default function AdminFilters() {
           focus:outline-none focus:border-palm-gold transition-colors"
       />
       <select
+        aria-label="Filtrer par service"
         defaultValue={searchParams.get('service') ?? ''}
         onChange={e => handleSelect('service', e.target.value)}
         className="border border-palm-gold/25 bg-white/70 rounded-sm px-3 py-2.5
@@ -74,6 +77,7 @@ export default function AdminFilters() {
         ))}
       </select>
       <select
+        aria-label="Filtrer par statut"
         defaultValue={searchParams.get('status') ?? ''}
         onChange={e => handleSelect('status', e.target.value)}
         className="border border-palm-gold/25 bg-white/70 rounded-sm px-3 py-2.5

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { sendLeadDecisionEmail } from '@/lib/email'
 
-const VALID_STATUSES        = ['new', 'contacted', 'confirmed', 'cancelled'] as const
+export const runtime = 'nodejs'
+
+const VALID_STATUSES        = ['new', 'contacted', 'confirmed', 'cancelled', 'accepted', 'rejected'] as const
 const VALID_APARTMENT_TYPES = ['standard', '2-chambres', 'grande-capacite'] as const
 const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
 
@@ -22,6 +25,7 @@ export async function PATCH(
   }
 
   const updates: Record<string, unknown> = {}
+  let decidedStatus: 'accepted' | 'rejected' | null = null
 
   if ('status' in body) {
     const { status } = body
@@ -32,6 +36,20 @@ export async function PATCH(
       )
     }
     updates.status = status
+    if (status === 'accepted' || status === 'rejected') {
+      decidedStatus      = status
+      updates.decision_at = new Date().toISOString()
+    }
+  }
+
+  if ('decision_note' in body) {
+    const { decision_note } = body
+    if (decision_note !== null && typeof decision_note !== 'string') {
+      return NextResponse.json({ error: 'decision_note doit être une chaîne ou null' }, { status: 400 })
+    }
+    updates.decision_note = typeof decision_note === 'string' && decision_note.trim()
+      ? decision_note.trim()
+      : null
   }
 
   if ('notes' in body) {
@@ -81,6 +99,34 @@ export async function PATCH(
   if (error) {
     console.error('[api/admin/leads] update error:', error.message)
     return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 })
+  }
+
+  // Fire-and-forget decision email — never blocks the response
+  if (decidedStatus) {
+    const { data: lead } = await supabaseAdmin
+      .from('leads')
+      .select('name, email, phone, service, check_in, check_out, apartment_type')
+      .eq('id', id)
+      .single()
+
+    if (lead?.email) {
+      const note = typeof updates.decision_note === 'string' ? updates.decision_note : null
+      sendLeadDecisionEmail(
+        {
+          name:           lead.name,
+          email:          lead.email,
+          phone:          lead.phone,
+          service:        lead.service,
+          check_in:       lead.check_in  ?? null,
+          check_out:      lead.check_out ?? null,
+          apartment_type: lead.apartment_type ?? null,
+        },
+        decidedStatus,
+        note,
+      ).catch((err: unknown) => console.error('[api/admin/leads] decision email failed:', err))
+    } else {
+      console.log('[api/admin/leads] decision made — no email on file for lead:', id)
+    }
   }
 
   return NextResponse.json({ success: true })

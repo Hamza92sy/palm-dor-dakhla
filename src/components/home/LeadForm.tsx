@@ -35,6 +35,7 @@ export default function LeadForm() {
   const [checkIn,       setCheckIn]       = useState('')
   const [checkOut,      setCheckOut]      = useState('')
   const [apartmentType, setApartmentType] = useState('')
+  const [email,         setEmail]         = useState('')
   const [loading,       setLoading]       = useState(false)
   const [error,         setError]         = useState<string | null>(null)
   const [success,       setSuccess]       = useState(false)
@@ -51,8 +52,16 @@ export default function LeadForm() {
     }
   }
 
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (service === 'accommodation' && !EMAIL_RE.test(email.trim())) {
+      setError('Email requis pour les réservations hébergement.')
+      return
+    }
+
     setLoading(true)
     setError(null)
 
@@ -66,6 +75,7 @@ export default function LeadForm() {
         body: JSON.stringify({
           name,
           phone,
+          email: email.trim() || null,
           service,
           message,
           language: 'fr',
@@ -187,6 +197,29 @@ export default function LeadForm() {
               onChange={e => setPhone(e.target.value)}
               disabled={loading}
               placeholder="+212 6XX XXX XXX"
+              className={INPUT_CLASS}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="lead-email" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+              Email{' '}
+              {service === 'accommodation' ? (
+                <span className="text-palm-gold">*</span>
+              ) : (
+                <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+              )}
+            </label>
+            <input
+              id="lead-email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              disabled={loading}
+              placeholder="votre@email.com"
               className={INPUT_CLASS}
             />
           </div>

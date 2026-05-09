@@ -3,10 +3,13 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import { assertServerEnv } from '@/lib/env'
 import { sendLeadNotification } from '@/lib/email'
 
-const VALID_SERVICES       = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
-const VALID_LANGUAGES      = ['fr', 'en'] as const
+export const runtime = 'nodejs'
+
+const VALID_SERVICES        = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
+const VALID_LANGUAGES       = ['fr', 'en'] as const
 const VALID_APARTMENT_TYPES = ['standard', '2-chambres', 'grande-capacite'] as const
-const DATE_RE              = /^\d{4}-\d{2}-\d{2}$/
+const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
+const EMAIL_RE              = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Service       = (typeof VALID_SERVICES)[number]
 type Language      = (typeof VALID_LANGUAGES)[number]
@@ -100,7 +103,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Corps de requête JSON invalide' }, { status: 400 })
   }
 
-  const { name, phone, service, message, language = 'fr' } = body
+  const { name, phone, service, message, language = 'fr', email } = body
 
   // ── Required fields ──────────────────────────────────────────────────────
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -124,6 +127,20 @@ export async function POST(req: NextRequest) {
   if (message !== undefined && message !== null && typeof message !== 'string') {
     return NextResponse.json({ error: 'message doit être une chaîne' }, { status: 400 })
   }
+
+  // ── Email — required for accommodation, optional + validated for others ──
+  const rawEmail = typeof email === 'string' ? email.trim() : null
+  if (service === 'accommodation') {
+    if (!rawEmail || !EMAIL_RE.test(rawEmail)) {
+      return NextResponse.json(
+        { error: 'Email requis et valide pour les réservations hébergement' },
+        { status: 400 }
+      )
+    }
+  } else if (rawEmail && !EMAIL_RE.test(rawEmail)) {
+    return NextResponse.json({ error: 'Format email invalide' }, { status: 400 })
+  }
+  const cleanEmail = rawEmail && EMAIL_RE.test(rawEmail) ? rawEmail : null
 
   // ── Optional accommodation fields (ignored for other services) ───────────
   let cleanCheckIn:       string | null = null
@@ -180,6 +197,7 @@ export async function POST(req: NextRequest) {
   const { error } = await supabaseAdmin.from('leads').insert({
     name:           cleanName,
     phone:          cleanPhone,
+    email:          cleanEmail,
     service:        svc,
     message:        cleanMessage,
     language:       lang,
