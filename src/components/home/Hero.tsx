@@ -63,20 +63,20 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
-          <WhatsAppButton className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
-              text-[11px] tracking-[0.14em] uppercase font-medium
-              px-7 py-3.5 rounded-full transition-colors duration-300">
-            <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-            Réserver maintenant
-          </WhatsAppButton>
           <Link
             href="#reservation"
-            className="flex items-center gap-2.5 border border-white/30 text-white/80 hover:border-white/60 hover:text-white
+            className="flex items-center gap-2.5 border border-white/60 text-white hover:border-white hover:bg-white/10
               text-[11px] tracking-[0.14em] uppercase font-medium
               px-7 py-3.5 rounded-full transition-all duration-300"
           >
-            Demander disponibilité
+            Faire une demande
           </Link>
+          <WhatsAppButton className="flex items-center gap-1.5
+              text-[10px] tracking-[0.18em] uppercase text-white/50 hover:text-white/80
+              transition-colors duration-200">
+            <WhatsAppIcon className="w-3 h-3 shrink-0" />
+            ou via WhatsApp
+          </WhatsAppButton>
         </div>
       </div>
 

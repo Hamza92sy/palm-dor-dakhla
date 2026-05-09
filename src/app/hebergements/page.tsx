@@ -148,23 +148,23 @@ export default function HebergementsPage() {
             6 appartements · 3 configurations · Dès 500 DH / nuit
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
-            <WhatsAppButton
-              href={generalWAUrl}
-              className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
-                text-[11px] tracking-[0.14em] uppercase font-medium
-                px-7 py-3.5 rounded-full transition-colors duration-300"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-              Vérifier disponibilité
-            </WhatsAppButton>
             <a
               href="#appartements"
-              className="flex items-center gap-2.5 border border-white/30 text-white/75 hover:border-white/60 hover:text-white
+              className="flex items-center gap-2.5 border border-white/60 text-white hover:border-white hover:bg-white/10
                 text-[11px] tracking-[0.14em] uppercase font-medium
                 px-7 py-3.5 rounded-full transition-all duration-300"
             >
               Voir nos appartements
             </a>
+            <WhatsAppButton
+              href={generalWAUrl}
+              className="flex items-center gap-1.5
+                text-[10px] tracking-[0.18em] uppercase text-white/50 hover:text-white/80
+                transition-colors duration-200"
+            >
+              <WhatsAppIcon className="w-3 h-3 shrink-0" />
+              ou WhatsApp
+            </WhatsAppButton>
           </div>
         </div>
       </section>
@@ -186,17 +186,6 @@ export default function HebergementsPage() {
             ))}
           </div>
 
-          <div className="flex justify-center mt-12">
-            <WhatsAppButton
-              href={generalWAUrl}
-              className="group flex items-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
-                text-[11px] tracking-[0.14em] uppercase font-medium
-                px-7 py-3.5 rounded-full transition-all duration-300"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-              Vérifier disponibilité
-            </WhatsAppButton>
-          </div>
         </div>
       </section>
 

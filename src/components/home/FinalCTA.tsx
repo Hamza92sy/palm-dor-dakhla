@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { WHATSAPP_NUMBER, WHATSAPP_PHONE_DISPLAY } from '@/lib/config'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
@@ -35,22 +36,32 @@ export default function FinalCTA() {
 
         {/* Subtext */}
         <p className="text-sm text-white/55 max-w-[38ch] leading-relaxed">
-          Contactez-nous sur WhatsApp pour vérifier la disponibilité et réserver rapidement.
+          Envoyez votre demande en 30 secondes — nous confirmons rapidement.
         </p>
 
         {/* CTA button */}
-        <WhatsAppButton className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
+        <Link
+          href="#reservation"
+          className="flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
             text-[11px] tracking-[0.18em] uppercase font-medium
             px-8 py-4 rounded-full transition-all duration-300 mt-2
-            shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
-          <WhatsAppIcon className="w-4 h-4 shrink-0 text-[#25D366] transition-transform duration-300 group-hover:scale-110" />
-          Réserver via WhatsApp
-        </WhatsAppButton>
+            shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
+        >
+          Faire ma demande
+        </Link>
 
         {/* Micro copy */}
         <p className="text-[10px] tracking-[0.2em] uppercase text-white/25">
           Disponible 7j/7 &middot; Sans engagement &middot; Confirmation rapide
         </p>
+
+        {/* WhatsApp secondary */}
+        <WhatsAppButton className="flex items-center gap-1.5
+            text-[11px] tracking-[0.18em] uppercase text-white/30 hover:text-white/55
+            transition-colors duration-200">
+          <WhatsAppIcon className="w-3 h-3 shrink-0" />
+          ou via WhatsApp
+        </WhatsAppButton>
 
         {/* Phone */}
         {WHATSAPP_PHONE_DISPLAY && (
