@@ -15,10 +15,127 @@ Les docs archivés décrivent l'état V1 et sont conservés à titre historique 
 
 ---
 
+## Documentation Update Protocol
+
+Après toute modification significative, vérifier si la documentation doit être mise à jour **avant de clore la session**.
+
+### Quand mettre à jour PROGRESS.md
+
+Mettre à jour si le changement concerne :
+
+- Nouvelle fonctionnalité ou page
+- Changement de workflow (réservation, dashboard, email)
+- Changement de schéma Supabase
+- Changement de variable d'environnement
+- Changement d'intégration (Resend, Supabase, Vercel)
+- Changement de données appartements
+- Changement d'UX réservation
+- Changement de roadmap ou identification d'une limitation
+
+### Quand NE PAS mettre à jour
+
+Ne pas modifier la doc pour :
+
+- Micro-copy (faute de frappe, tournure)
+- Styling mineur (couleur, espacement cosmétique)
+- Warnings linter sans impact fonctionnel
+- Changements purement cosmétiques sans effet sur le comportement
+
+### Docs à vérifier selon le type de changement
+
+- **Toujours** → `PROGRESS.md`
+- **Schéma DB change** → `docs/architecture/db-schema.md`
+- **User journey change** → `docs/architecture/user-flows.md`
+- **Dashboard / workflow admin change** → `docs/operations/ADMIN-WORKFLOW.md`
+- **Env vars / déploiement change** → `docs/operations/VERCEL_ENV_AUDIT.md`
+- **Données appartements / services change** → `docs/content/services.md`
+- **Architecture change** → `CLAUDE.md`
+- **Rôles agents change** → `AGENTS.md` + `.claude/agents/`
+
+### Format de réponse obligatoire après chaque session
+
+```text
+## Session summary
+
+1. Code changes      : [fichiers modifiés]
+2. Doc changes       : [docs mises à jour]
+3. Docs not updated  : [docs skippées + raison]
+4. Build result      : [OK / erreurs]
+5. Next step         : [recommandation]
+```
+
+---
+
+## Agent Selection Protocol
+
+Règle absolue : avant toute modification de fichier, déclarer explicitement :
+
+```text
+Agent principal   : [nom-agent]
+Agents secondaires: [si cross-domain]
+Rules à lire      : [rule1.md, rule2.md]
+Playbook          : [playbook.md]
+Fichiers probables: [chemin/fichier.ts, ...]
+Risques identifiés: [...]
+Plan              : [étapes avant de coder]
+```
+
+Ne jamais modifier un fichier sans avoir affiché cette déclaration.
+
+### Mapping tâche → agent
+
+- **UI / composants / formulaires** → `frontend-agent` — rules: `frontend.md` + `architecture.md` — playbook: `new-feature.md` ou `ui-polish.md`
+- **Design / galerie / mobile / premium look** → `design-agent` — rules: `frontend.md` — playbook: `ui-polish.md`
+- **API / Supabase / Resend / validation** → `backend-agent` — rules: `database.md` + `deployment.md` — playbook: `bugfix.md` ou `new-feature.md`
+- **Dashboard `/admin` / accept-refuse / CSV** → `dashboard-agent` — rules: `dashboard.md` — playbook: `dashboard-change.md`
+- **Copywriting / FR-EN / CTA / descriptions** → `content-agent` — rules: `frontend.md` — playbook: `new-feature.md`
+- **SEO / metadata / sitemap / structured data** → `seo-agent` — rules: `architecture.md` — playbook: `new-feature.md`
+- **PROGRESS.md / docs / archive / CLAUDE.md** → `documentation-agent` — rules: `documentation.md` — playbook: `documentation-update.md`
+- **Déploiement / Vercel / env vars** → `backend-agent` — rules: `deployment.md` — playbook: `deployment-checklist.md`
+- **Bug tous domaines** → agent du domaine concerné — playbook: `bugfix.md`
+
+### Exemples de routing
+
+#### "améliore la page hébergements"
+
+```text
+Agent principal   : design-agent
+Rules             : frontend.md + architecture.md
+Playbook          : ui-polish.md
+Fichiers probables: src/app/hebergements/page.tsx, src/lib/apartments.ts
+Risques           : ne pas casser le flux réservation
+Plan              : identifier les éléments à polir → mobile first → build
+```
+
+#### "corrige l'email d'acceptation"
+
+```text
+Agent principal   : backend-agent
+Rules             : database.md + deployment.md
+Playbook          : bugfix.md
+Fichiers probables: src/lib/email.ts, src/app/api/admin/leads/[id]/route.ts
+Risques           : email non envoyé en prod, template cassé
+Plan              : reproduire → root cause → fix minimal → build → tester envoi
+```
+
+#### "ajoute une section avis clients"
+
+```text
+Agent principal   : frontend-agent
+Agents secondaires: design-agent (polish), content-agent (textes)
+Rules             : frontend.md + architecture.md
+Playbook          : new-feature.md
+Fichiers probables: src/app/page.tsx, src/components/
+Risques           : impact performance (images), cohérence visuelle
+Plan              : lire PROGRESS.md → identifier zone homepage → implémenter → build
+```
+
+---
+
 ## Source of Truth Hierarchy
 
 | Niveau | Source | Rôle |
-|--------|--------|------|
+| -------- | -------- | ------ |
 | 1 — Absolu | `PROGRESS.md` | État V2.3 complet, architecture, DB, roadmap |
 | 2 — Code | `src/lib/apartments.ts` | Données appartements (seule source valide) |
 | 2 — Technique | `docs/architecture/db-schema.md` | Schéma DB (à mettre à jour — voir PROGRESS.md §7) |
@@ -91,23 +208,28 @@ WhatsApp est une option secondaire post-soumission, pas le flux primaire.
 ## Fichiers de référence actifs
 
 **Source absolue** :
+
 - État complet V2.3 : `PROGRESS.md`
 - Appartements (IDs, prix, étages, messages WA) : `src/lib/apartments.ts`
 
 **Architecture** :
+
 - Schéma DB : `docs/architecture/db-schema.md` *(attention : à jour jusqu'à migration 001 — voir PROGRESS.md §7 pour l'état complet)*
 - Parcours utilisateur : `docs/architecture/user-flows.md` *(V1 — voir PROGRESS.md §3 pour V2.3)*
 
 **Opérations** :
+
 - Variables ENV : `docs/operations/VERCEL_ENV_AUDIT.md` *(voir PROGRESS.md §9 pour liste complète)*
 - Admin : `docs/operations/ADMIN-WORKFLOW.md`
 - Setup local : `docs/operations/SETUP.md`
 
 **Contenu** :
+
 - Offres et prix : `docs/content/services.md`
 - Actifs manquants : `docs/content/assets-needed.md`
 
 **Archivés — ne plus référencer** :
+
 - `docs/archive/PROJECT_RESTART_AUDIT.md`
 - `docs/archive/PROJECT_ALIGNMENT_REPORT.md`
 - `docs/archive/POST_LAUNCH_ROADMAP.md`

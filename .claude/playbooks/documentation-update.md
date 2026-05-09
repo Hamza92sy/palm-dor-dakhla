@@ -1,9 +1,3 @@
----
-playbook: documentation-update
-version: 1.0
-project: palm-dor-dakhla
----
-
 # Playbook — Documentation Update
 
 Utiliser ce playbook après toute intervention significative sur le projet, ou quand la documentation est identifiée comme obsolète ou manquante.
@@ -20,42 +14,74 @@ Utiliser ce playbook après toute intervention significative sur le projet, ou q
 
 ---
 
-## Étape 1 — Update Affected Docs
+## Documentation Update Checklist
 
-Identifier tous les documents impactés par le changement récent :
+Après chaque changement significatif, répondre à chaque question :
 
-| Changement | Documents à mettre à jour |
-|---|---|
-| Nouvelle feature | `PROGRESS.md` en priorité |
-| Changement architecture | `CLAUDE.md` + `PROGRESS.md` |
-| Nouveau workflow réservation | `CLAUDE.md` + `docs/booking-flow.md` |
-| Changement schema DB | `PROGRESS.md` + `docs/database.md` |
-| Nouveau rôle agent | `AGENTS.md` + `.claude/agents/` |
-| Changement règle | `.claude/rules/[rule].md` |
+### PROGRESS.md
+
+- L'état de production a-t-il changé ?
+- Une fonctionnalité a-t-elle été ajoutée, modifiée ou supprimée ?
+- Un workflow a-t-il changé (réservation, email, dashboard) ?
+- Une limitation ou un bug a-t-il été identifié ?
+
+→ **Oui à l'une de ces questions** : mettre à jour `PROGRESS.md`
+
+### docs/architecture/db-schema.md
+
+- Le schéma Supabase a-t-il changé (nouvelle colonne, nouvelle table, migration) ?
+- Une contrainte DB a-t-elle été ajoutée ou modifiée ?
+
+→ **Oui** : mettre à jour `docs/architecture/db-schema.md`
+
+### docs/architecture/user-flows.md
+
+- Le parcours visiteur a-t-il changé (nouvelle étape, nouveau CTA, nouveau flux) ?
+- Le formulaire de réservation a-t-il évolué ?
+
+→ **Oui** : mettre à jour `docs/architecture/user-flows.md`
+
+### docs/operations/ADMIN-WORKFLOW.md
+
+- Le dashboard admin a-t-il changé (nouvelle action, nouveau statut, nouvelle vue) ?
+- Le workflow accept/refuse a-t-il évolué ?
+
+→ **Oui** : mettre à jour `docs/operations/ADMIN-WORKFLOW.md`
+
+### docs/operations/VERCEL_ENV_AUDIT.md
+
+- Une variable d'environnement a-t-elle été ajoutée, modifiée ou supprimée ?
+- La configuration Vercel a-t-elle changé ?
+
+→ **Oui** : mettre à jour `docs/operations/VERCEL_ENV_AUDIT.md`
+
+### docs/content/services.md
+
+- Les données appartements ont-elles changé (prix, description, capacité) ?
+- Un service a-t-il été ajouté ou modifié (restaurant, café, voiture) ?
+
+→ **Oui** : mettre à jour `docs/content/services.md`
 
 ---
 
-## Étape 2 — Archive Obsolete Docs
+## Étape — Archive Obsolete Docs
 
 Pour chaque document obsolète identifié :
 
-1. Déplacer le fichier dans `docs/archive/`
-2. Ajouter en tête de fichier :
-   ```
-   [ARCHIVED YYYY-MM-DD — Remplacé par docs/[nouveau-doc].md]
-   ```
-3. Dans le document qui le remplace, ajouter une note :
-   ```
-   > Remplace l'ancien [nom-doc.md] archivé le YYYY-MM-DD.
-   ```
+1. Déplacer dans `docs/archive/`
+1. Ajouter en tête de fichier :
+
+```text
+[ARCHIVED YYYY-MM-DD — Remplacé par docs/[nouveau-doc].md]
+```
+
+1. Dans le document qui le remplace, référencer l'archive.
 
 Ne jamais supprimer — toujours archiver.
 
 ---
 
-## Étape 3 — Sync PROGRESS.md
-
-`PROGRESS.md` se met à jour en dernier, car il référence tout ce qui a été fait.
+## Étape — Sync PROGRESS.md
 
 Format standard :
 
@@ -76,7 +102,23 @@ Format standard :
 - Tâche identifiée 2
 ```
 
-Garder chaque entrée sous 20 lignes. La concision est une forme de respect pour les futures lectures (humaines et IA).
+Garder chaque entrée sous 20 lignes.
+
+---
+
+## Format de rapport obligatoire
+
+Terminer chaque session avec :
+
+```text
+## Session summary
+
+1. Code changes      : [fichiers modifiés]
+2. Doc changes       : [docs mises à jour]
+3. Docs not updated  : [docs skippées + raison]
+4. Build result      : [OK / erreurs]
+5. Next step         : [recommandation]
+```
 
 ---
 
@@ -86,3 +128,4 @@ Garder chaque entrée sous 20 lignes. La concision est une forme de respect pour
 - [ ] Aucun document ne contredit un autre
 - [ ] Les docs obsolètes sont archivés (pas supprimés)
 - [ ] Aucune information n'est dupliquée entre deux sources
+- [ ] Le rapport de session a été affiché
