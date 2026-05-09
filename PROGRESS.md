@@ -1,287 +1,543 @@
-# Palm d'Or Dakhla — Project Progress
+# Palm d'Or Dakhla — Project Progress & Technical Reference
 
-## Current Production State
-
-| Élément            | Valeur                                                    |
-|--------------------|-----------------------------------------------------------|
-| Framework          | Next.js 16.2.3 (App Router, Turbopack)                   |
-| Language           | TypeScript strict                                         |
-| Style              | Tailwind CSS 4                                            |
-| BDD                | Supabase PostgreSQL 17 (région eu-central-1)              |
-| Déploiement        | Vercel                                                    |
-| URL production     | https://palmdordakhla.com                                 |
-| Statut général     | Live, opérationnel, build 0 erreurs (20 pages)           |
-
-### Fonctionnalités publiques actives
-- Site vitrine 7 sections homepage
-- Pages service : `/hebergements`, `/restaurant`, `/cafe`, `/location-voiture`
-- Galerie photo `/galerie`
-- Contact `/contact` avec carte Google Maps
-- Formulaire lead → WhatsApp (sur homepage, /contact, et chaque page service)
-- Pages bilingues `/fr` et `/en` (stubs — EN non encore implémenté)
-- Sitemap XML + robots.txt
-- Structured data (FAQ schema)
-- Meta Pixel + GA4 (structure prête, envoi conditionnel si env vars présentes)
-
-### Fonctionnalités admin actives (`/admin`)
-- Login par mot de passe (cookie HttpOnly, 7 jours)
-- Liste des leads avec filtres (service, statut, recherche nom/téléphone)
-- Mise à jour statut (Nouveau / Contacté / Confirmé / Annulé)
-- Notes internes par lead (auto-save 800ms)
-- Dates check-in / check-out par lead (blur-save, accommodation only)
-- Type d'appartement par lead (immediate-save, accommodation only)
-- Lien WhatsApp direct par lead
-- Export CSV enrichi (11 colonnes avec BOM UTF-8)
-- Déconnexion (Server Action)
-
-### Supabase
-- Projet ID : `mkpiriemezuzqkcupdqs` — région eu-central-1 — ACTIVE_HEALTHY
-- Table `leads` active avec RLS (anon INSERT only, service_role ALL)
-- Migrations 001 + 002 appliquées
-
-### Tracking
-- Meta Pixel : structure prête, déclenché si `NEXT_PUBLIC_META_PIXEL_ID` présent
-- GA4 : structure prête, déclenché si `NEXT_PUBLIC_GA_ID` présent
-- Événements implémentés : `Lead`, `Contact`, page views
+> **Version :** V2.3 — Request-Based Booking Management System
+> **Dernière mise à jour :** 2026-05-09
+> **Build :** ✓ Clean — 0 erreurs TypeScript — 20 pages
 
 ---
 
-## Completed Work
+## 1. Project Overview
 
-### Phase 1 — Site vitrine public
-- Homepage 7 sections (Hero, Services, Hébergement, Expérience, Galerie, Témoignages, CTA)
-- Pages service individuelles
-- Formulaire lead → Supabase → WhatsApp
-- SEO (metadata, OG, Twitter cards, sitemap, robots, structured data)
-- Design system palm-cream / palm-blue / palm-gold (Cormorant Garamond + Geist)
-- Mobile-first, Tailwind CSS 4
+**Palm d'Or Dakhla** est une résidence multi-services à Dakhla, Maroc.
+Services : hébergement (6 appartements), restaurant, café, location de voitures.
 
-### Phase 2 — Corrections P2
-- Footer duplicate text corrigé
-- Contact page anchor link `/contact#reservation` corrigé
-- `docs/services.md` : appartement count 5 → 6
+### Objectif business
 
-### Phase 3 — Dashboard admin V1
-- Route protégée `/admin` (middleware Edge Runtime)
-- Login `/admin/login` + API `/api/admin/auth` (cookie HttpOnly)
-- Tableau leads avec filtres URL (service, statut, recherche)
-- StatusSelect component (PATCH partiel, badges colorés)
-- WhatsApp CTA par ligne
-- Export CSV (`/api/admin/export`)
-- Notification email Resend (fire-and-forget, graceful no-op si env vars absentes)
+Convertir les visiteurs Google en réservations confirmées via un workflow structuré :
 
-### Phase 4 — Dashboard V1.5 — Reservation details
-- Migration 002 appliquée en production (notes, check_in, check_out, apartment_type)
-- LeadRow.tsx — ligne expandable ▼/▲
-- LeadNotes.tsx — notes internes auto-save 800ms
-- DateRangePicker.tsx — arrivée/départ, blur-save, validation check_out ≥ check_in
-- ApartmentSelect.tsx — type appartement immediate-save (accommodation only)
-- PATCH route étendu — mise à jour partielle de tous les nouveaux champs
-- Export CSV étendu — 4 nouvelles colonnes (Appartement, Arrivée, Départ, Notes)
+```
+Google → Site → Formulaire → Supabase → Dashboard admin → Accept/Refuse → Email client
+```
+
+### Ce que le système est maintenant
+
+Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking management system** :
+- Les clients soumettent des demandes structurées (nom, téléphone, email, appartement, dates)
+- L'admin reçoit une notification email immédiate
+- L'admin gère les leads depuis un dashboard sécurisé
+- L'admin accepte ou refuse chaque demande
+- Le client reçoit un email de confirmation ou de refus
+
+### Stack technique
+
+| Couche          | Technologie                                       |
+|----------------|--------------------------------------------------|
+| Framework       | Next.js 16.2.3 App Router (Turbopack)            |
+| Langage         | TypeScript strict                                 |
+| Style           | Tailwind CSS 4                                    |
+| Base de données | Supabase PostgreSQL 17 (eu-central-1)             |
+| Email           | Resend (domaine palmdordakhla.com vérifié)        |
+| Déploiement     | Vercel                                            |
+| URL production  | https://palmdordakhla.com                         |
 
 ---
 
-## Current Data Flow
+## 2. Current Production Features
 
-```text
-Client (browser)
-  └── remplit LeadForm.tsx ou ServiceContactForm.tsx
+### ✅ Site public
+
+- [x] Homepage 7 sections (Hero, Services, Hébergements, Expérience, Galerie, Témoignages, CTA)
+- [x] Pages service : `/hebergements`, `/restaurant`, `/cafe`, `/location-voiture`
+- [x] Page galerie `/galerie`
+- [x] Page contact `/contact` avec Google Maps
+- [x] Formulaire lead structuré (homepage + chaque page service)
+- [x] Formulaire hébergement : email obligatoire + arrivée + nuitées
+- [x] Appartements groupés par étage sur `/hebergements` (2e/3e/4e)
+- [x] Pages bilingues `/fr` et `/en` (EN = stub, non traduit)
+- [x] Sitemap XML + robots.txt
+- [x] Structured data (FAQ schema)
+- [x] Meta Pixel + GA4 (structure prête, conditionnels sur env vars)
+- [x] WhatsApp secondaire (bouton flottant + success state)
+- [x] Design system : `palm-cream / palm-blue / palm-gold`, Cormorant Garamond + Geist
+
+### ✅ Système de réservation (public)
+
+- [x] Formulaire `service=accommodation` : email requis, type appartement, arrivée, nuitées
+- [x] `check_out` calculé côté frontend (`addDays(check_in, nights)`)
+- [x] `nights_count` non stocké — calculé depuis `check_in` + `check_out` partout
+- [x] Validation email côté client + côté API
+- [x] POST `/api/lead` → INSERT Supabase + notification email admin
+- [x] URL WhatsApp pré-rempli retourné en réponse (option secondaire post-submit)
+- [x] Timeout 8s + gestion AbortController sur fetch public
+
+### ✅ Dashboard admin (`/admin`)
+
+- [x] Login mot de passe cookie HttpOnly 7 jours (`/admin/login`)
+- [x] Middleware Edge Runtime : vérifie `admin_token` avant toute route admin
+- [x] Table 8 colonnes : Date · Nom+Service · Téléphone · Email · Appartement · Séjour · Statut · Actions
+- [x] Filtres URL : service, statut, recherche nom/téléphone (debounce 350ms)
+- [x] **Boutons ✓ Accepter / ✗ Refuser inline** pour leads `accommodation` (sans expansion)
+- [x] Statut opérationnel via `StatusSelect` : Nouveau / Contacté / Confirmé / Annulé
+- [x] Badge statut décision : Accepté / Refusé (dans colonne Statut)
+- [x] Notes internes auto-save 800ms (`LeadNotes.tsx`)
+- [x] Panneau expandable "Détails" : DateRangePicker + ApartmentSelect + message + DecisionPanel complet
+- [x] DecisionPanel complet : note textarea + boutons + warning email informatif
+- [x] WhatsApp direct par lead (`wa.me` pré-rempli)
+- [x] Export CSV (`/api/admin/export`) — 15 colonnes avec BOM UTF-8 pour Excel
+- [x] Déconnexion Server Action
+
+### ✅ Emails (Resend)
+
+- [x] **Notification admin** : envoyée immédiatement à chaque nouveau lead
+- [x] **Email client acceptation** : envoyé automatiquement quand admin clique Accepter
+- [x] **Email client refus** : envoyé automatiquement quand admin clique Refuser
+- [x] Fire-and-forget : statut DB mis à jour même si email échoue
+- [x] Graceful no-op si env vars Resend absentes (logs warning, pas d'exception)
+- [x] `export const runtime = 'nodejs'` sur toutes les routes utilisant Resend
+- [x] Domaine `palmdordakhla.com` vérifié sur Resend
+- [x] FROM : `notifications@palmdordakhla.com`
+
+---
+
+## 3. Reservation Workflow
+
+```
+CLIENT
+  └── Remplit le formulaire (hébergement : email + appartement + arrivée + nuitées)
         └── POST /api/lead
-              ├── validation (name, phone, service, message?, language?)
-              ├── INSERT → Supabase leads (anon key)
-              ├── sendLeadNotification() → Resend (fire-and-forget)
-              └── retourne { success: true, whatsappUrl }
-                    └── window.open(whatsappUrl) → WhatsApp pré-rempli
+              ├── Validation : name, phone, email (requis héberg.), service, dates
+              ├── check_out = addDays(check_in, nights)  ← calculé frontend
+              ├── INSERT → Supabase leads (anon key + RLS)
+              ├── sendLeadNotification() → email admin (fire-and-forget)
+              └── { success: true, whatsappUrl } → affiche success state + WA optionnel
 
-Admin (browser)
-  └── /admin (cookie admin_token validé par middleware)
-        ├── lecture leads → supabaseAdmin (service_role)
-        ├── PATCH /api/admin/leads/:id → update status/notes/dates/apt
-        └── GET /api/admin/export → CSV téléchargé
+ADMIN (dashboard /admin)
+  └── Voit le lead dans le tableau (email, appartement, séjour visibles directement)
+        ├── Peut changer le statut opérationnel (Nouveau → Contacté → Confirmé)
+        ├── Peut noter en interne (notes non visibles par le client)
+        ├── Peut modifier appartement/dates via panneau Détails
+        ├── Clic ✓ Accepter ou ✗ Refuser (inline ou panneau complet avec note)
+        └── PATCH /api/admin/leads/:id
+              ├── UPDATE Supabase (status + decision_at + decision_note)
+              └── sendLeadDecisionEmail() → email client (fire-and-forget, si email présent)
+```
+
+### Notes importantes sur le workflow
+
+- **Workflow manuel** : pas de disponibilité automatique. L'admin valide chaque demande manuellement.
+- **Logique hybride Airbnb** : le client demande, l'admin confirme. Pas de booking instantané.
+- **Pas de double-booking protection** : deux demandes pour le même appartement aux mêmes dates peuvent coexister. L'admin gère le conflit manuellement.
+- **Email décision optionnel** : si le lead n'a pas d'email (anciens leads), la décision est quand même enregistrée, l'email client est simplement ignoré.
+
+---
+
+## 4. Apartments Architecture
+
+### Source unique : `src/lib/apartments.ts`
+
+**Ce fichier est la seule source de vérité pour les appartements.** Il alimente :
+- Formulaires publics (select appartement)
+- API `/api/lead` et `/api/admin/leads/[id]` (validation)
+- Dashboard admin `ApartmentSelect.tsx`
+- Emails Resend (labels appartement)
+- Export CSV
+- Page `/hebergements`
+
+### Les 6 appartements réels
+
+| Appartement   | Étage | Prix      | Chambres | Capacité max |
+|---------------|-------|-----------|----------|--------------|
+| Appartement 1 | 2e    | 500 DH/nuit | 1      | 2 personnes  |
+| Appartement 2 | 2e    | 650 DH/nuit | 2      | 4 personnes  |
+| Appartement 3 | 3e    | 750 DH/nuit | 2      | 5 personnes  |
+| Appartement 4 | 3e    | 650 DH/nuit | 2      | 4 personnes  |
+| Appartement 5 | 4e    | 750 DH/nuit | 2      | 5 personnes  |
+| Appartement 6 | 4e    | 650 DH/nuit | 2      | 4 personnes  |
+
+### IDs et exports
+
+```ts
+// IDs valides (nouveaux leads)
+'apt-1' | 'apt-2' | 'apt-3' | 'apt-4' | 'apt-5' | 'apt-6'
+
+// Legacy (anciens leads DB) — fallback géré dans getApartmentLabel()
+'standard' | '2-chambres' | 'grande-capacite'
+```
+
+### Fonctions exportées
+
+```ts
+getApartmentLabel(id)    // "Appartement 1 (500 DH/nuit)" — utilisé emails, CSV, admin
+getApartmentLabelEn(id)  // "Apartment 1 (500 MAD/night)" — réservé version EN future
+APARTMENT_MAP            // Record<string, Apartment> — lookup rapide
+VALID_APARTMENT_IDS      // apt-1..apt-6
+ALL_VALID_APARTMENT_IDS  // apt-1..apt-6 + legacy — pour validation API
 ```
 
 ---
 
-## Current Lead Fields
+## 5. Nights UX Architecture
 
-### Envoyés par les formulaires publics (actuellement)
-| Champ      | Type   | Requis | Notes                              |
-|------------|--------|--------|------------------------------------|
-| `name`     | string | oui    | min 2 chars                        |
-| `phone`    | string | oui    | min 8 chars                        |
-| `service`  | string | oui    | accommodation/restaurant/cafe/car_rental |
-| `message`  | string | non    | textarea libre, converti en null si vide |
-| `language` | string | non    | hardcodé `'fr'` dans les deux forms |
+### Frontend (UX client)
 
-### Présents en base Supabase (après migration 002)
-| Colonne         | Type        | Nullable | Source actuelle         |
-|-----------------|-------------|----------|-------------------------|
-| `id`            | uuid        | non      | auto (gen_random_uuid)  |
-| `created_at`    | timestamptz | non      | auto (now())            |
-| `name`          | text        | non      | formulaire public       |
-| `phone`         | text        | non      | formulaire public       |
-| `service`       | text        | non      | formulaire public       |
-| `message`       | text        | oui      | formulaire public       |
-| `status`        | text        | non      | défaut 'new', admin     |
-| `source`        | text        | non      | hardcodé 'website'      |
-| `language`      | text        | non      | formulaire public ('fr')|
-| `notes`         | text        | oui      | admin seulement         |
-| `check_in`      | date        | oui      | **admin seulement**     |
-| `check_out`     | date        | oui      | **admin seulement**     |
-| `apartment_type`| text        | oui      | **admin seulement**     |
+Les formulaires publics (`LeadForm.tsx`, `ServiceContactForm.tsx`) collectent :
+- **Arrivée** (`check_in`) — date picker
+- **Nombre de nuitées** (`nights`) — input number, requis, min 1
 
-### Modifiables dans le dashboard admin
-- `status` — StatusSelect, toutes les lignes
-- `notes` — LeadNotes, toutes les lignes (panneau expandable)
-- `check_in` + `check_out` — DateRangePicker, accommodation uniquement
-- `apartment_type` — ApartmentSelect, accommodation uniquement
+### Backend / DB (stockage)
 
-### Non encore envoyés automatiquement depuis le site public
-- `check_in` — client doit écrire dans message ou admin remplit manuellement
-- `check_out` — idem
-- `apartment_type` — idem
-- `language` — hardcodé 'fr', pas de sélection utilisateur
+L'API et la DB stockent :
+- `check_in` — date ISO YYYY-MM-DD
+- `check_out` — date ISO YYYY-MM-DD (**calculé** = check_in + nights)
+
+### Pourquoi cette séparation
+
+Le frontend demande "combien de nuits" (UX naturelle pour l'utilisateur) mais le backend stocke `check_out` pour permettre :
+
+```sql
+-- Futures queries de disponibilité / overlap
+SELECT * FROM leads
+WHERE check_in < '2025-06-10'
+  AND check_out > '2025-06-07'
+  AND apartment_type = 'apt-3'
+```
+
+**`nights_count` n'est pas une colonne DB.** Le nombre de nuitées est toujours calculé dynamiquement depuis `check_in` et `check_out` :
+
+```ts
+const nights = Math.round(
+  (new Date(check_out).getTime() - new Date(check_in).getTime()) / 86400000
+)
+```
+
+Ce calcul est dupliqué dans : `email.ts`, `export/route.ts`, `DateRangePicker.tsx`.
 
 ---
 
-## Admin Dashboard Features
+## 6. Admin Dashboard Architecture
 
-| Fonctionnalité     | Composant/Route                          | État    |
-|--------------------|------------------------------------------|---------|
-| Login              | `/admin/login` + `/api/admin/auth`       | actif   |
-| Logout             | Server Action dans `/admin/page.tsx`     | actif   |
-| Liste leads        | `/admin` (Server Component)             | actif   |
-| Filtre service     | `AdminFilters.tsx`                       | actif   |
-| Filtre statut      | `AdminFilters.tsx`                       | actif   |
-| Recherche nom/tél  | `AdminFilters.tsx` (debounce 350ms)      | actif   |
-| Mise à jour statut | `StatusSelect.tsx` + PATCH route         | actif   |
-| Notes internes     | `LeadNotes.tsx` (debounce 800ms)         | actif   |
-| Check-in/out       | `DateRangePicker.tsx` (blur-save)        | actif   |
-| Type appartement   | `ApartmentSelect.tsx` (immediate)        | actif   |
-| WhatsApp CTA       | `LeadRow.tsx` (lien `wa.me`)             | actif   |
-| Export CSV (11 cols)| `/api/admin/export`                     | actif   |
-| Notification email | `src/lib/email.ts` (Resend)              | actif*  |
+### Composants
 
-*actif si `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_EMAIL` configurés sur Vercel
+| Composant             | Rôle                                                      | Save strategy      |
+|-----------------------|-----------------------------------------------------------|--------------------|
+| `AdminFilters.tsx`    | Filtres URL service/statut/search + debounce              | URL push           |
+| `LeadRow.tsx`         | Ligne tableau + expansion + actions inline                | — (wrapper)        |
+| `DecisionPanel.tsx`   | Boutons Accepter/Refuser + note + mode compact            | PATCH immédiat     |
+| `StatusSelect.tsx`    | Dropdown 4 statuts opérationnels                          | PATCH immédiat     |
+| `ApartmentSelect.tsx` | Select 6 appartements (accommodation only)                | PATCH immédiat     |
+| `DateRangePicker.tsx` | Arrivée + Départ + nuitées calculées (accommodation only) | PATCH on blur      |
+| `LeadNotes.tsx`       | Notes internes (non visibles client)                      | PATCH debounce 800ms |
 
----
+### Modèle statut — deux axes séparés dans l'UI
 
-## Known Environment Variables
+**Suivi opérationnel** (colonne Statut, `StatusSelect`) :
+```
+new → contacted → confirmed → cancelled
+```
 
-| Variable                        | Requis | Statut        | Usage                              |
-|---------------------------------|--------|---------------|------------------------------------|
-| `NEXT_PUBLIC_SUPABASE_URL`      | oui    | configuré     | Client + server Supabase           |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | oui    | configuré     | Client Supabase (INSERT public)    |
-| `SUPABASE_SERVICE_ROLE_KEY`     | oui    | configuré     | Admin Supabase (bypass RLS)        |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER`   | oui    | configuré     | Génération URL WhatsApp            |
-| `ADMIN_SECRET`                  | oui    | configuré     | Authentification dashboard         |
-| `NEXT_PUBLIC_GA_ID`             | non    | en attente    | Google Analytics 4                 |
-| `NEXT_PUBLIC_META_PIXEL_ID`     | non    | en attente    | Meta Pixel                         |
-| `RESEND_API_KEY`                | non    | en attente    | Notifications email leads          |
-| `RESEND_FROM_EMAIL`             | non    | en attente    | Adresse expéditeur Resend          |
-| `ADMIN_EMAIL`                   | non    | en attente    | Destinataire notifications Resend  |
+**Décision finale** (colonne Actions, `DecisionPanel`) :
+```
+(non décidé) → accepted → (terminal, non réversible via UI)
+             → rejected → (terminal, non réversible via UI)
+```
 
----
+Une fois `accepted` ou `rejected`, `StatusSelect` disparaît (remplacé par badge). La décision est terminale dans l'UI — une modification manuelle en DB est nécessaire pour revenir en arrière.
 
-## Known Risks
+### DecisionPanel — deux modes
 
-| Risque                                    | Impact   | Statut       |
-|-------------------------------------------|----------|--------------|
-| Meta Pixel non configuré                  | tracking | en attente client |
-| Resend non configuré                      | email    | en attente   |
-| Version EN non implémentée                | SEO/UX   | session séparée |
-| Favicon/logo polish                       | branding | en attente designer |
-| Photos véhicule et façade manquantes      | UX       | en attente client |
-| Formulaire public ne collecte pas check-in/out ni apartment_type | conversion | → V1.7 |
-| `LeadForm` et `ServiceContactForm` sont deux composants quasi-identiques | dette technique | à surveiller |
-| Email Resend hardcode uniquement `fr` labels | i18n   | non critique pour l'instant |
-| WhatsApp message ne mentionne pas les dates même si admin les saisit | UX admin | → V1.7 |
-| Google Sheets non implémenté              | ops      | hors scope   |
+```tsx
+// Mode compact — inline dans la table (sans note)
+<DecisionPanel compact leadId={...} leadEmail={...} currentStatus={...} initialNote={null} />
+
+// Mode complet — dans le panneau expandable (avec textarea note)
+<DecisionPanel leadId={...} leadEmail={...} currentStatus={...} initialNote={lead.decision_note} />
+```
+
+Le mode compact envoie toujours `decision_note: null`. Pour ajouter une note, utiliser le panneau Détails.
+
+### Export CSV — 15 colonnes
+
+```
+Date · Nom · Téléphone · Email · Service · Message · Statut · Langue
+· Appartement · Arrivée · Départ · Nuitées · Notes · Décision · Date décision
+```
+
+BOM UTF-8 inclus pour compatibilité Excel direct.
 
 ---
 
-## Next Recommended Step — V1.7 Booking Form Extension
+## 7. Database Schema
 
-### Objectif
-Permettre aux clients de renseigner directement dans le formulaire public :
-- Date d'arrivée
-- Date de départ
-- Type d'appartement (Standard / 2 chambres / Grande capacité)
+### Table `leads` — état complet post-migrations 001+002+003+004
 
-Ces données apparaissent alors **automatiquement** dans le dashboard admin dès la soumission du lead.
+| Colonne         | Type        | Nullable | Défaut             | Notes                              |
+|-----------------|-------------|----------|--------------------|------------------------------------|
+| `id`            | uuid        | non      | gen_random_uuid()  | PK                                 |
+| `created_at`    | timestamptz | non      | now()              | Index leads_created_at_idx         |
+| `name`          | text        | non      | —                  |                                    |
+| `phone`         | text        | non      | —                  |                                    |
+| `email`         | text        | oui      | null               | Requis côté form hébergement       |
+| `service`       | text        | non      | —                  | CHECK accommodation/restaurant/cafe/car_rental |
+| `message`       | text        | oui      | null               |                                    |
+| `status`        | text        | non      | 'new'              | CHECK 6 valeurs (voir ci-dessous)  |
+| `source`        | text        | non      | 'website'          | Hardcodé — extensible futur        |
+| `language`      | text        | non      | 'fr'               | CHECK fr/en                        |
+| `notes`         | text        | oui      | null               | Notes internes admin               |
+| `check_in`      | date        | oui      | null               | Index leads_check_in_idx           |
+| `check_out`     | date        | oui      | null               | Index leads_check_out_idx ; ≥ check_in |
+| `apartment_type`| text        | oui      | null               | CHECK apt-1..apt-6 + legacy        |
+| `decision_note` | text        | oui      | null               | Note visible client (email)        |
+| `decision_at`   | timestamptz | oui      | null               | Timestamp auto quand accepted/rejected |
 
-### Champs ciblés
-Uniquement visibles quand `service === 'accommodation'` — les autres services ne sont pas concernés.
+### Contraintes actives
 
----
+```sql
+-- Status (6 valeurs post-migration 003)
+CHECK (status IN ('new', 'contacted', 'confirmed', 'cancelled', 'accepted', 'rejected'))
 
-## Safe Implementation Plan for V1.7
+-- Date range
+CHECK (check_in IS NULL OR check_out IS NULL OR check_out >= check_in)
 
-### 1. Frontend — `LeadForm.tsx` et `ServiceContactForm.tsx`
+-- Apartment type (post-migration 004)
+CHECK (apartment_type IS NULL OR apartment_type IN (
+  'apt-1', 'apt-2', 'apt-3', 'apt-4', 'apt-5', 'apt-6',
+  'standard', '2-chambres', 'grande-capacite'  -- legacy compat
+))
 
-**Changements :**
-- Ajouter `checkIn: string`, `checkOut: string`, `apartmentType: string` à l'état local
-- Afficher conditionellement ces champs quand `service === 'accommodation'`
-  - `<input type="date">` pour arrivée (min = today)
-  - `<input type="date">` pour départ (min = checkIn)
-  - `<select>` pour type d'appartement (Standard / 2 chambres / Grande capacité)
-- Inclure ces valeurs dans le `JSON.stringify()` du body — les autres services envoient `null`
-- Réinitialiser ces champs si l'utilisateur change de service
+-- Service
+CHECK (service IN ('accommodation', 'restaurant', 'cafe', 'car_rental'))
 
-**Risque :** Les deux composants sont indépendants — modifier l'un sans l'autre crée une incohérence.  
-**Mitigation :** Extraire vers un composant partagé `BookingFields.tsx`, ou mettre à jour les deux en une seule PR.
+-- Language
+CHECK (language IN ('fr', 'en'))
+```
 
-### 2. API — `/api/lead/route.ts`
+### RLS
 
-**Changements :**
-- Ajouter validation optionnelle pour `check_in`, `check_out`, `apartment_type`
-  - Regex `YYYY-MM-DD` pour les dates, null accepté
-  - Enum pour `apartment_type` : `standard | 2-chambres | grande-capacite | null`
-  - Vérification `check_out >= check_in` si les deux sont fournis
-  - Validation cohérente avec le service : `check_in/out/apartment_type` seulement si `service === 'accommodation'`
-- Inclure ces champs dans l'INSERT Supabase
-- Mettre à jour `buildWhatsAppMessage()` pour inclure les dates si fournies
-- Mettre à jour `LeadNotification` dans `src/lib/email.ts` pour inclure les nouveaux champs
-
-**Risque :** L'API reçoit actuellement des corps sans ces champs — avec validation optionnelle (`'check_in' in body`) il n'y a aucun breaking change.
-
-### 3. Supabase
-
-**Aucune migration nécessaire** — les colonnes `check_in`, `check_out`, `apartment_type` existent déjà depuis la migration 002. Toutes sont nullable : les leads existants et futurs sans ces données continuent de fonctionner.
-
-### 4. Dashboard admin
-
-**Aucune modification nécessaire** — les champs sont déjà affichés et éditables via le panneau expandable (`LeadRow.tsx`). Les nouvelles valeurs apparaîtront automatiquement à la lecture du lead.
-
-Optionnel : afficher un badge visuel (ex: dates dans la colonne principale) pour les leads avec check-in/out — mais hors scope V1.7.
-
-### 5. Tests avant déploiement
-
-- [ ] Tester formulaire avec `service=accommodation` : vérifier que les champs dates/type apparaissent
-- [ ] Tester formulaire avec `service=restaurant` : vérifier que les champs n'apparaissent PAS
-- [ ] Soumettre un lead accommodation avec dates → vérifier en DB que les valeurs sont insérées
-- [ ] Soumettre un lead restaurant → vérifier que `check_in/out/apartment_type` sont NULL en DB
-- [ ] Vérifier que le WhatsApp pré-rempli inclut les dates pour accommodation
-- [ ] Vérifier l'export CSV avec un lead ayant des dates
-- [ ] `npm run build` — 0 erreurs TypeScript
-
-### 6. Plan de rollback
-
-Les colonnes DB sont nullable et l'API valide optionnellement → rollback = redéployer le commit précédent sur Vercel. Aucune migration DB à annuler.
+- `anon` : INSERT only (via policy `website_can_insert_leads`)
+- `service_role` : ALL (bypass RLS pour routes admin serveur)
+- Aucun SELECT public — les leads ne sont jamais lisibles sans service_role
 
 ---
 
-## Do Not Touch
+## 8. Migrations History
 
-| Élément                              | Raison                                    |
-|--------------------------------------|-------------------------------------------|
-| `middleware.ts`                      | Auth admin — fonctionne en production     |
-| `/admin/login` + `/api/admin/auth`   | Auth admin — ne pas modifier              |
-| `StatusSelect.tsx`                   | Stable, utilisé en production             |
-| `src/lib/tracking.ts`               | Tracking Meta Pixel + GA4 — ne pas toucher |
-| `src/app/layout.tsx`                | Fonts, tracking global, metadata root     |
-| `src/lib/services.ts`               | Types ServiceType et messages WA          |
-| `/api/admin/leads/[id]/route.ts`    | PATCH route stable — si modifié, tester  |
-| Schéma Supabase                      | Stable post-002 — aucune migration nécessaire pour V1.7 |
-| Routing bilingue `/fr`, `/en`        | Session séparée — hors scope              |
-| Design global public (couleurs, typo)| Ne pas introduire de nouvelle dépendance UI |
+| Migration            | Appliquée | Contenu                                                   |
+|----------------------|-----------|-----------------------------------------------------------|
+| `001_leads.sql`      | ✅ prod   | Table `leads` initiale — colonnes core + RLS + indexes    |
+| `002_leads_v1.5.sql` | ✅ prod   | `notes`, `check_in`, `check_out`, `apartment_type` (legacy types) |
+| `003_leads_v2.sql`   | ✅ prod   | `email`, `decision_at`, `decision_note` + statuts `accepted`/`rejected` |
+| `004` (via MCP)      | ✅ prod   | Extend `apartment_type` CHECK : legacy + `apt-1..apt-6` (appliqué directement sur Supabase MCP, pas de fichier local) |
+
+**IMPORTANT :** La migration 004 n'a pas de fichier SQL local. Elle a été appliquée directement via le MCP Supabase. Si le schéma est resetté, reproduire manuellement :
+
+```sql
+ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_apartment_type_check;
+ALTER TABLE leads ADD CONSTRAINT leads_apartment_type_check
+  CHECK (apartment_type IS NULL OR apartment_type IN (
+    'apt-1', 'apt-2', 'apt-3', 'apt-4', 'apt-5', 'apt-6',
+    'standard', '2-chambres', 'grande-capacite'
+  ));
+```
+
+---
+
+## 9. Environment Variables
+
+| Variable                        | Requis | Statut Vercel | Rôle                                                    |
+|---------------------------------|--------|---------------|----------------------------------------------------------|
+| `NEXT_PUBLIC_SUPABASE_URL`      | oui    | ✅ configuré  | Client + server Supabase — URL projet                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | oui    | ✅ configuré  | Client Supabase — INSERT public (anon, limité par RLS)   |
+| `SUPABASE_SERVICE_ROLE_KEY`     | oui    | ✅ configuré  | Server-only — bypass RLS pour routes admin               |
+| `ADMIN_SECRET`                  | oui    | ✅ configuré  | Mot de passe dashboard `/admin` (hashé en cookie)        |
+| `RESEND_API_KEY`                | oui    | ✅ configuré  | SDK Resend — envoi emails admin + client                 |
+| `RESEND_FROM_EMAIL`             | oui    | ✅ configuré  | Expéditeur — ex: `notifications@palmdordakhla.com`       |
+| `ADMIN_EMAIL`                   | oui    | ✅ configuré  | Destinataire notifications nouvelles demandes            |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER`   | oui    | ✅ configuré  | Numéro international format `212XXXXXXXXX`               |
+| `NEXT_PUBLIC_SITE_URL`          | non    | —             | URL canonique (OG, sitemap) — peut être hardcodé         |
+| `NEXT_PUBLIC_GA_ID`             | non    | ⏳ en attente | Google Analytics 4 — conditonnel, no-op si absent        |
+| `NEXT_PUBLIC_META_PIXEL_ID`     | non    | ⏳ en attente | Meta Pixel — conditionnel, no-op si absent               |
+
+---
+
+## 10. Critical Files
+
+### Logique métier — ne pas modifier sans audit
+
+```
+src/lib/apartments.ts          Source unique appartements (6 apts + legacy fallback)
+src/lib/email.ts               Emails admin + client — Resend SDK v6 pattern Result
+src/lib/services.ts            Types ServiceType + messages WhatsApp
+src/lib/tracking.ts            Événements Meta Pixel + GA4
+src/lib/supabase/server.ts     Client supabaseAdmin (service_role)
+```
+
+### API routes
+
+```
+src/app/api/lead/route.ts                 POST — soumission formulaire public
+src/app/api/admin/leads/[id]/route.ts     PATCH — modifications dashboard (runtime nodejs)
+src/app/api/admin/export/route.ts         GET — CSV export
+src/app/api/admin/auth/route.ts           POST — login dashboard
+```
+
+### Dashboard admin
+
+```
+src/app/admin/page.tsx                    Server Component — liste leads + filtres
+src/app/admin/components/LeadRow.tsx      Client — ligne table + expansion + inline actions
+src/app/admin/components/DecisionPanel.tsx Client — accept/refuse (compact + full)
+src/app/admin/components/StatusSelect.tsx  Client — statuts opérationnels
+src/app/admin/components/ApartmentSelect.tsx Client — type appartement
+src/app/admin/components/DateRangePicker.tsx Client — arrivée/départ + nuitées
+src/app/admin/components/LeadNotes.tsx    Client — notes internes
+src/app/admin/components/AdminFilters.tsx  Client — filtres URL
+```
+
+### Formulaires publics
+
+```
+src/components/home/LeadForm.tsx           Formulaire homepage
+src/components/service/ServiceContactForm.tsx  Formulaire pages service
+```
+
+### Migrations DB
+
+```
+src/lib/supabase/migrations/001_leads.sql      Table initiale + RLS
+src/lib/supabase/migrations/002_leads_v1.5.sql Notes + dates + appartement legacy
+src/lib/supabase/migrations/003_leads_v2.sql   Email + décision + statuts accepted/rejected
+```
+
+### Infrastructure
+
+```
+middleware.ts                  Edge Runtime — auth cookie admin_token
+src/app/layout.tsx             Fonts + tracking global + metadata root
+next.config.ts                 Config Next.js
+```
+
+---
+
+## 11. Production Status
+
+| Élément                       | État                                        |
+|-------------------------------|---------------------------------------------|
+| Vercel deployment             | ✅ READY — palmdordakhla.com                |
+| Domaine principal             | ✅ www.palmdordakhla.com                    |
+| Resend domaine                | ✅ palmdordakhla.com vérifié                |
+| Supabase                      | ✅ ACTIVE_HEALTHY — eu-central-1            |
+| Build TypeScript              | ✅ 0 erreurs                                |
+| Pages générées                | ✅ 20/20                                    |
+| Formulaire public             | ✅ Lead → Supabase + email admin            |
+| Dashboard admin               | ✅ Login + leads + accept/refuse            |
+| Email décision client         | ✅ accept → email acceptation / refuse → email refus |
+| Export CSV                    | ✅ 15 colonnes, BOM UTF-8                   |
+
+---
+
+## 12. Known Limitations
+
+### Non implémenté actuellement
+
+- ❌ **Disponibilités automatiques** — pas de calendrier, pas de blocage de dates
+- ❌ **Double-booking protection** — deux demandes sur les mêmes dates/apt peuvent coexister
+- ❌ **Annulation de décision** — une fois accepted/rejected, l'admin ne peut pas revenir en arrière via l'UI (nécessite modification directe en DB)
+- ❌ **Tracking analytics actif** — Meta Pixel et GA4 sont câblés mais env vars non configurées
+- ❌ **Version anglaise** — pages `/en` existent comme stubs, contenu non traduit
+- ❌ **Photos appartements** — pages hébergements sans photos individuelles par apt
+- ❌ **Dashboard mobile** — table horizontale avec scroll sur mobile, pas de vue cards
+- ❌ **Paiements** — aucune intégration
+- ❌ **Multi-utilisateur** — un seul compte admin
+- ❌ **Sync Airbnb / OTA** — hors scope
+- ❌ **Statistiques avancées** — pas de charts, pas de reporting mensuel
+
+---
+
+## 13. Recommended Next Priorities
+
+### P1 — Impact conversion immédiat
+
+- **Photos appartements** : ajouter photos individuelles sur `/hebergements` (1 photo par apt minimum)
+- **UI premium hébergements** : galerie lightbox, capacité, équipements par appartement
+
+### P2 — Dashboard mobile
+
+- **LeadCard.tsx** : layout card pour mobile (`block md:hidden`, table reste pour desktop)
+- Boutons WA / Accepter / Refuser visibles sur carte mobile sans scroll horizontal
+
+### P3 — Disponibilités lecture seule
+
+- Calendrier read-only par appartement (marquer dates réservées depuis leads accepted)
+- Aucune intégration automatique requise — admin marque manuellement
+
+### P4 — Version EN complète
+
+- Traduction contenu toutes pages
+- `language` dans formulaires (`fr`/`en` auto-détecté ou sélectionné)
+- Emails Resend bilingues
+
+### P5 — Analytics
+
+- Configurer `NEXT_PUBLIC_GA_ID` et `NEXT_PUBLIC_META_PIXEL_ID` sur Vercel
+- Tester événements `Lead`, `Contact`, page views
+
+---
+
+## 14. Do Not Touch
+
+> Ces éléments sont en production et fonctionnels. Toute modification doit être précédée d'un audit complet.
+
+| Élément                                   | Raison                                                     |
+|-------------------------------------------|------------------------------------------------------------|
+| `middleware.ts`                           | Auth admin Edge Runtime — toute modification peut créer un lockout |
+| `/admin/login` + `/api/admin/auth`        | Auth sensible — stable                                     |
+| `src/lib/apartments.ts`                   | Source unique — 8 fichiers dépendent de ce module           |
+| Legacy apartment IDs dans `apartments.ts` | `standard / 2-chambres / grande-capacite` — anciens leads DB |
+| `check_in` + `check_out` en DB            | Ne pas remplacer par `nights_count` — overlap queries futures |
+| Workflow accept/refuse (`DecisionPanel`)   | En production, emails envoyés aux clients                  |
+| `sendLeadDecisionEmail()` dans `email.ts` | Fire-and-forget — ne pas rendre synchrone                  |
+| `export const runtime = 'nodejs'`         | Requis sur toutes routes Resend — Vercel Edge ne supporte pas le SDK |
+| Schéma Supabase                           | Ne pas modifier sans migration SQL et test local           |
+| `src/lib/services.ts`                     | Types ServiceType + messages WA — stable                   |
+| `src/lib/tracking.ts`                     | Tracking Meta Pixel + GA4                                  |
+| `src/app/layout.tsx`                      | Fonts + tracking global + metadata root                    |
+
+---
+
+## 15. Current Data Flow (complet V2.3)
+
+```text
+CLIENT
+  └── LeadForm.tsx / ServiceContactForm.tsx
+        ├── accommodation: email* + apartmentType + checkIn + nights
+        ├── autres services: name + phone + message
+        └── POST /api/lead
+              ├── Validation stricte (email requis si accommodation, dates, apt IDs)
+              ├── check_out = addDays(check_in, nights)
+              ├── INSERT leads (Supabase anon key + RLS INSERT policy)
+              ├── sendLeadNotification() → RESEND (fire-and-forget, .catch logged)
+              └── { success: true, whatsappUrl }
+                    └── UI: success state + WA optionnel
+
+ADMIN
+  └── /admin (middleware vérifie cookie admin_token)
+        ├── supabaseAdmin.from('leads').select('*') — service_role bypass RLS
+        ├── Table 8 colonnes — email + apt + séjour visibles sans expansion
+        ├── Actions inline accommodation : [✓ Accepter] [✗ Refuser] direct
+        │
+        ├── PATCH /api/admin/leads/:id
+        │     ├── status update → déclenche decision_at auto si accepted/rejected
+        │     ├── notes / decision_note / check_in / check_out / apartment_type
+        │     ├── DB update (supabaseAdmin)
+        │     └── si accepted/rejected : sendLeadDecisionEmail() (fire-and-forget)
+        │           ├── lead.email présent → email client envoyé
+        │           └── lead.email absent → log warning, pas d'exception
+        │
+        └── GET /api/admin/export → CSV 15 colonnes (BOM UTF-8)
+
+EMAIL CLIENT (Resend)
+  ├── Acceptation : "Votre réservation Palm d'Or Dakhla — Confirmée ✓"
+  │     └── inclut : appartement + check_in + nuitées + check_out + note admin
+  └── Refus : "Votre demande Palm d'Or Dakhla"
+        └── inclut : service + note admin (si présente) + CTA WhatsApp
+```
