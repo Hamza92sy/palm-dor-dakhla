@@ -57,7 +57,7 @@ export default function ServiceContactForm({ service }: Props) {
       setError('Email requis pour les réservations hébergement.')
       return
     }
-    if (isAccommodation && nights !== '' && nights < 1) {
+    if (isAccommodation && (nights === '' || nights < 1)) {
       setError('Le nombre de nuitées doit être au moins 1.')
       return
     }
@@ -272,12 +272,12 @@ export default function ServiceContactForm({ service }: Props) {
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="contact-nights" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                    Nuitées{' '}
-                    <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+                    Nombre de nuitées <span className="text-palm-gold">*</span>
                   </label>
                   <input
                     id="contact-nights"
                     type="number"
+                    required
                     min={1}
                     max={60}
                     step={1}
