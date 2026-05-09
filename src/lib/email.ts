@@ -1,3 +1,5 @@
+import { getApartmentLabel } from '@/lib/apartments'
+
 export interface LeadNotification {
   name:            string
   phone:           string
@@ -16,11 +18,6 @@ const SERVICE_LABELS: Record<string, string> = {
   car_rental:    'Location de voiture',
 }
 
-const APARTMENT_LABELS: Record<string, string> = {
-  'standard':        'Standard (500 DH/nuit)',
-  '2-chambres':      '2 Chambres (650 DH/nuit)',
-  'grande-capacite': 'Grande capacité (750 DH/nuit)',
-}
 
 // Fire-and-forget — caller must .catch() this.
 // No-op if RESEND_API_KEY / RESEND_FROM_EMAIL / ADMIN_EMAIL are absent.
@@ -84,7 +81,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           ${lead.apartment_type ? `
           <tr>
             <td style="padding:6px 0;color:#555;">Appartement</td>
-            <td style="padding:6px 0;">${APARTMENT_LABELS[lead.apartment_type] ?? lead.apartment_type}</td>
+            <td style="padding:6px 0;">${getApartmentLabel(lead.apartment_type)}</td>
           </tr>` : ''}
           ${lead.check_in ? `
           <tr>
@@ -208,7 +205,7 @@ export async function sendLeadDecisionEmail(
             <tr>
               <td style="padding:8px 14px;color:#888;font-size:12px;width:130px;">Appartement</td>
               <td style="padding:8px 14px;font-size:12px;font-weight:600;">
-                ${APARTMENT_LABELS[lead.apartment_type] ?? lead.apartment_type}
+                ${getApartmentLabel(lead.apartment_type)}
               </td>
             </tr>` : ''}
             ${lead.check_in ? `

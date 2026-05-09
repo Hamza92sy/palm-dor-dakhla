@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { sendLeadDecisionEmail } from '@/lib/email'
+import { ALL_VALID_APARTMENT_IDS, APARTMENTS } from '@/lib/apartments'
 
 export const runtime = 'nodejs'
 
 const VALID_STATUSES        = ['new', 'contacted', 'confirmed', 'cancelled', 'accepted', 'rejected'] as const
-const VALID_APARTMENT_TYPES = ['standard', '2-chambres', 'grande-capacite'] as const
 const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
 
 type Status        = (typeof VALID_STATUSES)[number]
-type ApartmentType = (typeof VALID_APARTMENT_TYPES)[number]
 
 export async function PATCH(
   req: NextRequest,
@@ -78,9 +77,9 @@ export async function PATCH(
 
   if ('apartment_type' in body) {
     const { apartment_type } = body
-    if (apartment_type !== null && !VALID_APARTMENT_TYPES.includes(apartment_type as ApartmentType)) {
+    if (apartment_type !== null && !ALL_VALID_APARTMENT_IDS.includes(apartment_type as string)) {
       return NextResponse.json(
-        { error: `apartment_type doit être : ${VALID_APARTMENT_TYPES.join(', ')} ou null` },
+        { error: `apartment_type doit être : ${APARTMENTS.map(a => a.id).join(', ')} ou null` },
         { status: 400 }
       )
     }

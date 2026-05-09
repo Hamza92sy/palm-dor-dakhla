@@ -3,15 +3,7 @@
 import { useState, useEffect } from 'react'
 import { trackLead } from '@/lib/tracking'
 import { SERVICE_LABELS, type ServiceType } from '@/lib/services'
-
-const VALID_APT_PARAMS = ['standard', '2-chambres', 'grande-capacite']
-
-const APARTMENT_TYPES = [
-  { value: '',                label: 'Type non précisé'               },
-  { value: 'standard',        label: 'Standard — 500 DH/nuit'        },
-  { value: '2-chambres',      label: '2 Chambres — 650 DH/nuit'      },
-  { value: 'grande-capacite', label: 'Grande capacité — 750 DH/nuit' },
-]
+import { APARTMENTS, VALID_APARTMENT_IDS } from '@/lib/apartments'
 
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
@@ -45,7 +37,7 @@ export default function ServiceContactForm({ service }: Props) {
     if (!isAccommodation) return
     const params = new URLSearchParams(window.location.search)
     const apt = params.get('apt')
-    if (apt && VALID_APT_PARAMS.includes(apt)) {
+    if (apt && VALID_APARTMENT_IDS.includes(apt)) {
       setApartmentType(apt)
     }
   }, [])
@@ -245,8 +237,9 @@ export default function ServiceContactForm({ service }: Props) {
                   disabled={loading}
                   className={`${INPUT_CLASS} cursor-pointer`}
                 >
-                  {APARTMENT_TYPES.map(t => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
+                  <option value="">Type non précisé</option>
+                  {APARTMENTS.map(a => (
+                    <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
                   ))}
                 </select>
               </div>

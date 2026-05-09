@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { trackLead } from '@/lib/tracking'
+import { APARTMENTS } from '@/lib/apartments'
 
 type Service = 'accommodation' | 'restaurant' | 'cafe' | 'car_rental'
 
@@ -12,12 +13,6 @@ const SERVICES: { value: Service; label: string }[] = [
   { value: 'car_rental',    label: 'Location de voiture' },
 ]
 
-const APARTMENT_TYPES = [
-  { value: '',                label: 'Type non précisé'               },
-  { value: 'standard',        label: 'Standard — 500 DH/nuit'        },
-  { value: '2-chambres',      label: '2 Chambres — 650 DH/nuit'      },
-  { value: 'grande-capacite', label: 'Grande capacité — 750 DH/nuit' },
-]
 
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
@@ -265,8 +260,9 @@ export default function LeadForm() {
                   disabled={loading}
                   className={`${INPUT_CLASS} cursor-pointer`}
                 >
-                  {APARTMENT_TYPES.map(t => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
+                  <option value="">Type non précisé</option>
+                  {APARTMENTS.map(a => (
+                    <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
                   ))}
                 </select>
               </div>

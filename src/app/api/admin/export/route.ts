@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { getApartmentLabel } from '@/lib/apartments'
 
 const SERVICE_LABELS: Record<string, string> = {
   accommodation: 'Hébergement',
@@ -16,11 +17,6 @@ const STATUS_LABELS: Record<string, string> = {
   rejected:  'Refusé',
 }
 
-const APARTMENT_LABELS: Record<string, string> = {
-  'standard':        'Standard',
-  '2-chambres':      '2 Chambres',
-  'grande-capacite': 'Grande capacité',
-}
 
 function csvCell(val: string | null | undefined): string {
   const s = (val ?? '').replace(/"/g, '""')
@@ -68,7 +64,7 @@ export async function GET() {
     lead.message ?? '',
     STATUS_LABELS[lead.status]   ?? lead.status,
     lead.language.toUpperCase(),
-    lead.apartment_type ? (APARTMENT_LABELS[lead.apartment_type] ?? lead.apartment_type) : '',
+    getApartmentLabel(lead.apartment_type),
     formatDate(lead.check_in),
     formatDate(lead.check_out),
     lead.notes ?? '',

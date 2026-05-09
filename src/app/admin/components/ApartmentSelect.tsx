@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-
-const APARTMENT_TYPES = [
-  { value: '',                label: 'Non précisé'     },
-  { value: 'standard',        label: 'Standard (500 DH/nuit)' },
-  { value: '2-chambres',      label: '2 Chambres (650 DH/nuit)' },
-  { value: 'grande-capacite', label: 'Grande capacité (750 DH/nuit)' },
-]
+import { APARTMENTS } from '@/lib/apartments'
 
 type Props = {
   id:          string
@@ -57,12 +51,14 @@ export default function ApartmentSelect({ id, initialType }: Props) {
       <select
         value={value}
         onChange={handleChange}
+        aria-label="Type d'appartement"
         className="w-full border border-palm-gold/20 bg-white/60 rounded-sm px-3 py-2
           text-[12px] text-palm-blue focus:outline-none focus:border-palm-gold
           transition-colors cursor-pointer"
       >
-        {APARTMENT_TYPES.map(t => (
-          <option key={t.value} value={t.value}>{t.label}</option>
+        <option value="">Non précisé</option>
+        {APARTMENTS.map(a => (
+          <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
         ))}
       </select>
     </div>

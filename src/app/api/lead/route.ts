@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { assertServerEnv } from '@/lib/env'
 import { sendLeadNotification } from '@/lib/email'
+import { ALL_VALID_APARTMENT_IDS, APARTMENTS, getApartmentLabel, getApartmentLabelEn } from '@/lib/apartments'
 
 export const runtime = 'nodejs'
 
 const VALID_SERVICES        = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
 const VALID_LANGUAGES       = ['fr', 'en'] as const
-const VALID_APARTMENT_TYPES = ['standard', '2-chambres', 'grande-capacite'] as const
 const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
 const EMAIL_RE              = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Service       = (typeof VALID_SERVICES)[number]
 type Language      = (typeof VALID_LANGUAGES)[number]
-type ApartmentType = (typeof VALID_APARTMENT_TYPES)[number]
 
 const SERVICE_LABELS: Record<Language, Record<Service, string>> = {
   fr: {
@@ -30,18 +29,6 @@ const SERVICE_LABELS: Record<Language, Record<Service, string>> = {
   },
 }
 
-const APARTMENT_TYPE_LABELS: Record<Language, Record<string, string>> = {
-  fr: {
-    'standard':        'Standard (500 DH/nuit)',
-    '2-chambres':      '2 Chambres (650 DH/nuit)',
-    'grande-capacite': 'Grande capacité (750 DH/nuit)',
-  },
-  en: {
-    'standard':        'Standard (500 DH/night)',
-    '2-chambres':      '2 Bedrooms (650 DH/night)',
-    'grande-capacite': 'Large capacity (750 DH/night)',
-  },
-}
 
 function buildWhatsAppMessage(
   lang:          Language,
@@ -62,7 +49,7 @@ function buildWhatsAppMessage(
       'Je souhaite faire une demande pour :',
       `Service : ${label}`,
     ]
-    if (apartmentType) parts.push(`Appartement : ${APARTMENT_TYPE_LABELS.fr[apartmentType] ?? apartmentType}`)
+    if (apartmentType) parts.push(`Appartement : ${getApartmentLabel(apartmentType)}`)
     if (checkIn)       parts.push(`Arrivée : ${checkIn}`)
     if (checkOut)      parts.push(`Départ : ${checkOut}`)
     parts.push('', `Nom : ${name}`, `Téléphone : ${phone}`)
@@ -77,7 +64,7 @@ function buildWhatsAppMessage(
     'I would like to request:',
     `Service: ${label}`,
   ]
-  if (apartmentType) parts.push(`Apartment: ${APARTMENT_TYPE_LABELS.en[apartmentType] ?? apartmentType}`)
+  if (apartmentType) parts.push(`Apartment: ${getApartmentLabelEn(apartmentType)}`)
   if (checkIn)       parts.push(`Check-in: ${checkIn}`)
   if (checkOut)      parts.push(`Check-out: ${checkOut}`)
   parts.push('', `Name: ${name}`, `Phone: ${phone}`)
@@ -178,13 +165,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (apartment_type != null) {
-      if (!VALID_APARTMENT_TYPES.includes(apartment_type as ApartmentType)) {
+      if (!ALL_VALID_APARTMENT_IDS.includes(apartment_type as string)) {
         return NextResponse.json(
-          { error: `apartment_type doit être : ${VALID_APARTMENT_TYPES.join(', ')}` },
+          { error: `apartment_type doit être : ${APARTMENTS.map(a => a.id).join(', ')}` },
           { status: 400 }
         )
       }
-      cleanApartmentType = apartment_type as ApartmentType
+      cleanApartmentType = apartment_type as string
     }
   }
 

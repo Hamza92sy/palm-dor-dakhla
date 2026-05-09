@@ -85,7 +85,7 @@ export default function DecisionPanel({ leadId, leadEmail, currentStatus, initia
           <div className="flex items-center gap-2.5 flex-wrap">
             <button
               onClick={() => decide('accepted')}
-              disabled={!hasEmail || !!loading}
+              disabled={!!loading}
               className="flex items-center gap-1.5
                 text-[11px] tracking-[0.08em] uppercase font-medium
                 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200
@@ -99,7 +99,7 @@ export default function DecisionPanel({ leadId, leadEmail, currentStatus, initia
 
             <button
               onClick={() => decide('rejected')}
-              disabled={!hasEmail || !!loading}
+              disabled={!!loading}
               className="flex items-center gap-1.5
                 text-[11px] tracking-[0.08em] uppercase font-medium
                 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200
