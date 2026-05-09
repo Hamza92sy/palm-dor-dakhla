@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { APARTMENT_MAP } from '@/lib/apartments'
 import StatusSelect    from './StatusSelect'
 import LeadNotes       from './LeadNotes'
 import DateRangePicker from './DateRangePicker'
@@ -37,6 +38,32 @@ type Props = {
   index: number
 }
 
+function aptShortLabel(id: string | null): string {
+  if (!id) return '—'
+  const apt = APARTMENT_MAP[id]
+  if (apt) return apt.name
+  const legacy: Record<string, string> = {
+    'standard':        'Standard',
+    '2-chambres':      '2 Chambres',
+    'grande-capacite': 'Grande cap.',
+  }
+  return legacy[id] ?? id
+}
+
+function formatSejour(checkIn: string | null, checkOut: string | null): string {
+  if (!checkIn) return '—'
+  const dateStr = new Date(checkIn).toLocaleDateString('fr-FR', {
+    day:      'numeric',
+    month:    'short',
+    timeZone: 'Africa/Casablanca',
+  })
+  if (!checkOut) return dateStr
+  const nights = Math.round(
+    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000
+  )
+  return `${dateStr} · ${nights} nuit${nights > 1 ? 's' : ''}`
+}
+
 export default function LeadRow({ lead, index }: Props) {
   const [expanded, setExpanded] = useState(false)
 
@@ -44,6 +71,8 @@ export default function LeadRow({ lead, index }: Props) {
   const waText  = encodeURIComponent(
     `Bonjour ${lead.name}, suite à votre demande Palm d'Or Dakhla, nous vous confirmons...`
   )
+  const waUrl           = `https://wa.me/${waPhone}?text=${waText}`
+  const isAccommodation = lead.service === 'accommodation'
 
   return (
     <>
@@ -67,9 +96,16 @@ export default function LeadRow({ lead, index }: Props) {
           </span>
         </td>
 
-        {/* Nom */}
-        <td className="px-4 py-3 text-palm-blue font-medium">
-          {lead.name}
+        {/* Nom + service */}
+        <td className="px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-palm-blue font-medium text-[13px] whitespace-nowrap">
+              {lead.name}
+            </span>
+            <span className="text-[9px] tracking-[0.15em] uppercase text-palm-gold/70 font-medium">
+              {SERVICE_LABELS[lead.service] ?? lead.service}
+            </span>
+          </div>
         </td>
 
         {/* Téléphone */}
@@ -77,24 +113,32 @@ export default function LeadRow({ lead, index }: Props) {
           {lead.phone}
         </td>
 
-        {/* Service */}
-        <td className="px-4 py-3">
-          <span className="text-[10px] tracking-[0.1em] uppercase text-palm-gold font-medium">
-            {SERVICE_LABELS[lead.service] ?? lead.service}
-          </span>
-        </td>
-
-        {/* Message */}
-        <td className="px-4 py-3 max-w-[180px]">
-          {lead.message ? (
-            <span
-              className="text-[12px] text-palm-blue/55 block truncate"
-              title={lead.message}
-            >
-              {lead.message}
+        {/* Email */}
+        <td className="px-4 py-3 max-w-[160px]">
+          {lead.email ? (
+            <span className="text-[12px] text-palm-blue/65 block truncate" title={lead.email}>
+              {lead.email}
             </span>
           ) : (
             <span className="text-[11px] text-palm-blue/20 italic">—</span>
+          )}
+        </td>
+
+        {/* Appartement */}
+        <td className="px-4 py-3 text-[12px] whitespace-nowrap">
+          {isAccommodation ? (
+            <span className="text-palm-blue/70">{aptShortLabel(lead.apartment_type)}</span>
+          ) : (
+            <span className="text-palm-blue/20 italic text-[11px]">—</span>
+          )}
+        </td>
+
+        {/* Séjour */}
+        <td className="px-4 py-3 text-[12px] whitespace-nowrap">
+          {isAccommodation ? (
+            <span className="text-palm-blue/65">{formatSejour(lead.check_in, lead.check_out)}</span>
+          ) : (
+            <span className="text-palm-blue/20 italic text-[11px]">—</span>
           )}
         </td>
 
@@ -115,35 +159,51 @@ export default function LeadRow({ lead, index }: Props) {
 
         {/* Actions */}
         <td className="px-4 py-3">
-          <div className="flex items-center gap-3">
-            <a
-              href={`https://wa.me/${waPhone}?text=${waText}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] tracking-[0.08em] uppercase font-medium
-                text-[#1a9e51] hover:text-[#25D366] transition-colors whitespace-nowrap"
-            >
-              Contacter
-            </a>
-            <button
-              onClick={() => setExpanded(v => !v)}
-              className="text-[11px] tracking-[0.08em] uppercase font-medium
-                text-palm-blue/35 hover:text-palm-blue transition-colors whitespace-nowrap"
-              title={expanded ? 'Réduire' : 'Détails'}
-            >
-              {expanded ? '▲' : '▼'}
-            </button>
+          <div className="flex flex-col gap-1.5">
+            {/* Quick decision — accommodation only */}
+            {isAccommodation && (
+              <DecisionPanel
+                compact
+                leadId={lead.id}
+                leadEmail={lead.email}
+                currentStatus={lead.status}
+                initialNote={null}
+              />
+            )}
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] tracking-[0.08em] uppercase font-medium
+                  text-[#1a9e51] hover:text-[#25D366] transition-colors whitespace-nowrap"
+              >
+                WA
+              </a>
+              <button
+                type="button"
+                onClick={() => setExpanded(v => !v)}
+                className="text-[11px] tracking-[0.08em] uppercase font-medium
+                  text-palm-blue/50 hover:text-palm-blue
+                  border border-palm-blue/20 hover:border-palm-blue/40
+                  px-2.5 py-1 rounded-sm transition-all duration-200 whitespace-nowrap"
+              >
+                {expanded ? 'Réduire' : 'Détails'}
+              </button>
+            </div>
           </div>
         </td>
       </tr>
 
+      {/* Expanded detail panel */}
       {expanded && (
         <tr className={`border-t border-palm-gold/10 ${index % 2 === 0 ? 'bg-white/50' : 'bg-white/25'}`}>
-          <td colSpan={7} className="px-4 py-4">
+          <td colSpan={8} className="px-4 py-4">
             <div className="flex flex-col gap-4 max-w-2xl">
 
               {/* Accommodation-specific fields */}
-              {lead.service === 'accommodation' && (
+              {isAccommodation && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <ApartmentSelect id={lead.id} initialType={lead.apartment_type} />
                   <DateRangePicker
@@ -151,6 +211,16 @@ export default function LeadRow({ lead, index }: Props) {
                     initialCheckIn={lead.check_in}
                     initialCheckOut={lead.check_out}
                   />
+                </div>
+              )}
+
+              {/* Message client */}
+              {lead.message && (
+                <div className="space-y-0.5">
+                  <span className="text-[10px] tracking-[0.15em] uppercase text-palm-blue/40 font-medium">
+                    Message client
+                  </span>
+                  <p className="text-[12px] text-palm-blue/65 leading-relaxed">{lead.message}</p>
                 </div>
               )}
 
@@ -164,7 +234,7 @@ export default function LeadRow({ lead, index }: Props) {
                 </div>
               )}
 
-              {/* Decision */}
+              {/* Full decision panel — with note textarea */}
               <DecisionPanel
                 leadId={lead.id}
                 leadEmail={lead.email}

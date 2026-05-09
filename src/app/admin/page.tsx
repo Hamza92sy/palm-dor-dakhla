@@ -108,7 +108,7 @@ export default async function AdminPage({
         ) : (
           <>
             <div className="overflow-x-auto rounded-sm border border-palm-gold/15 shadow-sm">
-              <table className="w-full text-sm min-w-[720px]">
+              <table className="w-full text-sm min-w-[900px]">
                 <thead>
                   <tr className="bg-palm-blue text-white">
                     <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium whitespace-nowrap">
@@ -121,16 +121,19 @@ export default async function AdminPage({
                       Téléphone
                     </th>
                     <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium">
-                      Service
+                      Email
                     </th>
-                    <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium max-w-[180px]">
-                      Message
+                    <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium">
+                      Appartement
+                    </th>
+                    <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium">
+                      Séjour
                     </th>
                     <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium">
                       Statut
                     </th>
                     <th className="text-left px-4 py-3 text-[10px] tracking-[0.18em] uppercase font-medium">
-                      Action
+                      Actions
                     </th>
                   </tr>
                 </thead>
