@@ -85,6 +85,11 @@ export default function DateRangePicker({ id, initialCheckIn, initialCheckOut }:
       {dateError && (
         <p className="text-[10px] text-red-500">{dateError}</p>
       )}
+      {checkIn && checkOut && !dateError && (
+        <p className="text-[10px] text-palm-blue/35 tracking-[0.08em]">
+          {Math.round((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000)} nuitée(s)
+        </p>
+      )}
     </div>
   )
 }

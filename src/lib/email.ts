@@ -48,6 +48,9 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
   const waUrl = `https://wa.me/${waPhone}?text=${waText}`
 
   const hasBookingDetails = lead.check_in || lead.check_out || lead.apartment_type
+  const nights = lead.check_in && lead.check_out
+    ? Math.round((new Date(lead.check_out).getTime() - new Date(lead.check_in).getTime()) / 86400000)
+    : null
 
   try {
   const { data, error } = await resend.emails.send({
@@ -87,6 +90,11 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           <tr>
             <td style="padding:6px 0;color:#555;">Arrivée</td>
             <td style="padding:6px 0;font-weight:600;">${lead.check_in}</td>
+          </tr>` : ''}
+          ${nights !== null ? `
+          <tr>
+            <td style="padding:6px 0;color:#555;">Nuitées</td>
+            <td style="padding:6px 0;font-weight:600;">${nights}</td>
           </tr>` : ''}
           ${lead.check_out ? `
           <tr>
@@ -163,6 +171,9 @@ export async function sendLeadDecisionEmail(
   const waUrl          = `https://wa.me/${waPhone}?text=${waText}`
   const isAccepted     = decision === 'accepted'
   const hasBookingInfo = lead.check_in || lead.check_out || lead.apartment_type
+  const nights = lead.check_in && lead.check_out
+    ? Math.round((new Date(lead.check_out).getTime() - new Date(lead.check_in).getTime()) / 86400000)
+    : null
 
   const subject = isAccepted
     ? `Votre réservation Palm d'Or Dakhla — Confirmée ✓`
@@ -212,6 +223,11 @@ export async function sendLeadDecisionEmail(
             <tr>
               <td style="padding:8px 14px;color:#888;font-size:12px;">Arrivée</td>
               <td style="padding:8px 14px;font-size:12px;font-weight:600;">${lead.check_in}</td>
+            </tr>` : ''}
+            ${nights !== null ? `
+            <tr>
+              <td style="padding:8px 14px;color:#888;font-size:12px;">Nuitées</td>
+              <td style="padding:8px 14px;font-size:12px;font-weight:600;">${nights}</td>
             </tr>` : ''}
             ${lead.check_out ? `
             <tr>

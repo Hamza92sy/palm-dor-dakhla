@@ -4,6 +4,12 @@ import { useState } from 'react'
 import { trackLead } from '@/lib/tracking'
 import { APARTMENTS } from '@/lib/apartments'
 
+function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr)
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
 type Service = 'accommodation' | 'restaurant' | 'cafe' | 'car_rental'
 
 const SERVICES: { value: Service; label: string }[] = [
@@ -28,7 +34,7 @@ export default function LeadForm() {
   const [service,       setService]       = useState<Service>('accommodation')
   const [message,       setMessage]       = useState('')
   const [checkIn,       setCheckIn]       = useState('')
-  const [checkOut,      setCheckOut]      = useState('')
+  const [nights,        setNights]        = useState<number | ''>('')
   const [apartmentType, setApartmentType] = useState('')
   const [email,         setEmail]         = useState('')
   const [loading,       setLoading]       = useState(false)
@@ -42,7 +48,7 @@ export default function LeadForm() {
     setService(next)
     if (next !== 'accommodation') {
       setCheckIn('')
-      setCheckOut('')
+      setNights('')
       setApartmentType('')
     }
   }
@@ -54,6 +60,10 @@ export default function LeadForm() {
 
     if (service === 'accommodation' && !EMAIL_RE.test(email.trim())) {
       setError('Email requis pour les réservations hébergement.')
+      return
+    }
+    if (service === 'accommodation' && nights !== '' && nights < 1) {
+      setError('Le nombre de nuitées doit être au moins 1.')
       return
     }
 
@@ -75,8 +85,8 @@ export default function LeadForm() {
           message,
           language: 'fr',
           ...(service === 'accommodation' && {
-            check_in:       checkIn       || null,
-            check_out:      checkOut      || null,
+            check_in:       checkIn || null,
+            check_out:      checkIn && typeof nights === 'number' && nights >= 1 ? addDays(checkIn, nights) : null,
             apartment_type: apartmentType || null,
           }),
         }),
@@ -267,7 +277,7 @@ export default function LeadForm() {
                 </select>
               </div>
 
-              {/* Check-in / Check-out */}
+              {/* Check-in / Nights */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="lead-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
@@ -278,25 +288,26 @@ export default function LeadForm() {
                     type="date"
                     min={today}
                     value={checkIn}
-                    onChange={e => {
-                      setCheckIn(e.target.value)
-                      if (checkOut && e.target.value > checkOut) setCheckOut('')
-                    }}
+                    onChange={e => setCheckIn(e.target.value)}
                     disabled={loading}
                     className={INPUT_CLASS}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="lead-check-out" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                    Départ
+                  <label htmlFor="lead-nights" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Nuitées{' '}
+                    <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
                   </label>
                   <input
-                    id="lead-check-out"
-                    type="date"
-                    min={checkIn || today}
-                    value={checkOut}
-                    onChange={e => setCheckOut(e.target.value)}
+                    id="lead-nights"
+                    type="number"
+                    min={1}
+                    max={60}
+                    step={1}
+                    value={nights}
+                    onChange={e => setNights(e.target.value === '' ? '' : Math.floor(Number(e.target.value)))}
                     disabled={loading}
+                    placeholder="ex. 3"
                     className={INPUT_CLASS}
                   />
                 </div>

@@ -45,7 +45,7 @@ export async function GET() {
 
   const header = [
     'Date', 'Nom', 'Téléphone', 'Email', 'Service', 'Message', 'Statut', 'Langue',
-    'Appartement', 'Arrivée', 'Départ', 'Notes', 'Décision', 'Date décision',
+    'Appartement', 'Arrivée', 'Départ', 'Nuitées', 'Notes', 'Décision', 'Date décision',
   ]
 
   const rows = (leads ?? []).map(lead => [
@@ -67,6 +67,9 @@ export async function GET() {
     getApartmentLabel(lead.apartment_type),
     formatDate(lead.check_in),
     formatDate(lead.check_out),
+    lead.check_in && lead.check_out
+      ? String(Math.round((new Date(lead.check_out).getTime() - new Date(lead.check_in).getTime()) / 86400000))
+      : '',
     lead.notes ?? '',
     lead.decision_note ?? '',
     lead.decision_at ? formatDate(lead.decision_at) : '',

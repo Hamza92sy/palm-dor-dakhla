@@ -5,6 +5,12 @@ import { trackLead } from '@/lib/tracking'
 import { SERVICE_LABELS, type ServiceType } from '@/lib/services'
 import { APARTMENTS, VALID_APARTMENT_IDS } from '@/lib/apartments'
 
+function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr)
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
 const INPUT_CLASS = `
   w-full bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5
   text-sm text-palm-blue placeholder:text-palm-blue/25
@@ -22,7 +28,7 @@ export default function ServiceContactForm({ service }: Props) {
   const [phone,         setPhone]         = useState('')
   const [message,       setMessage]       = useState('')
   const [checkIn,       setCheckIn]       = useState('')
-  const [checkOut,      setCheckOut]      = useState('')
+  const [nights,        setNights]        = useState<number | ''>('')
   const [apartmentType, setApartmentType] = useState('')
   const [email,         setEmail]         = useState('')
   const [loading,       setLoading]       = useState(false)
@@ -51,6 +57,10 @@ export default function ServiceContactForm({ service }: Props) {
       setError('Email requis pour les réservations hébergement.')
       return
     }
+    if (isAccommodation && nights !== '' && nights < 1) {
+      setError('Le nombre de nuitées doit être au moins 1.')
+      return
+    }
 
     setLoading(true)
     setError(null)
@@ -70,8 +80,8 @@ export default function ServiceContactForm({ service }: Props) {
           message,
           language: 'fr',
           ...(isAccommodation && {
-            check_in:       checkIn       || null,
-            check_out:      checkOut      || null,
+            check_in:       checkIn || null,
+            check_out:      checkIn && typeof nights === 'number' && nights >= 1 ? addDays(checkIn, nights) : null,
             apartment_type: apartmentType || null,
           }),
         }),
@@ -244,7 +254,7 @@ export default function ServiceContactForm({ service }: Props) {
                 </select>
               </div>
 
-              {/* Check-in / Check-out */}
+              {/* Check-in / Nights */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="contact-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
@@ -255,25 +265,26 @@ export default function ServiceContactForm({ service }: Props) {
                     type="date"
                     min={today}
                     value={checkIn}
-                    onChange={e => {
-                      setCheckIn(e.target.value)
-                      if (checkOut && e.target.value > checkOut) setCheckOut('')
-                    }}
+                    onChange={e => setCheckIn(e.target.value)}
                     disabled={loading}
                     className={INPUT_CLASS}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="contact-check-out" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                    Départ
+                  <label htmlFor="contact-nights" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                    Nuitées{' '}
+                    <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
                   </label>
                   <input
-                    id="contact-check-out"
-                    type="date"
-                    min={checkIn || today}
-                    value={checkOut}
-                    onChange={e => setCheckOut(e.target.value)}
+                    id="contact-nights"
+                    type="number"
+                    min={1}
+                    max={60}
+                    step={1}
+                    value={nights}
+                    onChange={e => setNights(e.target.value === '' ? '' : Math.floor(Number(e.target.value)))}
                     disabled={loading}
+                    placeholder="ex. 3"
                     className={INPUT_CLASS}
                   />
                 </div>
