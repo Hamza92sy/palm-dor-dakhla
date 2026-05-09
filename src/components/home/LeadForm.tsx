@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { trackLead, trackWhatsApp } from '@/lib/tracking'
+import { trackLead } from '@/lib/tracking'
 
 type Service = 'accommodation' | 'restaurant' | 'cafe' | 'car_rental'
 
@@ -37,6 +37,8 @@ export default function LeadForm() {
   const [apartmentType, setApartmentType] = useState('')
   const [loading,       setLoading]       = useState(false)
   const [error,         setError]         = useState<string | null>(null)
+  const [success,       setSuccess]       = useState(false)
+  const [whatsappUrl,   setWhatsappUrl]   = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -83,10 +85,9 @@ export default function LeadForm() {
         return
       }
 
-      // Fire tracking before opening WA (new tab keeps page alive → events flush)
       trackLead(service)
-      trackWhatsApp('form')
-      window.open(data.whatsappUrl!, '_blank', 'noopener,noreferrer')
+      setWhatsappUrl(data.whatsappUrl ?? null)
+      setSuccess(true)
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         setError('La requête a pris trop de temps. Vérifiez votre connexion et réessayez.')
@@ -113,11 +114,42 @@ export default function LeadForm() {
           </h2>
           <div className="w-8 h-px bg-palm-gold/50 mt-1" />
           <p className="text-[10px] tracking-[0.2em] uppercase text-palm-blue/40">
-            Réponse rapide via WhatsApp
+            Réponse rapide garantie
           </p>
         </div>
 
-        {/* Form */}
+        {/* Form / Success */}
+        {success ? (
+          <div className="flex flex-col items-center text-center gap-6 py-8">
+            <div className="w-14 h-14 rounded-full bg-palm-gold/10 flex items-center justify-center">
+              <CheckIcon className="w-7 h-7 text-palm-gold" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-display font-light italic text-2xl text-palm-blue">
+                Demande envoyée
+              </h3>
+              <p className="text-sm text-palm-blue/60 leading-relaxed max-w-xs mx-auto">
+                Votre demande a bien été envoyée. Notre équipe vous contactera rapidement.
+              </p>
+            </div>
+            {whatsappUrl && (
+              <div className="border-t border-palm-gold/20 pt-5 w-full flex flex-col items-center gap-2.5">
+                <p className="text-[10px] tracking-[0.2em] uppercase text-palm-blue/40">
+                  Besoin urgent ?
+                </p>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-[#25D366] text-xs font-medium hover:underline"
+                >
+                  <WhatsAppIcon className="w-4 h-4" />
+                  Contactez-nous sur WhatsApp
+                </a>
+              </div>
+            )}
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
 
           {/* Name */}
@@ -279,11 +311,11 @@ export default function LeadForm() {
             type="submit"
             disabled={loading}
             className="group flex items-center justify-center gap-2.5 mt-1
-              bg-[#25D366] hover:bg-[#1DAF57] disabled:bg-[#25D366]/50
+              bg-palm-blue hover:bg-palm-blue/90 disabled:bg-palm-blue/40
               text-white text-[11px] tracking-[0.2em] uppercase font-medium
               px-8 py-4 rounded-full transition-all duration-300
-              shadow-[0_4px_20px_rgba(37,211,102,0.2)]
-              hover:shadow-[0_6px_28px_rgba(37,211,102,0.35)]
+              shadow-[0_4px_20px_rgba(26,49,84,0.15)]
+              hover:shadow-[0_6px_28px_rgba(26,49,84,0.25)]
               disabled:cursor-not-allowed disabled:shadow-none"
           >
             {loading ? (
@@ -293,7 +325,7 @@ export default function LeadForm() {
               </>
             ) : (
               <>
-                <WhatsAppIcon className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                <SendIcon className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" />
                 Envoyer ma demande
               </>
             )}
@@ -303,8 +335,25 @@ export default function LeadForm() {
             Nous vous répondons rapidement pour confirmer votre demande.
           </p>
         </form>
+        )}
       </div>
     </section>
+  )
+}
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function SendIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
