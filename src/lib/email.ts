@@ -207,7 +207,7 @@ export async function sendLeadDecisionEmail(
     return null
   }
 
-  console.log(`[email] Sending ${decision} email to ${lead.name}…`)
+  console.log(`[email] Sending ${decision} email to ${lead.name} <${lead.email}>…`)
 
   const { Resend } = await import('resend')
   const resend = new Resend(apiKey)
@@ -348,7 +348,7 @@ export async function sendLeadDecisionEmail(
       html,
     })
     if (error) throw new Error(`[Resend] ${error.message}`)
-    console.log(`[email] Decision email sent: ${data.id}`)
+    console.log(`[email] Decision email sent to ${lead.email}: ${data.id}`)
     return data.id
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

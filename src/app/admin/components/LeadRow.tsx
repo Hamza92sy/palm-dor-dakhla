@@ -44,10 +44,16 @@ const EMAIL_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   failed:     { label: '✗ Échec',     color: 'text-red-500' },
 }
 
-function EmailStatusBadge({ status }: { status: string | null }) {
+function EmailStatusBadge({ status, statusAt }: { status: string | null; statusAt: string | null }) {
   if (!status) return null
   const c = EMAIL_STATUS_CONFIG[status]
   if (!c) return null
+  if (status === 'sent' && statusAt) {
+    const ageMs = Date.now() - new Date(statusAt).getTime()
+    if (ageMs > 60 * 60 * 1000) {
+      return <span className="text-[9px] font-medium tracking-wide text-amber-500" title="Email envoyé mais réception non confirmée — vérifier Resend ou contacter via WA">✉ Non confirmé</span>
+    }
+  }
   return <span className={`text-[9px] font-medium tracking-wide ${c.color}`}>{c.label}</span>
 }
 
@@ -167,14 +173,14 @@ export default function LeadRow({ lead, index }: Props) {
               <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-green-50 text-green-700">
                 Accepté
               </span>
-              <EmailStatusBadge status={lead.email_status} />
+              <EmailStatusBadge status={lead.email_status} statusAt={lead.email_status_at} />
             </div>
           ) : lead.status === 'rejected' ? (
             <div className="flex flex-col gap-1 items-start">
               <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-red-50 text-red-600">
                 Refusé
               </span>
-              <EmailStatusBadge status={lead.email_status} />
+              <EmailStatusBadge status={lead.email_status} statusAt={lead.email_status_at} />
             </div>
           ) : (
             <StatusSelect id={lead.id} currentStatus={lead.status} />

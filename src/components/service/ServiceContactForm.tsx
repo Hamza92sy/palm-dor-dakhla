@@ -35,10 +35,30 @@ export default function ServiceContactForm({ service }: Props) {
   const [error,         setError]         = useState<string | null>(null)
   const [success,       setSuccess]       = useState(false)
   const [whatsappUrl,   setWhatsappUrl]   = useState<string | null>(null)
-  const [aptLocked,     setAptLocked]     = useState(false)
+  const [aptLocked,        setAptLocked]        = useState(false)
+  const [emailSuggestion,  setEmailSuggestion]  = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
   const isAccommodation = service === 'accommodation'
+
+  const DOMAIN_CORRECTIONS: Record<string, string> = {
+    'gmial.com':   'gmail.com', 'gmal.com':    'gmail.com',
+    'gmali.com':   'gmail.com', 'gmaill.com':  'gmail.com',
+    'gmail.fr':    'gmail.com', 'gmailcom':    'gmail.com',
+    'hotmial.com': 'hotmail.com', 'hotmai.com': 'hotmail.com',
+    'homail.com':  'hotmail.com', 'hotmaill.com': 'hotmail.com',
+    'outlok.com':  'outlook.com', 'outook.com':  'outlook.com',
+    'iclould.com': 'icloud.com', 'iclound.com': 'icloud.com',
+    'yaho.com':    'yahoo.com',  'yahooo.com':  'yahoo.com',
+  }
+
+  function handleEmailChange(val: string) {
+    setEmail(val)
+    const domain = val.split('@')[1]?.toLowerCase()
+    setEmailSuggestion(domain && DOMAIN_CORRECTIONS[domain]
+      ? val.split('@')[0] + '@' + DOMAIN_CORRECTIONS[domain]
+      : null)
+  }
 
   useEffect(() => {
     if (!isAccommodation) return
@@ -237,11 +257,19 @@ export default function ServiceContactForm({ service }: Props) {
               autoComplete="email"
               inputMode="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => handleEmailChange(e.target.value)}
               disabled={loading}
               placeholder="votre@email.com"
               className={INPUT_CLASS}
             />
+            {emailSuggestion && (
+              <p className="text-[10px] text-amber-600/80 flex items-center gap-1 mt-0.5">
+                Voulez-vous dire
+                <button type="button" onClick={() => { setEmail(emailSuggestion); setEmailSuggestion(null) }}
+                  className="underline font-medium">{emailSuggestion}</button>
+                ?
+              </p>
+            )}
           </div>
 
           {/* Accommodation-specific fields */}
