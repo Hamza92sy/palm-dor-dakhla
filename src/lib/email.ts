@@ -153,9 +153,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           </tr>
         </table>
         <div style="margin-top:24px;">
-          <a href="${waUrl}"
-            style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;
-              padding:10px 22px;border-radius:4px;font-size:13px;font-weight:600;">
+          <a href="${waUrl}" style="color:#1C3A28;font-size:13px;text-decoration:underline;">
             Contacter via WhatsApp
           </a>
         </div>
@@ -212,9 +210,9 @@ export async function sendLeadDecisionEmail(
   const resend = new Resend(apiKey)
 
   const serviceLabel   = SERVICE_LABELS[lead.service] ?? lead.service
-  const waPhone        = lead.phone.replace(/\D/g, '')
-  const waText         = encodeURIComponent(`Bonjour ${lead.name}, suite à votre demande Palm d'Or Dakhla…`)
-  const waUrl          = `https://wa.me/${waPhone}?text=${waText}`
+  const palmDorPhone   = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
+  const waText         = encodeURIComponent(`Bonjour, je souhaite obtenir plus d'informations suite à ma demande Palm d'Or Dakhla (${lead.name}).`)
+  const waUrl          = palmDorPhone ? `https://wa.me/${palmDorPhone}?text=${waText}` : '#'
   const isAccepted     = decision === 'accepted'
   const hasBookingInfo = lead.check_in || lead.check_out || lead.apartment_type
   const nights = lead.check_in && lead.check_out
@@ -330,7 +328,7 @@ export async function sendLeadDecisionEmail(
 
         <p style="margin:0 0 24px;font-size:13px;color:#555;">
           Une question&nbsp;?
-          <a href="${waUrl}" style="color:#1a9e51;text-decoration:underline;">Contactez-nous sur WhatsApp</a>
+          <a href="${waUrl}" style="color:#1C3A28;text-decoration:underline;">Contactez-nous sur WhatsApp</a>
         </p>
 
         <p style="margin:0;font-size:11px;color:#aaa;text-align:center;
