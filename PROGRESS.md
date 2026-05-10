@@ -102,7 +102,11 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 - [x] Graceful no-op si env vars Resend absentes (logs warning, pas d'exception)
 - [x] `export const runtime = 'nodejs'` sur toutes les routes utilisant Resend
 - [x] Domaine `palmdordakhla.com` vérifié sur Resend
-- [x] FROM : `notifications@palmdordakhla.com`
+- [x] FROM : `notifications@palmdordakhla.com` (bascule vers `mail.palmdordakhla.com` prête — voir §9)
+- [x] Preheader texte dans emails client (preview Gmail/Outlook)
+- [x] Typo correction domaines email (gmial.com, hotmial.com, etc.) côté formulaires
+- [x] Badge admin "✉ Non confirmé" si email_status reste `sent` > 60 min
+- [x] DMARC `p=none` ajouté sur `palmdordakhla.com`
 
 ---
 

@@ -226,6 +226,11 @@ export async function sendLeadDecisionEmail(
     ? `Votre réservation Palm d'Or Dakhla — Confirmée`
     : `Votre demande Palm d'Or Dakhla`
 
+  // Preheader: hidden text shown in Gmail/Outlook inbox preview before the email is opened.
+  const preheader = isAccepted
+    ? `Votre demande a été acceptée — notre équipe vous contacte pour confirmer les détails.`
+    : `Réponse à votre demande ${serviceLabel} — Palm d'Or Dakhla.`
+
   // Plain-text alternative
   const textLines: string[] = [`Bonjour ${lead.name},`, '']
   if (isAccepted) {
@@ -253,6 +258,9 @@ export async function sendLeadDecisionEmail(
 
   const html = `
     <div style="font-family:sans-serif;font-size:14px;color:#1C3A28;line-height:1.7;max-width:480px;margin:0 auto;">
+      <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F9F5EC;">
+        ${preheader}
+      </div>
       <div style="background:#F9F5EC;padding:28px 32px;border-radius:4px;">
 
         <div style="text-align:center;margin-bottom:28px;">
