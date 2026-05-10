@@ -16,21 +16,39 @@ const SERVICE_LABELS: Record<string, string> = {
 }
 
 type Lead = {
-  id:             string
-  created_at:     string
-  name:           string
-  phone:          string
-  service:        string
-  message:        string | null
-  status:         string
-  language:       string
-  email:          string | null
-  notes:          string | null
-  check_in:       string | null
-  check_out:      string | null
-  apartment_type: string | null
-  decision_at:    string | null
-  decision_note:  string | null
+  id:                string
+  created_at:        string
+  name:              string
+  phone:             string
+  service:           string
+  message:           string | null
+  status:            string
+  language:          string
+  email:             string | null
+  notes:             string | null
+  check_in:          string | null
+  check_out:         string | null
+  apartment_type:    string | null
+  decision_at:       string | null
+  decision_note:     string | null
+  email_status:      string | null
+  email_provider_id: string | null
+  email_status_at:   string | null
+}
+
+const EMAIL_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  sent:       { label: '✉ Envoyé',    color: 'text-blue-400' },
+  delivered:  { label: '✓ Délivré',   color: 'text-emerald-600' },
+  bounced:    { label: '✗ Bounce',    color: 'text-red-500' },
+  complained: { label: '⚠ Plainte',   color: 'text-amber-500' },
+  failed:     { label: '✗ Échec',     color: 'text-red-500' },
+}
+
+function EmailStatusBadge({ status }: { status: string | null }) {
+  if (!status) return null
+  const c = EMAIL_STATUS_CONFIG[status]
+  if (!c) return null
+  return <span className={`text-[9px] font-medium tracking-wide ${c.color}`}>{c.label}</span>
 }
 
 type Props = {
@@ -145,13 +163,19 @@ export default function LeadRow({ lead, index }: Props) {
         {/* Statut */}
         <td className="px-4 py-3">
           {lead.status === 'accepted' ? (
-            <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-green-50 text-green-700">
-              Accepté
-            </span>
+            <div className="flex flex-col gap-1 items-start">
+              <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-green-50 text-green-700">
+                Accepté
+              </span>
+              <EmailStatusBadge status={lead.email_status} />
+            </div>
           ) : lead.status === 'rejected' ? (
-            <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-red-50 text-red-600">
-              Refusé
-            </span>
+            <div className="flex flex-col gap-1 items-start">
+              <span className="text-[10px] font-medium px-2.5 py-1.5 rounded-sm bg-red-50 text-red-600">
+                Refusé
+              </span>
+              <EmailStatusBadge status={lead.email_status} />
+            </div>
           ) : (
             <StatusSelect id={lead.id} currentStatus={lead.status} />
           )}
@@ -176,10 +200,16 @@ export default function LeadRow({ lead, index }: Props) {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] tracking-[0.08em] uppercase font-medium
-                  text-[#1a9e51] hover:text-[#25D366] transition-colors whitespace-nowrap"
+                className={`text-[11px] tracking-[0.08em] uppercase font-medium
+                  transition-colors whitespace-nowrap ${
+                  ['bounced', 'complained', 'failed'].includes(lead.email_status ?? '')
+                    ? 'text-red-500 hover:text-red-600 font-semibold'
+                    : 'text-[#1a9e51] hover:text-[#25D366]'
+                }`}
               >
-                WA
+                {['bounced', 'complained', 'failed'].includes(lead.email_status ?? '')
+                  ? 'WA !'
+                  : 'WA'}
               </a>
               <button
                 type="button"

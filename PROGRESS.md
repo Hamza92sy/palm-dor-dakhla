@@ -62,7 +62,9 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 
 ### ✅ Système de réservation (public)
 
-- [x] Formulaire `service=accommodation` : email requis, type appartement, arrivée, nuitées
+- [x] Formulaire `service=accommodation` : email requis, type appartement, **arrivée requise**, nuitées
+- [x] Validation frontend + backend : email · check_in · nights tous requis pour accommodation — soumission incomplète bloquée aux deux couches
+- [x] Pré-sélection appartement depuis `/hebergements` : CTA `?apt=apt-X#contact` → appartement affiché en lecture seule avec option "Modifier"
 - [x] `check_out` calculé côté frontend (`addDays(check_in, nights)`)
 - [x] `nights_count` non stocké — calculé depuis `check_in` + `check_out` partout
 - [x] Validation email côté client + côté API
@@ -92,6 +94,11 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 - [x] **Email client acceptation** : envoyé automatiquement quand admin clique Accepter
 - [x] **Email client refus** : envoyé automatiquement quand admin clique Refuser
 - [x] Fire-and-forget : statut DB mis à jour même si email échoue
+- [x] Exécution post-réponse fiabilisée via `after()` (next/server) sur la route admin PATCH
+- [x] Validation prod effectuée : logs Vercel + event `Delivered` Resend confirmés sur test réel
+- [x] **Suivi délivrabilité** : `email_provider_id` + `email_status` + `email_status_at` sauvegardés sur le lead après envoi
+- [x] **Webhook Resend** : `/api/webhooks/resend` reçoit `delivered` / `bounced` / `complained` et met à jour le lead en temps réel
+- [x] **Dashboard** : badge email status visible sous le badge décision (✉ Envoyé / ✓ Délivré / ✗ Bounce / ⚠ Plainte / ✗ Échec) — bouton WA mis en évidence si email en erreur
 - [x] Graceful no-op si env vars Resend absentes (logs warning, pas d'exception)
 - [x] `export const runtime = 'nodejs'` sur toutes les routes utilisant Resend
 - [x] Domaine `palmdordakhla.com` vérifié sur Resend
@@ -121,6 +128,15 @@ ADMIN (dashboard /admin)
               ├── UPDATE Supabase (status + decision_at + decision_note)
               └── sendLeadDecisionEmail() → email client (fire-and-forget, si email présent)
 ```
+
+### Note opérationnelle — Validation prod emails décision (2026-05-10)
+
+Flow complet validé en conditions réelles :
+
+- Clic admin ✓ Accepter → PATCH `/api/admin/leads/[id]` → UPDATE DB (`status`, `decision_at`) → `sendLeadDecisionEmail()` via `after()` → event Resend `Sent → Delivered` confirmé
+- Logs Vercel observés : `[email] Sending accepted email to…` + `[email] Decision email sent: c7c4509d-…`
+- Conclusion : code applicatif OK, délivrabilité technique OK
+- Limitation identifiée : `Delivered` Resend ≠ visibilité inbox — Outlook peut filtrer en spam / focused-other / archive sans accusé côté expéditeur
 
 ### Notes importantes sur le workflow
 
@@ -286,14 +302,20 @@ BOM UTF-8 inclus pour compatibilité Excel direct.
 | `check_in`      | date        | oui      | null               | Index leads_check_in_idx           |
 | `check_out`     | date        | oui      | null               | Index leads_check_out_idx ; ≥ check_in |
 | `apartment_type`| text        | oui      | null               | CHECK apt-1..apt-6 + legacy        |
-| `decision_note` | text        | oui      | null               | Note visible client (email)        |
-| `decision_at`   | timestamptz | oui      | null               | Timestamp auto quand accepted/rejected |
+| `decision_note`     | text        | oui      | null               | Note visible client (email)        |
+| `decision_at`       | timestamptz | oui      | null               | Timestamp auto quand accepted/rejected |
+| `email_status`      | text        | oui      | null               | Statut délivrabilité Resend : sent / delivered / bounced / complained / failed |
+| `email_provider_id` | text        | oui      | null               | ID email Resend — clé de rattachement webhook |
+| `email_status_at`   | timestamptz | oui      | null               | Timestamp du dernier événement email |
 
 ### Contraintes actives
 
 ```sql
 -- Status (6 valeurs post-migration 003)
 CHECK (status IN ('new', 'contacted', 'confirmed', 'cancelled', 'accepted', 'rejected'))
+
+-- Email status (post-migration 005)
+CHECK (email_status IS NULL OR email_status IN ('sent', 'delivered', 'bounced', 'complained', 'failed'))
 
 -- Date range
 CHECK (check_in IS NULL OR check_out IS NULL OR check_out >= check_in)
@@ -327,6 +349,7 @@ CHECK (language IN ('fr', 'en'))
 | `002_leads_v1.5.sql` | ✅ prod   | `notes`, `check_in`, `check_out`, `apartment_type` (legacy types) |
 | `003_leads_v2.sql`   | ✅ prod   | `email`, `decision_at`, `decision_note` + statuts `accepted`/`rejected` |
 | `004` (via MCP)      | ✅ prod   | Extend `apartment_type` CHECK : legacy + `apt-1..apt-6` (appliqué directement sur Supabase MCP, pas de fichier local) |
+| `005_leads_email_tracking.sql` | ⏳ à appliquer | `email_status`, `email_provider_id`, `email_status_at` + CHECK constraint |
 
 **IMPORTANT :** La migration 004 n'a pas de fichier SQL local. Elle a été appliquée directement via le MCP Supabase. Si le schéma est resetté, reproduire manuellement :
 
@@ -351,6 +374,7 @@ ALTER TABLE leads ADD CONSTRAINT leads_apartment_type_check
 | `ADMIN_SECRET`                  | oui    | ✅ configuré  | Mot de passe dashboard `/admin` (hashé en cookie)        |
 | `RESEND_API_KEY`                | oui    | ✅ configuré  | SDK Resend — envoi emails admin + client                 |
 | `RESEND_FROM_EMAIL`             | oui    | ✅ configuré  | Expéditeur — ex: `notifications@palmdordakhla.com`       |
+| `RESEND_WEBHOOK_SECRET`         | oui    | ⏳ à ajouter  | Secret de signature webhook Resend (format `whsec_xxx`) — requis pour `/api/webhooks/resend` |
 | `ADMIN_EMAIL`                   | oui    | ✅ configuré  | Destinataire notifications nouvelles demandes            |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER`   | oui    | ✅ configuré  | Numéro international format `212XXXXXXXXX`               |
 | `NEXT_PUBLIC_SITE_URL`          | non    | —             | URL canonique (OG, sitemap) — peut être hardcodé         |
@@ -378,6 +402,7 @@ src/app/api/lead/route.ts                 POST — soumission formulaire public
 src/app/api/admin/leads/[id]/route.ts     PATCH — modifications dashboard (runtime nodejs)
 src/app/api/admin/export/route.ts         GET — CSV export
 src/app/api/admin/auth/route.ts           POST — login dashboard
+src/app/api/webhooks/resend/route.ts      POST — webhook Resend delivery events (runtime nodejs)
 ```
 
 ### Dashboard admin
@@ -442,6 +467,7 @@ next.config.ts                 Config Next.js
 - ❌ **Disponibilités automatiques** — pas de calendrier, pas de blocage de dates
 - ❌ **Double-booking protection** — deux demandes sur les mêmes dates/apt peuvent coexister
 - ❌ **Annulation de décision** — une fois accepted/rejected, l'admin ne peut pas revenir en arrière via l'UI (nécessite modification directe en DB)
+- ❌ **Inbox visibility non garantie** — un statut `Delivered` dans Resend confirme l'acceptation par le serveur destinataire, pas l'affichage en boîte principale (Outlook : spam, focused/other, archive, règles, filtrage fournisseur)
 - ❌ **Tracking analytics actif** — Meta Pixel et GA4 sont câblés mais env vars non configurées
 - ❌ **Version anglaise** — pages `/en` existent comme stubs, contenu non traduit
 - ❌ **Photos appartements** — pages hébergements sans photos individuelles par apt

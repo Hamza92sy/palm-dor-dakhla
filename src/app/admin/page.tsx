@@ -6,21 +6,24 @@ import AdminFilters from './components/AdminFilters'
 import LeadRow from './components/LeadRow'
 
 type Lead = {
-  id:             string
-  created_at:     string
-  name:           string
-  phone:          string
-  service:        string
-  message:        string | null
-  status:         string
-  language:       string
-  email:          string | null
-  notes:          string | null
-  check_in:       string | null
-  check_out:      string | null
-  apartment_type: string | null
-  decision_at:    string | null
-  decision_note:  string | null
+  id:                string
+  created_at:        string
+  name:              string
+  phone:             string
+  service:           string
+  message:           string | null
+  status:            string
+  language:          string
+  email:             string | null
+  notes:             string | null
+  check_in:          string | null
+  check_out:         string | null
+  apartment_type:    string | null
+  decision_at:       string | null
+  decision_note:     string | null
+  email_status:      string | null
+  email_provider_id: string | null
+  email_status_at:   string | null
 }
 
 async function logout() {

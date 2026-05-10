@@ -137,15 +137,13 @@ export async function POST(req: NextRequest) {
   if (service === 'accommodation') {
     const { check_in, check_out, apartment_type } = body
 
-    if (check_in != null) {
-      if (typeof check_in !== 'string' || !DATE_RE.test(check_in)) {
-        return NextResponse.json(
-          { error: 'check_in doit être une date YYYY-MM-DD' },
-          { status: 400 }
-        )
-      }
-      cleanCheckIn = check_in
+    if (!check_in || typeof check_in !== 'string' || !DATE_RE.test(check_in)) {
+      return NextResponse.json(
+        { error: 'check_in est requis pour les réservations hébergement (format YYYY-MM-DD)' },
+        { status: 400 }
+      )
     }
+    cleanCheckIn = check_in
 
     if (check_out != null) {
       if (typeof check_out !== 'string' || !DATE_RE.test(check_out)) {
@@ -164,15 +162,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (apartment_type != null) {
-      if (!ALL_VALID_APARTMENT_IDS.includes(apartment_type as string)) {
-        return NextResponse.json(
-          { error: `apartment_type doit être : ${APARTMENTS.map(a => a.id).join(', ')}` },
-          { status: 400 }
-        )
-      }
-      cleanApartmentType = apartment_type as string
+    if (!apartment_type || !ALL_VALID_APARTMENT_IDS.includes(apartment_type as string)) {
+      return NextResponse.json(
+        { error: `apartment_type est requis pour les réservations hébergement. Valeurs acceptées : ${APARTMENTS.map(a => a.id).join(', ')}` },
+        { status: 400 }
+      )
     }
+    cleanApartmentType = apartment_type as string
   }
 
   const lang          = language      as Language

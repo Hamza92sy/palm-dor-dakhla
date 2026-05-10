@@ -144,11 +144,12 @@ export interface LeadDecisionNotification {
   apartment_type?: string | null
 }
 
+// Returns the Resend email ID on success, null if env vars missing, throws on Resend error.
 export async function sendLeadDecisionEmail(
   lead:     LeadDecisionNotification,
   decision: 'accepted' | 'rejected',
   note?:    string | null,
-): Promise<void> {
+): Promise<string | null> {
   const apiKey    = process.env.RESEND_API_KEY
   const fromEmail = process.env.RESEND_FROM_EMAIL
 
@@ -157,7 +158,7 @@ export async function sendLeadDecisionEmail(
       RESEND_API_KEY:    !!apiKey,
       RESEND_FROM_EMAIL: !!fromEmail,
     })
-    return
+    return null
   }
 
   console.log(`[email] Sending ${decision} email to ${lead.name}…`)
@@ -274,6 +275,7 @@ export async function sendLeadDecisionEmail(
     })
     if (error) throw new Error(`[Resend] ${error.message}`)
     console.log(`[email] Decision email sent: ${data.id}`)
+    return data.id
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[email] Decision email failed:', msg)

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { sendLeadDecisionEmail } from '@/lib/email'
 import { ALL_VALID_APARTMENT_IDS, APARTMENTS } from '@/lib/apartments'
@@ -109,20 +109,41 @@ export async function PATCH(
       .single()
 
     if (lead?.email) {
-      const note = typeof updates.decision_note === 'string' ? updates.decision_note : null
-      sendLeadDecisionEmail(
-        {
-          name:           lead.name,
-          email:          lead.email,
-          phone:          lead.phone,
-          service:        lead.service,
-          check_in:       lead.check_in  ?? null,
-          check_out:      lead.check_out ?? null,
-          apartment_type: lead.apartment_type ?? null,
-        },
-        decidedStatus,
-        note,
-      ).catch((err: unknown) => console.error('[api/admin/leads] decision email failed:', err))
+      const note   = typeof updates.decision_note === 'string' ? updates.decision_note : null
+      const status = decidedStatus
+      const leadId = id
+      after(async () => {
+        try {
+          const emailId = await sendLeadDecisionEmail(
+            {
+              name:           lead.name,
+              email:          lead.email,
+              phone:          lead.phone,
+              service:        lead.service,
+              check_in:       lead.check_in  ?? null,
+              check_out:      lead.check_out ?? null,
+              apartment_type: lead.apartment_type ?? null,
+            },
+            status,
+            note,
+          )
+          if (emailId) {
+            const { error: dbErr } = await supabaseAdmin.from('leads').update({
+              email_provider_id: emailId,
+              email_status:      'sent',
+              email_status_at:   new Date().toISOString(),
+            }).eq('id', leadId)
+            if (dbErr) console.error('[api/admin/leads] email_status update failed:', dbErr.message)
+          }
+        } catch (err) {
+          console.error('[api/admin/leads] decision email failed:', err)
+          const { error: dbErr } = await supabaseAdmin.from('leads').update({
+            email_status:    'failed',
+            email_status_at: new Date().toISOString(),
+          }).eq('id', leadId)
+          if (dbErr) console.error('[api/admin/leads] email_status failed update failed:', dbErr.message)
+        }
+      })
     } else {
       console.log('[api/admin/leads] decision made — no email on file for lead:', id)
     }

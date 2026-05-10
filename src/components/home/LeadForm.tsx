@@ -58,8 +58,24 @@ export default function LeadForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!name.trim() || name.trim().length < 2) {
+      setError('Votre nom est requis.')
+      return
+    }
+    if (!phone.trim() || phone.trim().length < 8) {
+      setError('Votre numéro de téléphone est requis.')
+      return
+    }
     if (service === 'accommodation' && !EMAIL_RE.test(email.trim())) {
       setError('Email requis pour les réservations hébergement.')
+      return
+    }
+    if (service === 'accommodation' && !apartmentType) {
+      setError('Veuillez sélectionner un appartement.')
+      return
+    }
+    if (service === 'accommodation' && !checkIn) {
+      setError('La date d\'arrivée est requise pour les réservations hébergement.')
       return
     }
     if (service === 'accommodation' && (nights === '' || nights < 1)) {
@@ -259,8 +275,7 @@ export default function LeadForm() {
               {/* Apartment type */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="lead-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                  Type d&apos;appartement{' '}
-                  <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+                  Type d&apos;appartement <span className="text-palm-gold">*</span>
                 </label>
                 <select
                   id="lead-apt-type"
@@ -281,11 +296,12 @@ export default function LeadForm() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="lead-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                    Arrivée
+                    Arrivée <span className="text-palm-gold">*</span>
                   </label>
                   <input
                     id="lead-check-in"
                     type="date"
+                    required
                     min={today}
                     value={checkIn}
                     onChange={e => setCheckIn(e.target.value)}

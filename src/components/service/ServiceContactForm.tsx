@@ -35,6 +35,7 @@ export default function ServiceContactForm({ service }: Props) {
   const [error,         setError]         = useState<string | null>(null)
   const [success,       setSuccess]       = useState(false)
   const [whatsappUrl,   setWhatsappUrl]   = useState<string | null>(null)
+  const [aptLocked,     setAptLocked]     = useState(false)
 
   const today = new Date().toISOString().split('T')[0]
   const isAccommodation = service === 'accommodation'
@@ -45,6 +46,7 @@ export default function ServiceContactForm({ service }: Props) {
     const apt = params.get('apt')
     if (apt && VALID_APARTMENT_IDS.includes(apt)) {
       setApartmentType(apt)
+      setAptLocked(true)
     }
   }, [])
 
@@ -53,8 +55,24 @@ export default function ServiceContactForm({ service }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!name.trim() || name.trim().length < 2) {
+      setError('Votre nom est requis.')
+      return
+    }
+    if (!phone.trim() || phone.trim().length < 8) {
+      setError('Votre numéro de téléphone est requis.')
+      return
+    }
     if (isAccommodation && !EMAIL_RE.test(email.trim())) {
       setError('Email requis pour les réservations hébergement.')
+      return
+    }
+    if (isAccommodation && !apartmentType) {
+      setError('Veuillez sélectionner un appartement.')
+      return
+    }
+    if (isAccommodation && !checkIn) {
+      setError('La date d\'arrivée est requise pour les réservations hébergement.')
       return
     }
     if (isAccommodation && (nights === '' || nights < 1)) {
@@ -237,32 +255,57 @@ export default function ServiceContactForm({ service }: Props) {
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="contact-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
                   Type d&apos;appartement{' '}
-                  <span className="normal-case tracking-normal font-normal text-palm-blue/30">(facultatif)</span>
+                  {aptLocked && apartmentType
+                    ? null
+                    : <span className="text-palm-gold">*</span>
+                  }
                 </label>
-                <select
-                  id="contact-apt-type"
-                  autoComplete="off"
-                  value={apartmentType}
-                  onChange={e => setApartmentType(e.target.value)}
-                  disabled={loading}
-                  className={`${INPUT_CLASS} cursor-pointer`}
-                >
-                  <option value="">Type non précisé</option>
-                  {APARTMENTS.map(a => (
-                    <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
-                  ))}
-                </select>
+                {aptLocked && apartmentType ? (
+                  <div className="flex items-center justify-between bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5">
+                    <span className="text-sm text-palm-blue">
+                      {APARTMENTS.find(a => a.id === apartmentType)?.name ?? apartmentType}
+                      {' '}
+                      <span className="text-palm-blue/40 text-xs">
+                        — {APARTMENTS.find(a => a.id === apartmentType)?.price} DH/nuit
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setAptLocked(false)}
+                      disabled={loading}
+                      className="text-[10px] tracking-[0.1em] uppercase text-palm-blue/35
+                        hover:text-palm-blue transition-colors disabled:opacity-40 shrink-0 ml-3"
+                    >
+                      Modifier
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    id="contact-apt-type"
+                    autoComplete="off"
+                    value={apartmentType}
+                    onChange={e => setApartmentType(e.target.value)}
+                    disabled={loading}
+                    className={`${INPUT_CLASS} cursor-pointer`}
+                  >
+                    <option value="">Type non précisé</option>
+                    {APARTMENTS.map(a => (
+                      <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {/* Check-in / Nights */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="contact-check-in" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                    Arrivée
+                    Arrivée <span className="text-palm-gold">*</span>
                   </label>
                   <input
                     id="contact-check-in"
                     type="date"
+                    required
                     min={today}
                     value={checkIn}
                     onChange={e => setCheckIn(e.target.value)}
