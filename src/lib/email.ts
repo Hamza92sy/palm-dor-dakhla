@@ -195,9 +195,8 @@ export async function sendLeadDecisionEmail(
   decision: 'accepted' | 'rejected',
   note?:    string | null,
 ): Promise<string | null> {
-  const apiKey     = process.env.RESEND_API_KEY
-  const fromEmail  = process.env.RESEND_FROM_EMAIL
-  const adminEmail = process.env.ADMIN_EMAIL
+  const apiKey    = process.env.RESEND_API_KEY
+  const fromEmail = process.env.RESEND_FROM_EMAIL
 
   if (!apiKey || !fromEmail) {
     console.warn('[email] sendLeadDecisionEmail skipped — missing env vars:', {
@@ -350,7 +349,6 @@ export async function sendLeadDecisionEmail(
     const { data, error } = await resend.emails.send({
       from:    buildSender(fromEmail),
       to:      lead.email,
-      replyTo: adminEmail,
       subject,
       text,
       html,

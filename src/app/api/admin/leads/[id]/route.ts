@@ -128,20 +128,28 @@ export async function PATCH(
             note,
           )
           if (emailId) {
-            const { error: dbErr } = await supabaseAdmin.from('leads').update({
-              email_provider_id: emailId,
-              email_status:      'sent',
-              email_status_at:   new Date().toISOString(),
-            }).eq('id', leadId)
-            if (dbErr) console.error('[api/admin/leads] email_status update failed:', dbErr.message)
+            console.log(`[api/admin/leads] ${leadId} — email dispatched to ${lead.email}, provider_id: ${emailId}`)
+            const { data: updated, error: dbErr } = await supabaseAdmin
+              .from('leads')
+              .update({
+                email_provider_id: emailId,
+                email_status:      'sent',
+                email_status_at:   new Date().toISOString(),
+              })
+              .eq('id', leadId)
+              .select('id')
+            if (dbErr) console.error(`[api/admin/leads] ${leadId} — email_status update failed:`, dbErr.message)
+            else console.log(`[api/admin/leads] ${leadId} — email_status=sent persisted (${updated?.length ?? 0} row(s))`)
+          } else {
+            console.warn(`[api/admin/leads] ${leadId} — sendLeadDecisionEmail returned null (env vars missing?)`)
           }
         } catch (err) {
-          console.error('[api/admin/leads] decision email failed:', err)
+          console.error(`[api/admin/leads] ${leadId} — email send failed for ${lead.email}:`, err instanceof Error ? err.message : err)
           const { error: dbErr } = await supabaseAdmin.from('leads').update({
             email_status:    'failed',
             email_status_at: new Date().toISOString(),
           }).eq('id', leadId)
-          if (dbErr) console.error('[api/admin/leads] email_status failed update failed:', dbErr.message)
+          if (dbErr) console.error(`[api/admin/leads] ${leadId} — email_status=failed update failed:`, dbErr.message)
         }
       })
     } else {
