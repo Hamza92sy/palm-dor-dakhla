@@ -20,10 +20,11 @@ export default function DecisionPanel({
   initialNote,
   compact = false,
 }: Props) {
-  const router                = useRouter()
-  const [note, setNote]       = useState(initialNote ?? '')
-  const [loading, setLoading] = useState<Decision | null>(null)
-  const [error, setError]     = useState<string | null>(null)
+  const router                    = useRouter()
+  const [note, setNote]           = useState(initialNote ?? '')
+  const [loading, setLoading]     = useState<Decision | null>(null)
+  const [error, setError]         = useState<string | null>(null)
+  const [justDecided, setJustDecided] = useState(false)
 
   const isDecided = currentStatus === 'accepted' || currentStatus === 'rejected'
 
@@ -45,6 +46,7 @@ export default function DecisionPanel({
         const d = await res.json().catch(() => ({})) as { error?: string }
         throw new Error(d.error ?? 'Erreur serveur')
       }
+      setJustDecided(true)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur — réessayer')
@@ -57,11 +59,18 @@ export default function DecisionPanel({
   if (compact) {
     if (isDecided) {
       return (
-        <span className={`text-[10px] font-medium tracking-wide whitespace-nowrap ${
-          currentStatus === 'accepted' ? 'text-green-700' : 'text-red-600'
-        }`}>
-          {currentStatus === 'accepted' ? '✓ Accepté' : '✗ Refusé'}
-        </span>
+        <div className="flex flex-col gap-0.5">
+          <span className={`text-[10px] font-medium tracking-wide whitespace-nowrap ${
+            currentStatus === 'accepted' ? 'text-green-700' : 'text-red-600'
+          }`}>
+            {currentStatus === 'accepted' ? '✓ Accepté' : '✗ Refusé'}
+          </span>
+          {justDecided && (
+            <span className="text-[9px] text-amber-500 font-medium tracking-wide whitespace-nowrap">
+              → Confirmer via WA
+            </span>
+          )}
+        </div>
       )
     }
     return (
@@ -101,16 +110,23 @@ export default function DecisionPanel({
       </span>
 
       {isDecided ? (
-        <div className="flex items-start gap-2">
-          <span className={`text-[11px] font-medium tracking-wide ${
-            currentStatus === 'accepted' ? 'text-green-700' : 'text-red-600'
-          }`}>
-            {currentStatus === 'accepted' ? '✓ Accepté' : '✗ Refusé'}
-          </span>
-          {initialNote && (
-            <span className="text-[11px] text-palm-blue/40">— {initialNote}</span>
+        <>
+          <div className="flex items-start gap-2">
+            <span className={`text-[11px] font-medium tracking-wide ${
+              currentStatus === 'accepted' ? 'text-green-700' : 'text-red-600'
+            }`}>
+              {currentStatus === 'accepted' ? '✓ Accepté' : '✗ Refusé'}
+            </span>
+            {initialNote && (
+              <span className="text-[11px] text-palm-blue/40">— {initialNote}</span>
+            )}
+          </div>
+          {justDecided && (
+            <p className="text-[11px] text-amber-600">
+              Email envoyé. Si le client ne confirme pas réception, contacter via WhatsApp.
+            </p>
           )}
-        </div>
+        </>
       ) : (
         <>
           <textarea
