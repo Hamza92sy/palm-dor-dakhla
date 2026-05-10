@@ -1,18 +1,26 @@
 # VERCEL ENV AUDIT — Palm d'Or Dakhla
-*Audit du 2026-05-07*
+
+*Audit mis à jour le 2026-05-10 — V2.3 post-validation production*
 
 ---
 
 ## Inventaire complet des variables d'environnement
 
-| Variable | Utilisation dans le code | Obligatoire | Type | Statut local | Statut Vercel |
-|----------|-------------------------|-------------|------|-------------|--------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `supabase/client.ts`, `supabase/server.ts` | ✅ Oui | Public | ✅ Configuré | ⚠️ À vérifier |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `supabase/client.ts` | ✅ Oui | Public | ✅ Configuré | ⚠️ À vérifier |
-| `SUPABASE_SERVICE_ROLE_KEY` | `supabase/server.ts` (server-only) | ✅ Oui | **Secret** | ✅ Configuré | ⚠️ À vérifier |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | `config.ts`, `api/lead/route.ts` | ✅ Oui | Public | ✅ Configuré | ⚠️ À vérifier |
-| `NEXT_PUBLIC_META_PIXEL_ID` | `layout.tsx` (conditionnel) | ❌ Non | Public | ✅ Présent | ⚠️ À configurer |
-| `NEXT_PUBLIC_GA_ID` | `layout.tsx` (conditionnel) | ❌ Non | Public | ✅ Présent | ⚠️ À configurer |
+| Variable | Obligatoire | Type | Statut Vercel | Rôle |
+|----------|-------------|------|---------------|------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Oui | Public | ✅ Configuré | Client + server Supabase — URL projet |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Oui | Public | ✅ Configuré | Client Supabase — INSERT public (RLS) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Oui | **Secret** | ✅ Configuré | Server-only — bypass RLS pour routes admin |
+| `ADMIN_SECRET` | Oui | **Secret** | ✅ Configuré | Mot de passe dashboard `/admin` (hashé en cookie) |
+| `ADMIN_EMAIL` | Oui | Secret | ✅ Configuré | Destinataire notifications nouvelles demandes |
+| `RESEND_API_KEY` | Oui | **Secret** | ✅ Configuré | SDK Resend — envoi emails admin + client |
+| `RESEND_FROM_EMAIL` | Oui | Secret | ✅ Configuré | Adresse expéditeur — ex: `notifications@palmdordakhla.com` |
+| `RESEND_FROM_NAME` | Non | Secret | ✅ Configuré | Nom affiché expéditeur — ex: `Palm d'Or Dakhla` |
+| `RESEND_WEBHOOK_SECRET` | Oui | **Secret** | ✅ Configuré | Signature webhook Resend (`whsec_xxx`) — tracking délivrabilité |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Oui | Public | ✅ Configuré | Numéro officiel Palm d'Or — format `212XXXXXXXXX` |
+| `NEXT_PUBLIC_SITE_URL` | Non | Public | — Non configuré | URL canonique — hardcodé en fallback `palmdordakhla.com` |
+| `NEXT_PUBLIC_GA_ID` | Non | Public | ⏳ En attente | Google Analytics 4 — no-op si absent |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Non | Public | ⏳ En attente | Meta Pixel — no-op si absent |
 
 ---
 
@@ -24,124 +32,116 @@
 - **Impact si absent** : formulaires lead brisés (500 sur `/api/lead`), leads non enregistrés
 - **Format** : `https://xxxxx.supabase.co`
 - **Où trouver** : Supabase Dashboard → Project Settings → API → Project URL
-- **⚠️ Critique** : sans cette variable, le formulaire ne fonctionne pas en production
 
 ### `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 - **Utilisé dans** : `src/lib/supabase/client.ts` (client-side)
 - **Impact si absent** : client Supabase browser non initialisé
 - **Format** : JWT long (eyJh...)
-- **Où trouver** : Supabase Dashboard → Project Settings → API → anon/public key
 - **Sécurité** : clé publique, safe d'exposer côté browser avec RLS activé
 
 ### `SUPABASE_SERVICE_ROLE_KEY`
 
-- **Utilisé dans** : `src/lib/supabase/server.ts` — Route Handler `/api/lead` uniquement
-- **Impact si absent** : impossible d'insérer des leads dans Supabase (bypass RLS requis)
+- **Utilisé dans** : `src/lib/supabase/server.ts` — routes admin server-only
+- **Impact si absent** : impossible d'accéder aux leads depuis le dashboard ou les routes admin
 - **Format** : JWT long (eyJh...)
-- **Où trouver** : Supabase Dashboard → Project Settings → API → service_role key
-- **⚠️ SECRET** : ne JAMAIS préfixer `NEXT_PUBLIC_`. Jamais exposer côté client.
+- **CRITIQUE** : ne JAMAIS préfixer `NEXT_PUBLIC_`. Ne jamais importer dans un composant `'use client'`.
 - **Configuration Vercel** : cocher **"Sensitive"** lors de l'ajout
+
+### `ADMIN_SECRET`
+
+- **Utilisé dans** : `/api/admin/auth/route.ts` — login dashboard
+- **Impact si absent** : impossible de se connecter au dashboard admin
+- **Format** : chaîne libre (mot de passe)
+- **Configuration Vercel** : cocher **"Sensitive"**
+
+### `ADMIN_EMAIL`
+
+- **Utilisé dans** : `src/lib/email.ts` — `sendLeadNotification()`
+- **Impact si absent** : pas d'email de notification à chaque nouvelle demande (warning loggé, pas d'erreur)
+- **Format** : adresse email valide
+
+### `RESEND_API_KEY`
+
+- **Utilisé dans** : `src/lib/email.ts` — SDK Resend (emails admin + client)
+- **Impact si absent** : aucun email envoyé (warning loggé, pas d'erreur — graceful no-op)
+- **Format** : `re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Où trouver** : Resend Dashboard → API Keys
+- **Configuration Vercel** : cocher **"Sensitive"**
+
+### `RESEND_FROM_EMAIL`
+
+- **Utilisé dans** : `src/lib/email.ts` — champ `from` de tous les emails
+- **Impact si absent** : aucun email envoyé (no-op)
+- **Format** : adresse email vérifiée sur Resend — `notifications@palmdordakhla.com`
+- **Prérequis** : le domaine `palmdordakhla.com` doit être vérifié dans Resend (✅ fait)
+
+### `RESEND_FROM_NAME`
+
+- **Utilisé dans** : `src/lib/email.ts` — nom affiché dans le champ `from`
+- **Impact si absent** : fallback hardcodé `Palm d'Or Dakhla` (non bloquant)
+- **Format** : texte libre — ex: `Palm d'Or Dakhla`
+
+### `RESEND_WEBHOOK_SECRET`
+
+- **Utilisé dans** : `/api/webhooks/resend/route.ts` — vérification signature Svix
+- **Impact si absent** : webhook retourne 500, tracking délivrabilité inactif (badge `✓ Délivré` jamais affiché)
+- **Format** : `whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- **Où trouver** : Resend Dashboard → Webhooks → signing secret
+- **Statut** : ✅ configuré sur Vercel — webhook opérationnel
 
 ### `NEXT_PUBLIC_WHATSAPP_NUMBER`
 
-- **Utilisé dans** : `src/lib/config.ts` (affichage + liens tel:), `src/app/api/lead/route.ts` (URL WhatsApp)
-- **Impact si absent** : API `/api/lead` retourne 503, bouton WhatsApp inactif, numéro non affiché
-- **Format** : `212661931317` (sans +, sans espaces — ex. Maroc)
-- **Valeur actuelle** : `+212 661 931 317`
-- **⚠️ Critique** : sans cette variable, l'intégralité du funnel de conversion est brisée
+- **Utilisé dans** : `src/lib/services.ts`, `src/lib/email.ts` (lien WA dans emails client), `src/app/api/lead/route.ts`
+- **Impact si absent** : lien WhatsApp non généré dans les emails client, bouton WA flottant inactif
+- **Format** : `212XXXXXXXXX` (sans +, sans espaces)
+- **CRITIQUE** : ce numéro est utilisé comme **destinataire** du lien WhatsApp dans les emails client — s'assurer que c'est le numéro officiel Palm d'Or, pas un numéro personnel
 
-### `NEXT_PUBLIC_META_PIXEL_ID`
+### `NEXT_PUBLIC_SITE_URL`
 
-- **Utilisé dans** : `src/app/layout.tsx` — conditionnel (`if PIXEL_ID`)
-- **Impact si absent** : tracking Meta désactivé — site fonctionne normalement
-- **Format** : nombre à 15-16 chiffres (ex. `1234567890123456`)
-- **Où trouver** : Meta Business Manager → Events Manager → Pixels
-- **Statut** : optionnel — activer avant lancement de campagnes Meta Ads
+- **Utilisé dans** : `src/lib/email.ts` (footer emails), sitemap, OG tags
+- **Impact si absent** : fallback `https://palmdordakhla.com` hardcodé — fonctionnel
+- **Format** : `https://palmdordakhla.com`
+- **Statut** : non configuré sur Vercel — le fallback hardcodé suffit pour la prod actuelle
 
-### `NEXT_PUBLIC_GA_ID`
+### `NEXT_PUBLIC_GA_ID` et `NEXT_PUBLIC_META_PIXEL_ID`
 
-- **Utilisé dans** : `src/app/layout.tsx` — conditionnel (`if GA_ID`)
-- **Impact si absent** : tracking GA4 désactivé — site fonctionne normalement
-- **Format** : `G-XXXXXXXXXX`
-- **Où trouver** : Google Analytics → Admin → Property → Data Streams → Measurement ID
-- **Statut** : optionnel — activer dès que le domaine est connecté
+- **Utilisé dans** : `src/app/layout.tsx` — conditionnel (no-op si absent)
+- **Impact si absent** : tracking désactivé — site fonctionnel normalement
+- **Priorité** : P5 — activer avant lancement de campagnes payantes
 
 ---
 
-## Risques identifiés
+## Sécurité — règles actives
 
-### 🔴 Risque critique — `SUPABASE_SERVICE_ROLE_KEY` exposée
+- `SUPABASE_SERVICE_ROLE_KEY` : importé uniquement dans des Route Handlers serveur — jamais côté client
+- `ADMIN_SECRET` : jamais exposé dans les logs ou les réponses API
+- `RESEND_API_KEY` : server-only (`import('resend')` dynamique dans des fonctions serveur)
+- `RESEND_WEBHOOK_SECRET` : utilisé uniquement pour vérifier la signature des webhooks entrants
 
-**Ce risque N'EXISTE PAS dans le code actuel** — le fichier `server.ts` est uniquement importé dans `api/lead/route.ts` (Route Handler), qui s'exécute côté serveur. La clé n'est jamais envoyée au browser.
-
-À surveiller : ne jamais importer `src/lib/supabase/server.ts` dans un composant Client (fichier avec `'use client'`).
-
-### 🟠 Risque — Variables absentes sur Vercel
-
-Les variables sont configurées dans `.env.local` (local uniquement). Vercel **ne lit pas** `.env.local` — il faut les reconfigurer manuellement dans le dashboard Vercel.
-
-### 🟡 Risque — Format `NEXT_PUBLIC_WHATSAPP_NUMBER`
-
-Le code dans `config.ts` gère le formatage d'affichage en assumant 12 chiffres :
-```ts
-const display = number.length === 12
-  ? `+${number.slice(0,3)} ${number.slice(3,6)}...`
-  : `+${number}`
-```
-Le numéro `212661931317` fait bien 12 chiffres. ✅
+Surveiller : ne jamais importer `src/lib/supabase/server.ts` ou `src/lib/email.ts` dans un composant `'use client'`.
 
 ---
 
-## Procédure de configuration sur Vercel
-
-### Accès
-
-Vercel Dashboard → projet **palm-dor-dakhla** → **Settings** → **Environment Variables**
-
-### Variables à configurer (copier depuis `.env.local`)
-
-```
-NEXT_PUBLIC_SUPABASE_URL        = https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY   = eyJh...
-SUPABASE_SERVICE_ROLE_KEY       = eyJh...  [cocher Sensitive]
-NEXT_PUBLIC_WHATSAPP_NUMBER     = 212661931317
-NEXT_PUBLIC_META_PIXEL_ID       = [votre Pixel ID — laisser vide si pas encore créé]
-NEXT_PUBLIC_GA_ID               = [votre GA4 ID — laisser vide si pas encore créé]
-```
-
-### Environnements à cocher
-
-Pour chaque variable, cocher **Production**, **Preview** et **Development**.
-
-Exception : `SUPABASE_SERVICE_ROLE_KEY` — cocher uniquement **Production** et **Preview**
-(en développement, le `.env.local` est utilisé).
-
-### Après ajout des variables
-
-Déclencher un nouveau déploiement : **Deployments** → **Redeploy** sur le dernier déploiement.
-
----
-
-## Vérification post-déploiement
+## Procédure de vérification post-déploiement
 
 ```bash
-# Test formulaire lead (remplacer l'URL par le domaine connecté)
+# Test formulaire lead
 curl -X POST https://palmdordakhla.com/api/lead \
   -H "Content-Type: application/json" \
-  -d '{"name":"Test","phone":"0600000000","service":"accommodation"}'
+  -d '{"name":"Test","phone":"0600000000","service":"restaurant","message":"test"}'
+# Réponse attendue : {"success":true,"whatsappUrl":"https://wa.me/212..."}
 
-# Réponse attendue : {"success":true,"whatsappUrl":"https://wa.me/..."}
-# Réponse si ENV absent : {"error":"Service temporairement indisponible"} (503)
+# Test webhook Resend (vérifier dans Vercel logs que le endpoint retourne 200)
+# Resend Dashboard → Webhooks → tester l'envoi d'un event
 ```
 
 ---
 
-## Résumé des actions
+## Actions restantes (non bloquantes)
 
 | Priorité | Action |
 |----------|--------|
-| 🔴 Critique | Configurer les 4 variables obligatoires sur Vercel avant le go-live |
-| 🟠 Avant campagnes | Ajouter `NEXT_PUBLIC_META_PIXEL_ID` sur Vercel |
-| 🟠 Avant campagnes | Ajouter `NEXT_PUBLIC_GA_ID` sur Vercel |
-| ✅ Déjà fait | Toutes les variables sont configurées en local (`.env.local`) |
+| P3 délivrabilité | Créer sous-domaine d'envoi `mail.palmdordakhla.com` dans Resend + SPF/DKIM/DMARC dédiés |
+| P5 analytics | Configurer `NEXT_PUBLIC_GA_ID` sur Vercel |
+| P5 analytics | Configurer `NEXT_PUBLIC_META_PIXEL_ID` sur Vercel |

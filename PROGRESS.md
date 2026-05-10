@@ -94,20 +94,28 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 - [x] **Email client acceptation** : envoyé automatiquement quand admin clique Accepter
 - [x] **Email client refus** : envoyé automatiquement quand admin clique Refuser
 - [x] Fire-and-forget : statut DB mis à jour même si email échoue
-- [x] Exécution post-réponse fiabilisée via `after()` (next/server) sur la route admin PATCH
-- [x] Validation prod effectuée : logs Vercel + event `Delivered` Resend confirmés sur test réel
-- [x] **Suivi délivrabilité** : `email_provider_id` + `email_status` + `email_status_at` sauvegardés sur le lead après envoi
-- [x] **Webhook Resend** : `/api/webhooks/resend` reçoit `delivered` / `bounced` / `complained` et met à jour le lead en temps réel — **⚠ requiert `RESEND_WEBHOOK_SECRET` + URL configurée dans Resend dashboard (voir §9)**
-- [x] **Dashboard** : badge email status visible sous le badge décision (✉ Envoyé / ✓ Délivré / ✗ Bounce / ⚠ Plainte / ✗ Échec) — bouton WA mis en évidence si email en erreur
-- [x] Bouton WhatsApp client remplacé par lien texte sobre (réduit score "email promotionnel" Gmail/Outlook)
+- [x] Exécution post-réponse fiabilisée sur la route admin PATCH via `after()`
+- [x] Display name expéditeur : `Palm d'Or Dakhla <notifications@palmdordakhla.com>`
+- [x] Emails client en multipart `text/plain` + `html`
+- [x] Preheader texte ajouté pour améliorer l'aperçu inbox
+- [x] `replyTo` retiré des emails client décision après audit délivrabilité Gmail
+- [x] Liens email simplifiés / plus sobres pour réduire les signaux promotionnels
+- [x] **Bug corrigé (2026-05-10)** : lien WhatsApp dans emails client → pointe vers `NEXT_PUBLIC_WHATSAPP_NUMBER` (numéro Palm d'Or officiel) et non plus `lead.phone` (numéro du client)
+- [x] Webhook Resend `/api/webhooks/resend` déployé — suit `delivered / bounced / complained` en temps réel
+- [x] Fallback `data.email_id ?? data.id` dans le webhook (résilience payload Resend)
+- [x] Tracking email côté admin déployé (`email_status`, `email_provider_id`, `email_status_at`)
+- [x] Badge admin "✉ Non confirmé" si email_status reste `sent` > 60 min
+- [x] Bouton WA mis en évidence dans le dashboard si bounce / failed / complained
+- [x] Validation prod effectuée :
+  - cas réel **Accepté** → email reçu
+  - cas réel **Refusé** → email reçu
+  - tests Gmail réels validés sur plusieurs comptes
+- [x] Typo correction domaines email (gmial.com, hotmial.com, etc.) côté formulaires
+- [x] DMARC `p=none` ajouté sur `palmdordakhla.com`
 - [x] Graceful no-op si env vars Resend absentes (logs warning, pas d'exception)
 - [x] `export const runtime = 'nodejs'` sur toutes les routes utilisant Resend
 - [x] Domaine `palmdordakhla.com` vérifié sur Resend
-- [x] FROM : `notifications@palmdordakhla.com` (bascule vers `mail.palmdordakhla.com` prête — voir §9)
-- [x] Preheader texte dans emails client (preview Gmail/Outlook)
-- [x] Typo correction domaines email (gmial.com, hotmial.com, etc.) côté formulaires
-- [x] Badge admin "✉ Non confirmé" si email_status reste `sent` > 60 min
-- [x] DMARC `p=none` ajouté sur `palmdordakhla.com`
+- [x] FROM piloté par env vars (`RESEND_FROM_EMAIL`, `RESEND_FROM_NAME`)
 
 ---
 
@@ -142,6 +150,16 @@ Flow complet validé en conditions réelles :
 - Logs Vercel observés : `[email] Sending accepted email to…` + `[email] Decision email sent: c7c4509d-…`
 - Conclusion : code applicatif OK, délivrabilité technique OK
 - Limitation identifiée : `Delivered` Resend ≠ visibilité inbox — Outlook peut filtrer en spam / focused-other / archive sans accusé côté expéditeur
+
+### Note opérationnelle — Anti-spam session (2026-05-10)
+
+Audit délivrabilité complet V2.3 — résultat :
+
+- **Ce qui est déjà bon (code) :** expéditeur lisible `Palm d'Or Dakhla <notifications@palmdordakhla.com>`, text/plain dans les deux emails, HTML sobre, preheader client, sujets transactionnels, lien WA texte (pas bouton) dans l'email client, webhook tracking actif, DMARC p=none, domaine vérifié Resend, typo correction email côté formulaire.
+- **Correctifs appliqués :** bouton WhatsApp vert `#25D366` → lien texte `#1C3A28` dans l'email admin (`sendLeadNotification`) ; couleur lien `#1a9e51` → `#1C3A28` dans l'email client (`sendLeadDecisionEmail`). Suppression de deux signaux promotionnels résiduels.
+- **Prochaine étape DNS (non bloquant, priorité P1 délivrabilité) :** créer sous-domaine d'envoi dédié `mail.palmdordakhla.com` dans Resend, ajouter SPF+DKIM+DMARC dessus, mettre à jour `RESEND_FROM_EMAIL` → `notifications@mail.palmdordakhla.com`, redéployer.
+- **Limite irréductible :** `Delivered` Resend ≠ affichage boîte principale. Gmail Promotions / Outlook Other/Spam décidés côté client sans signal retour. Régler via Google Postmaster Tools + signal opérateur WhatsApp si besoin.
+- **Règle opérateur finalisée :** badge ≠ `✓ Délivré` après 30 min OU client dit "je n'ai rien reçu" → WhatsApp systématique.
 
 ### Note opérationnelle — Audit délivrabilité (2026-05-10)
 
@@ -388,8 +406,8 @@ ALTER TABLE leads ADD CONSTRAINT leads_apartment_type_check
 | `ADMIN_SECRET`                  | oui    | ✅ configuré  | Mot de passe dashboard `/admin` (hashé en cookie)        |
 | `RESEND_API_KEY`                | oui    | ✅ configuré  | SDK Resend — envoi emails admin + client                 |
 | `RESEND_FROM_EMAIL`             | oui    | ✅ configuré  | Expéditeur — ex: `notifications@palmdordakhla.com`       |
-| `RESEND_FROM_NAME`              | non    | ⏳ recommandé | Nom affiché — ex: `Palm d'Or Dakhla`. Fallback code: `Palm d'Or Dakhla`. Améliore délivrabilité Outlook. |
-| `RESEND_WEBHOOK_SECRET`         | oui    | ⏳ à ajouter  | Secret de signature webhook Resend (format `whsec_xxx`) — requis pour `/api/webhooks/resend` |
+| `RESEND_FROM_NAME`              | non    | ✅ configuré  | Nom affiché expéditeur — ex: `Palm d'Or Dakhla`         |
+| `RESEND_WEBHOOK_SECRET`         | oui    | ✅ configuré  | Secret signature webhook Resend (`whsec_xxx`)           |
 | `ADMIN_EMAIL`                   | oui    | ✅ configuré  | Destinataire notifications nouvelles demandes            |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER`   | oui    | ✅ configuré  | Numéro international format `212XXXXXXXXX`               |
 | `NEXT_PUBLIC_SITE_URL`          | non    | —             | URL canonique (OG, sitemap) — peut être hardcodé         |
@@ -482,7 +500,7 @@ next.config.ts                 Config Next.js
 - ❌ **Disponibilités automatiques** — pas de calendrier, pas de blocage de dates
 - ❌ **Double-booking protection** — deux demandes sur les mêmes dates/apt peuvent coexister
 - ❌ **Annulation de décision** — une fois accepted/rejected, l'admin ne peut pas revenir en arrière via l'UI (nécessite modification directe en DB)
-- ❌ **Webhook tracking non opérationnel** — `RESEND_WEBHOOK_SECRET` absent de Vercel → badge `✓ Délivré` ne s'affiche jamais → **à configurer en priorité absolue**
+- ✅ **Webhook tracking opérationnel** — `RESEND_WEBHOOK_SECRET` configuré sur Vercel → badge `✓ Délivré` / `⚠ Bounce` actif
 - ❌ **Inbox visibility non garantie** — un statut `Delivered` dans Resend confirme l'acceptation par le serveur destinataire, pas l'affichage en boîte principale (Outlook : spam, focused/other, archive, règles, filtrage fournisseur)
 - ❌ **Tracking analytics actif** — Meta Pixel et GA4 sont câblés mais env vars non configurées
 - ❌ **Version anglaise** — pages `/en` existent comme stubs, contenu non traduit
