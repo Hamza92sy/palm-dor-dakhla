@@ -12,6 +12,9 @@ function formatDateFr(iso: string): string {
   return `${parseInt(d, 10)} ${MONTHS_FR[parseInt(m, 10) - 1]} ${y}`
 }
 
+// Canonical site URL — used in email footers so links match the sending domain.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://palmdordakhla.com'
+
 // Constructs "Display Name <email@domain>" — improves Outlook deliverability.
 // RESEND_FROM_NAME overrides the default; fallback is hardcoded brand name.
 function buildSender(email: string): string {
@@ -89,7 +92,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
     if (nights !== null)     textLines.push(`Nuitées : ${nights}`)
     if (lead.check_out)      textLines.push(`Départ : ${formatDateFr(lead.check_out)}`)
   }
-  textLines.push('', `Message : ${lead.message ?? '—'}`, '', `WhatsApp : ${waUrl}`, '', "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
+  textLines.push('', `Message : ${lead.message ?? '—'}`, '', `WhatsApp : ${waUrl}`, '', `${SITE_URL}`, "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
   const text = textLines.join('\n')
 
   try {
@@ -157,7 +160,8 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           </a>
         </div>
         <p style="margin-top:32px;font-size:11px;color:#aaa;">
-          Palm d&rsquo;Or Dakhla &mdash; AV Al Walaa, Dakhla 73000
+          <a href="${SITE_URL}" style="color:#aaa;text-decoration:none;">palmdordakhla.com</a>
+          &mdash; AV Al Walaa, Dakhla 73000
         </p>
       </div>
     `,
@@ -244,7 +248,7 @@ export async function sendLeadDecisionEmail(
     if (note) textLines.push('', note)
     textLines.push('', "N'hésitez pas à nous contacter pour d'autres dates ou pour toute question.")
   }
-  textLines.push('', `Contacter via WhatsApp : ${waUrl}`, '', "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
+  textLines.push('', `Contacter via WhatsApp : ${waUrl}`, '', `${SITE_URL}`, "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
   const text = textLines.join('\n')
 
   const html = `
@@ -327,7 +331,8 @@ export async function sendLeadDecisionEmail(
 
         <p style="margin:0;font-size:11px;color:#aaa;text-align:center;
           border-top:1px solid #e5dcc3;padding-top:16px;">
-          Palm d&rsquo;Or Dakhla &mdash; AV Al Walaa, Dakhla 73000
+          <a href="${SITE_URL}" style="color:#aaa;text-decoration:none;">palmdordakhla.com</a>
+          &mdash; AV Al Walaa, Dakhla 73000
         </p>
       </div>
     </div>
