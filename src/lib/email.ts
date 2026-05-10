@@ -328,13 +328,10 @@ export async function sendLeadDecisionEmail(
           : `<p style="margin:0 0 24px;">N&rsquo;hésitez pas à nous contacter pour d&rsquo;autres dates ou pour toute question.</p>`
         }
 
-        <div style="text-align:center;margin-bottom:28px;">
-          <a href="${waUrl}"
-            style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;
-              padding:12px 28px;border-radius:30px;font-size:13px;font-weight:600;letter-spacing:0.03em;">
-            Contacter via WhatsApp
-          </a>
-        </div>
+        <p style="margin:0 0 24px;font-size:13px;color:#555;">
+          Une question&nbsp;?
+          <a href="${waUrl}" style="color:#1a9e51;text-decoration:underline;">Contactez-nous sur WhatsApp</a>
+        </p>
 
         <p style="margin:0;font-size:11px;color:#aaa;text-align:center;
           border-top:1px solid #e5dcc3;padding-top:16px;">

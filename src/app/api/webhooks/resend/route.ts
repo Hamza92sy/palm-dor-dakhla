@@ -29,9 +29,17 @@ const EVENT_STATUS: Record<string, string> = {
   'email.complained': 'complained',
 }
 
+// Resend webhook data shape — email_id is the canonical field but some payload
+// versions expose id instead. Both are checked as fallback.
+type ResendEventData = {
+  email_id?: string
+  id?:       string
+  [key: string]: unknown
+}
+
 type ResendEvent = {
   type: string
-  data: { email_id: string }
+  data: ResendEventData
 }
 
 export async function POST(req: NextRequest) {
@@ -41,30 +49,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'not configured' }, { status: 500 })
   }
 
-  // Log receipt immediately — confirms the webhook URL is correct and reachable
   const svixId = req.headers.get('svix-id') ?? 'no-svix-id'
   console.log(`[webhook/resend] received — svix-id: ${svixId}`)
 
   const rawBody = await req.text()
 
   if (!verifySignature(rawBody, req.headers, secret)) {
-    console.warn(`[webhook/resend] invalid signature for svix-id: ${svixId}`)
+    console.warn(`[webhook/resend] invalid signature — svix-id: ${svixId}`)
     return NextResponse.json({ error: 'invalid signature' }, { status: 401 })
   }
 
   const event = JSON.parse(rawBody) as ResendEvent
-  const newStatus = EVENT_STATUS[event.type]
 
+  // Full payload log — critical for diagnosing field-name or format mismatches.
+  console.log(`[webhook/resend] parsed — type: ${event.type}, data keys: ${Object.keys(event.data ?? {}).join(', ')}, email_id: ${event.data?.email_id ?? '(none)'}, id: ${(event.data as { id?: string })?.id ?? '(none)'}`)
+
+  const newStatus = EVENT_STATUS[event.type]
   if (!newStatus) {
     console.log(`[webhook/resend] untracked event type: ${event.type} — acknowledged`)
     return NextResponse.json({ ok: true })
   }
 
-  const emailId = event.data?.email_id
+  // Accept both data.email_id (Resend standard) and data.id (observed in some payloads).
+  const emailId = event.data?.email_id ?? (event.data as { id?: string })?.id
   if (!emailId) {
-    console.warn(`[webhook/resend] ${event.type} — missing email_id in payload`)
+    console.warn(`[webhook/resend] ${event.type} — no email_id or id in payload data`)
     return NextResponse.json({ ok: true })
   }
+
+  console.log(`[webhook/resend] ${event.type} — searching DB for email_provider_id: ${emailId}`)
 
   const { data: updated, error } = await supabaseAdmin
     .from('leads')
@@ -82,9 +95,9 @@ export async function POST(req: NextRequest) {
 
   const rowsUpdated = updated?.length ?? 0
   if (rowsUpdated === 0) {
-    console.warn(`[webhook/resend] ${event.type} — no lead matched provider_id: ${emailId} (0 rows updated — possible tracking mismatch)`)
+    console.warn(`[webhook/resend] ${event.type} — 0 rows matched email_provider_id: ${emailId} — email_provider_id may not be saved yet or ID mismatch`)
   } else {
-    console.log(`[webhook/resend] ${event.type} → ${newStatus} (provider_id: ${emailId}) — ${rowsUpdated} lead(s) updated`)
+    console.log(`[webhook/resend] ${event.type} → ${newStatus} — provider_id: ${emailId} — ${rowsUpdated} lead(s) updated`)
   }
 
   return NextResponse.json({ ok: true })

@@ -97,8 +97,9 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 - [x] Exécution post-réponse fiabilisée via `after()` (next/server) sur la route admin PATCH
 - [x] Validation prod effectuée : logs Vercel + event `Delivered` Resend confirmés sur test réel
 - [x] **Suivi délivrabilité** : `email_provider_id` + `email_status` + `email_status_at` sauvegardés sur le lead après envoi
-- [x] **Webhook Resend** : `/api/webhooks/resend` reçoit `delivered` / `bounced` / `complained` et met à jour le lead en temps réel
+- [x] **Webhook Resend** : `/api/webhooks/resend` reçoit `delivered` / `bounced` / `complained` et met à jour le lead en temps réel — **⚠ requiert `RESEND_WEBHOOK_SECRET` + URL configurée dans Resend dashboard (voir §9)**
 - [x] **Dashboard** : badge email status visible sous le badge décision (✉ Envoyé / ✓ Délivré / ✗ Bounce / ⚠ Plainte / ✗ Échec) — bouton WA mis en évidence si email en erreur
+- [x] Bouton WhatsApp client remplacé par lien texte sobre (réduit score "email promotionnel" Gmail/Outlook)
 - [x] Graceful no-op si env vars Resend absentes (logs warning, pas d'exception)
 - [x] `export const runtime = 'nodejs'` sur toutes les routes utilisant Resend
 - [x] Domaine `palmdordakhla.com` vérifié sur Resend
@@ -141,6 +142,15 @@ Flow complet validé en conditions réelles :
 - Logs Vercel observés : `[email] Sending accepted email to…` + `[email] Decision email sent: c7c4509d-…`
 - Conclusion : code applicatif OK, délivrabilité technique OK
 - Limitation identifiée : `Delivered` Resend ≠ visibilité inbox — Outlook peut filtrer en spam / focused-other / archive sans accusé côté expéditeur
+
+### Note opérationnelle — Audit délivrabilité (2026-05-10)
+
+Audit complet réalisé suite au problème "email Delivered mais client ne voit rien" :
+
+- **Cause racine #1 (bloquante)** : `RESEND_WEBHOOK_SECRET` absent de Vercel → webhook retourne 500 → `email_status` reste éternellement `sent` → badge "✉ Non confirmé" toujours affiché → opérateur perd le signal tracking. **Action requise : configurer la var + URL webhook dans Resend dashboard.**
+- **Cause racine #2 (délivrabilité)** : bouton WhatsApp fond vert dans l'email client → classifié "email promotionnel" par Gmail/Outlook → remplacé par lien texte sobre (2026-05-10).
+- **Limite irréductible** : `Delivered` Resend = SMTP 250 OK côté serveur destinataire ≠ affichage inbox. Gmail Promotions / Outlook Other/Spam sont décidés côté client sans signal retour.
+- **Règle opérateur** : si badge ≠ "✓ Délivré" après 30 min OU si client dit ne rien avoir reçu → WhatsApp systématique.
 
 ### Notes importantes sur le workflow
 
@@ -353,7 +363,7 @@ CHECK (language IN ('fr', 'en'))
 | `002_leads_v1.5.sql` | ✅ prod   | `notes`, `check_in`, `check_out`, `apartment_type` (legacy types) |
 | `003_leads_v2.sql`   | ✅ prod   | `email`, `decision_at`, `decision_note` + statuts `accepted`/`rejected` |
 | `004` (via MCP)      | ✅ prod   | Extend `apartment_type` CHECK : legacy + `apt-1..apt-6` (appliqué directement sur Supabase MCP, pas de fichier local) |
-| `005_leads_email_tracking.sql` | ⏳ à appliquer | `email_status`, `email_provider_id`, `email_status_at` + CHECK constraint |
+| `005_leads_email_tracking.sql` | ✅ prod   | `email_status`, `email_provider_id`, `email_status_at` + CHECK constraint |
 
 **IMPORTANT :** La migration 004 n'a pas de fichier SQL local. Elle a été appliquée directement via le MCP Supabase. Si le schéma est resetté, reproduire manuellement :
 
@@ -472,6 +482,7 @@ next.config.ts                 Config Next.js
 - ❌ **Disponibilités automatiques** — pas de calendrier, pas de blocage de dates
 - ❌ **Double-booking protection** — deux demandes sur les mêmes dates/apt peuvent coexister
 - ❌ **Annulation de décision** — une fois accepted/rejected, l'admin ne peut pas revenir en arrière via l'UI (nécessite modification directe en DB)
+- ❌ **Webhook tracking non opérationnel** — `RESEND_WEBHOOK_SECRET` absent de Vercel → badge `✓ Délivré` ne s'affiche jamais → **à configurer en priorité absolue**
 - ❌ **Inbox visibility non garantie** — un statut `Delivered` dans Resend confirme l'acceptation par le serveur destinataire, pas l'affichage en boîte principale (Outlook : spam, focused/other, archive, règles, filtrage fournisseur)
 - ❌ **Tracking analytics actif** — Meta Pixel et GA4 sont câblés mais env vars non configurées
 - ❌ **Version anglaise** — pages `/en` existent comme stubs, contenu non traduit

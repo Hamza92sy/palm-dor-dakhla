@@ -128,7 +128,7 @@ export async function PATCH(
             note,
           )
           if (emailId) {
-            console.log(`[api/admin/leads] ${leadId} — email dispatched to ${lead.email}, provider_id: ${emailId}`)
+            console.log(`[api/admin/leads] ${leadId} — email dispatched, saving email_provider_id: "${emailId}"`)
             const { data: updated, error: dbErr } = await supabaseAdmin
               .from('leads')
               .update({
@@ -139,7 +139,7 @@ export async function PATCH(
               .eq('id', leadId)
               .select('id')
             if (dbErr) console.error(`[api/admin/leads] ${leadId} — email_status update failed:`, dbErr.message)
-            else console.log(`[api/admin/leads] ${leadId} — email_status=sent persisted (${updated?.length ?? 0} row(s))`)
+            else console.log(`[api/admin/leads] ${leadId} — email_provider_id "${emailId}" + email_status=sent persisted (${updated?.length ?? 0} row(s))`)
           } else {
             console.warn(`[api/admin/leads] ${leadId} — sendLeadDecisionEmail returned null (env vars missing?)`)
           }
