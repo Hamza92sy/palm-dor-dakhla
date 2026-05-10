@@ -374,6 +374,7 @@ ALTER TABLE leads ADD CONSTRAINT leads_apartment_type_check
 | `ADMIN_SECRET`                  | oui    | ✅ configuré  | Mot de passe dashboard `/admin` (hashé en cookie)        |
 | `RESEND_API_KEY`                | oui    | ✅ configuré  | SDK Resend — envoi emails admin + client                 |
 | `RESEND_FROM_EMAIL`             | oui    | ✅ configuré  | Expéditeur — ex: `notifications@palmdordakhla.com`       |
+| `RESEND_FROM_NAME`              | non    | ⏳ recommandé | Nom affiché — ex: `Palm d'Or Dakhla`. Fallback code: `Palm d'Or Dakhla`. Améliore délivrabilité Outlook. |
 | `RESEND_WEBHOOK_SECRET`         | oui    | ⏳ à ajouter  | Secret de signature webhook Resend (format `whsec_xxx`) — requis pour `/api/webhooks/resend` |
 | `ADMIN_EMAIL`                   | oui    | ✅ configuré  | Destinataire notifications nouvelles demandes            |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER`   | oui    | ✅ configuré  | Numéro international format `212XXXXXXXXX`               |

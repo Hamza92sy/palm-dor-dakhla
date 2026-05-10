@@ -1,5 +1,26 @@
 import { getApartmentLabel } from '@/lib/apartments'
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const MONTHS_FR = [
+  'janvier','février','mars','avril','mai','juin',
+  'juillet','août','septembre','octobre','novembre','décembre',
+]
+
+function formatDateFr(iso: string): string {
+  const [y, m, d] = iso.split('-')
+  return `${parseInt(d, 10)} ${MONTHS_FR[parseInt(m, 10) - 1]} ${y}`
+}
+
+// Constructs "Display Name <email@domain>" — improves Outlook deliverability.
+// RESEND_FROM_NAME overrides the default; fallback is hardcoded brand name.
+function buildSender(email: string): string {
+  const name = process.env.RESEND_FROM_NAME ?? "Palm d'Or Dakhla"
+  return `${name} <${email}>`
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export interface LeadNotification {
   name:            string
   phone:           string
@@ -52,11 +73,31 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
     ? Math.round((new Date(lead.check_out).getTime() - new Date(lead.check_in).getTime()) / 86400000)
     : null
 
+  // Plain-text alternative — required for multipart/alternative (Exchange / Office 365)
+  const textLines = [
+    `Nouvelle demande — ${serviceLabel}`,
+    '',
+    `Nom : ${lead.name}`,
+    `Téléphone : ${lead.phone}`,
+    `Service : ${serviceLabel}`,
+    `Langue : ${lead.language.toUpperCase()}`,
+  ]
+  if (hasBookingDetails) {
+    textLines.push('')
+    if (lead.apartment_type) textLines.push(`Appartement : ${getApartmentLabel(lead.apartment_type)}`)
+    if (lead.check_in)       textLines.push(`Arrivée : ${formatDateFr(lead.check_in)}`)
+    if (nights !== null)     textLines.push(`Nuitées : ${nights}`)
+    if (lead.check_out)      textLines.push(`Départ : ${formatDateFr(lead.check_out)}`)
+  }
+  textLines.push('', `Message : ${lead.message ?? '—'}`, '', `WhatsApp : ${waUrl}`, '', "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
+  const text = textLines.join('\n')
+
   try {
   const { data, error } = await resend.emails.send({
-    from:    fromEmail,
+    from:    buildSender(fromEmail),
     to:      adminEmail,
     subject: `Nouvelle demande — ${serviceLabel} — ${lead.name}`,
+    text,
     html: `
       <div style="font-family:sans-serif;font-size:14px;color:#1C3A28;line-height:1.7;max-width:480px;">
         <h2 style="font-size:18px;font-weight:600;margin:0 0 16px;">
@@ -89,7 +130,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           ${lead.check_in ? `
           <tr>
             <td style="padding:6px 0;color:#555;">Arrivée</td>
-            <td style="padding:6px 0;font-weight:600;">${lead.check_in}</td>
+            <td style="padding:6px 0;font-weight:600;">${formatDateFr(lead.check_in)}</td>
           </tr>` : ''}
           ${nights !== null ? `
           <tr>
@@ -99,7 +140,7 @@ export async function sendLeadNotification(lead: LeadNotification): Promise<void
           ${lead.check_out ? `
           <tr>
             <td style="padding:6px 0;color:#555;">Départ</td>
-            <td style="padding:6px 0;font-weight:600;">${lead.check_out}</td>
+            <td style="padding:6px 0;font-weight:600;">${formatDateFr(lead.check_out)}</td>
           </tr>` : ''}
           <tr><td colspan="2" style="padding:4px 0 10px;"><hr style="border:none;border-top:1px solid #e5dcc3;margin:0;"/></td></tr>
           ` : ''}
@@ -150,8 +191,9 @@ export async function sendLeadDecisionEmail(
   decision: 'accepted' | 'rejected',
   note?:    string | null,
 ): Promise<string | null> {
-  const apiKey    = process.env.RESEND_API_KEY
-  const fromEmail = process.env.RESEND_FROM_EMAIL
+  const apiKey     = process.env.RESEND_API_KEY
+  const fromEmail  = process.env.RESEND_FROM_EMAIL
+  const adminEmail = process.env.ADMIN_EMAIL
 
   if (!apiKey || !fromEmail) {
     console.warn('[email] sendLeadDecisionEmail skipped — missing env vars:', {
@@ -177,8 +219,33 @@ export async function sendLeadDecisionEmail(
     : null
 
   const subject = isAccepted
-    ? `Votre réservation Palm d'Or Dakhla — Confirmée ✓`
+    ? `Votre réservation Palm d'Or Dakhla — Confirmée`
     : `Votre demande Palm d'Or Dakhla`
+
+  // Plain-text alternative
+  const textLines: string[] = [`Bonjour ${lead.name},`, '']
+  if (isAccepted) {
+    textLines.push(
+      `Votre demande de réservation pour ${serviceLabel} a été acceptée par notre équipe.`,
+      '',
+    )
+    if (lead.apartment_type) textLines.push(`Appartement : ${getApartmentLabel(lead.apartment_type)}`)
+    if (lead.check_in)       textLines.push(`Arrivée : ${formatDateFr(lead.check_in)}`)
+    if (nights !== null)     textLines.push(`Nuitées : ${nights}`)
+    if (lead.check_out)      textLines.push(`Départ : ${formatDateFr(lead.check_out)}`)
+    if (note)                textLines.push('', note)
+    textLines.push('', "Notre équipe vous contactera rapidement pour confirmer les détails finaux.")
+  } else {
+    textLines.push(
+      "Nous vous remercions de l'intérêt que vous portez à la résidence Palm d'Or Dakhla.",
+      '',
+      `Malheureusement, nous ne sommes pas en mesure d'honorer votre demande pour ${serviceLabel} en ce moment.`,
+    )
+    if (note) textLines.push('', note)
+    textLines.push('', "N'hésitez pas à nous contacter pour d'autres dates ou pour toute question.")
+  }
+  textLines.push('', `Contacter via WhatsApp : ${waUrl}`, '', "Palm d'Or Dakhla — AV Al Walaa, Dakhla 73000")
+  const text = textLines.join('\n')
 
   const html = `
     <div style="font-family:sans-serif;font-size:14px;color:#1C3A28;line-height:1.7;max-width:480px;margin:0 auto;">
@@ -223,7 +290,7 @@ export async function sendLeadDecisionEmail(
             ${lead.check_in ? `
             <tr>
               <td style="padding:8px 14px;color:#888;font-size:12px;">Arrivée</td>
-              <td style="padding:8px 14px;font-size:12px;font-weight:600;">${lead.check_in}</td>
+              <td style="padding:8px 14px;font-size:12px;font-weight:600;">${formatDateFr(lead.check_in)}</td>
             </tr>` : ''}
             ${nights !== null ? `
             <tr>
@@ -233,7 +300,7 @@ export async function sendLeadDecisionEmail(
             ${lead.check_out ? `
             <tr>
               <td style="padding:8px 14px;color:#888;font-size:12px;">Départ</td>
-              <td style="padding:8px 14px;font-size:12px;font-weight:600;">${lead.check_out}</td>
+              <td style="padding:8px 14px;font-size:12px;font-weight:600;">${formatDateFr(lead.check_out)}</td>
             </tr>` : ''}
           </table>
         ` : ''}
@@ -268,9 +335,11 @@ export async function sendLeadDecisionEmail(
 
   try {
     const { data, error } = await resend.emails.send({
-      from:    fromEmail,
+      from:    buildSender(fromEmail),
       to:      lead.email,
+      replyTo: adminEmail,
       subject,
+      text,
       html,
     })
     if (error) throw new Error(`[Resend] ${error.message}`)
