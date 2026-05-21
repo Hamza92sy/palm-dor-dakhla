@@ -6,6 +6,43 @@ import { ALL_VALID_APARTMENT_IDS, APARTMENTS, getApartmentLabel, getApartmentLab
 
 export const runtime = 'nodejs'
 
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+// In-memory store — resets on cold start, sufficient for low-volume protection.
+// Upgrade to Vercel KV / Upstash if traffic scales to multi-instance levels.
+const RL_MAX    = 5    // requests per window per IP
+const RL_WINDOW = 600  // seconds (10 minutes)
+
+const rlMap = new Map<string, { count: number; resetAt: number }>()
+
+function getIp(req: NextRequest): string {
+  const fwd = req.headers.get('x-forwarded-for')
+  return fwd ? fwd.split(',')[0].trim() : 'unknown'
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfter: number } {
+  const now = Math.floor(Date.now() / 1000)
+
+  // Purge expired entries when map grows large
+  if (rlMap.size > 500) {
+    for (const [k, v] of rlMap) {
+      if (now >= v.resetAt) rlMap.delete(k)
+    }
+  }
+
+  const entry = rlMap.get(ip)
+  if (!entry || now >= entry.resetAt) {
+    rlMap.set(ip, { count: 1, resetAt: now + RL_WINDOW })
+    return { allowed: true, retryAfter: 0 }
+  }
+  if (entry.count >= RL_MAX) {
+    return { allowed: false, retryAfter: entry.resetAt - now }
+  }
+  entry.count++
+  return { allowed: true, retryAfter: 0 }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const VALID_SERVICES        = ['accommodation', 'restaurant', 'cafe', 'car_rental'] as const
 const VALID_LANGUAGES       = ['fr', 'en'] as const
 const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
@@ -81,6 +118,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Service temporairement indisponible' }, { status: 503 })
   }
 
+  const ip = getIp(req)
+  const { allowed, retryAfter } = checkRateLimit(ip)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Trop de demandes. Veuillez patienter quelques minutes avant de réessayer.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+    )
+  }
+
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER!
 
   let body: Record<string, unknown>
@@ -113,6 +159,9 @@ export async function POST(req: NextRequest) {
   }
   if (message !== undefined && message !== null && typeof message !== 'string') {
     return NextResponse.json({ error: 'message doit être une chaîne' }, { status: 400 })
+  }
+  if (typeof message === 'string' && message.length > 2000) {
+    return NextResponse.json({ error: 'message trop long (2000 caractères max)' }, { status: 400 })
   }
 
   // ── Email — required for accommodation, optional + validated for others ──

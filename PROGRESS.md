@@ -1,8 +1,9 @@
 # Palm d'Or Dakhla — Project Progress & Technical Reference
 
-> **Version :** V3.6 — Favicon haute qualité depuis logo officiel (mark centré sur les palms, fond vert foncé)
+> **Version :** V3.8 — Rate limiting /api/lead
 > **Dernière mise à jour :** 2026-05-21
 > **Build :** ✓ Clean — 0 erreurs TypeScript — 28 routes
+> **⚠ Dépôt GitHub actif (temporaire) :** `Hamza92sy/palm-dor-dakhla` — voir §29
 
 ---
 
@@ -630,6 +631,82 @@ next.config.ts                 Config Next.js
 | `src/lib/services.ts`                     | Types ServiceType + messages WA — stable                   |
 | `src/lib/tracking.ts`                     | Tracking Meta Pixel + GA4                                  |
 | `src/app/layout.tsx`                      | Fonts + tracking global + metadata root                    |
+
+---
+
+## 31. Security hardening (phase 2) — Rate limiting /api/lead — 2026-05-21
+
+**Correctif appliqué :**
+
+- `src/app/api/lead/route.ts` : rate limiting in-memory par IP
+  - 5 requêtes max par fenêtre de 10 minutes par IP
+  - IP extraite depuis `x-forwarded-for` (standard Vercel)
+  - Réponse 429 + header `Retry-After` si limite atteinte
+  - Purge automatique des entrées expirées quand `Map.size > 500`
+  - Zéro nouvelle dépendance — solution adaptée au faible volume actuel
+
+**Comportement :**
+
+- Un vrai visiteur (1–2 soumissions) : jamais bloqué
+- Un bot burst (dizaines de req/min depuis une IP) : bloqué dès la 6e requête
+- Après 10 minutes : compteur réinitialisé automatiquement
+- Message d'erreur en français affiché dans le formulaire
+
+**Limite connue :** le store est in-memory, il se réinitialise sur cold start Vercel et ne partage pas l'état entre instances parallèles. Acceptable à ce volume. Si trafic > 1 000 soumissions/mois, envisager Vercel KV ou Upstash.
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 30. Security hardening (phase 1) — 2026-05-21
+
+**Correctifs appliqués (audit sécurité post-lancement) :**
+
+- `next.config.ts` : ajout de 3 headers HTTP globaux sur toutes les routes :
+  - `X-Frame-Options: DENY` (protection clickjacking)
+  - `X-Content-Type-Options: nosniff` (protection MIME sniffing)
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+- `src/app/api/lead/route.ts` : limite `message` à 2000 caractères max (400 si dépassé)
+
+**Non traités dans cette phase (pour phase 2) :**
+
+- Rate limiting `/api/lead` (priorité avant montée en charge)
+- Cookie admin = secret brut → token aléatoire
+- CSV formula injection dans export
+- Route logout admin
+- Vérification RLS Supabase (à vérifier manuellement dans le dashboard)
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 29. Changement opérationnel — dépôt GitHub temporaire — 2026-05-21
+
+**Contexte :**
+
+Blocage du push GitHub sur le compte initial `HamzaSeidous` : aucun email vérifié sur le compte, malgré plusieurs tentatives. GitHub bloque toute opération d'écriture dans ce cas, indépendamment de l'authentification CLI (`gh auth login`).
+
+**Contournement appliqué :**
+
+Le projet a été poussé sur un compte GitHub vérifié de secours :
+
+- Compte : `Hamza92sy`
+- Repo actif : `https://github.com/Hamza92sy/palm-dor-dakhla`
+- Vercel est connecté à ce repo pour le déploiement automatique
+
+**À faire quand `HamzaSeidous` est débloqué :**
+
+1. Vérifier l'email sur `HamzaSeidous` (GitHub Settings → Emails)
+2. Transférer le repo vers `HamzaSeidous` (GitHub Settings → Danger Zone → Transfer)
+3. Mettre à jour le remote local : `git remote set-url origin https://github.com/HamzaSeidous/palm-dor-dakhla.git`
+4. Reconnecter Vercel au nouveau repo si nécessaire
+5. Supprimer l'ancienne note `⚠` dans l'en-tête de ce fichier
+
+**Ce que ce changement n'est PAS :**
+
+- Pas un changement de code applicatif
+- Pas un changement d'architecture
+- Pas un changement de configuration Vercel (env vars inchangées)
 
 ---
 
