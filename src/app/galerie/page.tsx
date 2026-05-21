@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import SectionLabel from '@/components/ui/SectionLabel'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import { GALLERY_IMAGES } from '@/lib/gallery'
@@ -54,8 +55,8 @@ export default function GaleriePage() {
               L&apos;ambiance Palm d&apos;Or Dakhla
             </h1>
             <p className="text-sm md:text-base text-palm-blue/70 leading-8 max-w-[58ch]">
-              Cette galerie présente une première sélection de photos réelles déjà intégrées. La
-              structure reste prête à accueillir les prochains visuels client sans changer la page.
+              Appartements, restaurant et café — découvrez l&apos;ambiance de Palm d&apos;Or Dakhla
+              en photos avant votre séjour.
             </p>
           </div>
 
@@ -70,7 +71,7 @@ export default function GaleriePage() {
                     isFeatured ? 'sm:col-span-2' : ''
                   }`}
                 >
-                  <div className={`relative ${isFeatured ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}>
+                  <div className={`relative ${isFeatured ? 'aspect-16/10' : 'aspect-4/3'}`}>
                     <Image
                       src={image.src}
                       alt={image.alt}
@@ -88,6 +89,34 @@ export default function GaleriePage() {
                 </figure>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-palm-cream border-t border-palm-gold/15 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-10 text-center">
+          <p className="text-[10px] tracking-[0.28em] uppercase text-palm-blue/40 mb-6">
+            Découvrez nos services
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { label: 'Hébergements', href: '/hebergements', detail: 'Appartements dès 500 DH/nuit' },
+              { label: 'Restaurant', href: '/restaurant', detail: 'Cuisine locale & internationale' },
+              { label: 'Café', href: '/cafe', detail: 'Petit-déjeuner & boissons' },
+              { label: 'Contact', href: '/contact', detail: 'Adresse & formulaire de réservation' },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex flex-col gap-0.5 border border-palm-gold/25 rounded-sm px-5 py-3.5
+                  hover:border-palm-gold/60 hover:bg-palm-cream-dark transition-all duration-200 text-left"
+              >
+                <span className="text-[10px] tracking-[0.18em] uppercase text-palm-gold font-medium">
+                  {link.label}
+                </span>
+                <span className="text-xs text-palm-blue/60">{link.detail}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

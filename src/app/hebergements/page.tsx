@@ -10,14 +10,16 @@ import { lodgingSchema, faqSchema } from '@/lib/schemas'
 import { APARTMENTS } from '@/lib/apartments'
 
 export const metadata: Metadata = {
-  title: "Appartements à Dakhla — Palm d'Or",
-  description: "6 appartements à Dakhla, répartis sur 3 étages. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réponse rapide via WhatsApp.",
+  title: "Appartements meublés à Dakhla dès 500 DH — Palm d'Or",
+  description:
+    "6 appartements meublés à Dakhla, répartis sur 3 étages. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes. Réservation en ligne.",
   alternates: {
     canonical: '/hebergements',
   },
   openGraph: {
-    title: "Appartements à Dakhla — Palm d'Or",
-    description: "6 appartements à Dakhla, répartis sur 3 étages. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes.",
+    title: "Appartements meublés à Dakhla dès 500 DH — Palm d'Or",
+    description:
+      "6 appartements meublés à Dakhla, répartis sur 3 étages. De 500 à 750 DH la nuit. Idéal pour couples, familles et groupes.",
     url: '/hebergements',
     siteName: "Palm d'Or Dakhla",
     locale: 'fr_MA',
@@ -26,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Appartements à Dakhla — Palm d'Or",
-    description: "6 appartements à Dakhla, 3 configurations. De 500 à 750 DH la nuit.",
+    title: "Appartements meublés à Dakhla dès 500 DH — Palm d'Or",
+    description: "6 appartements meublés à Dakhla, 3 configurations. De 500 à 750 DH la nuit.",
     images: ['/og-image.jpg'],
   },
 }
@@ -37,12 +39,6 @@ const FLOOR_GROUPS = [2, 3, 4].map(floor => ({
   label: `${floor}e étage`,
   apts: APARTMENTS.filter(a => a.floor === floor),
 }))
-
-function getApartmentWAUrl(message: string): string {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
-  if (!number) return '#'
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
-}
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -75,7 +71,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Comment réserver un appartement meublé à Dakhla ?",
-    answer: "La réservation se fait via WhatsApp ou le formulaire en ligne. Indiquez vos dates souhaitées, le nombre de personnes et l'appartement qui vous intéresse. Nous confirmons la disponibilité rapidement.",
+    answer: "La réservation se fait via le formulaire en ligne. Indiquez vos dates souhaitées, le nombre de personnes et l'appartement qui vous intéresse. Pour toute question, contactez-nous via WhatsApp.",
   },
   {
     question: "Quels sont les tarifs des appartements à Dakhla ?",
@@ -104,8 +100,8 @@ export default function HebergementsPage() {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="relative flex flex-col items-center justify-center min-h-[70vh] overflow-hidden">
         <Image
-          src="/assets/photos-client/chambre-double.jpg"
-          alt="Chambre avec grand lit — Appartements Palm d'Or Dakhla"
+          src="/assets/photos-client/apartments/apt-2/apt-2-vue-ensemble.jpg"
+          alt="Salon et salle à manger — Appartements Palm d'Or Dakhla"
           fill
           priority
           className="object-cover object-center"
@@ -153,7 +149,7 @@ export default function HebergementsPage() {
             {[
               "Appartements entièrement équipés — salon, cuisine, salle à manger, salle de bain",
               "Idéal pour couples, familles et groupes jusqu'à 5 personnes",
-              "Réservation simple et rapide via WhatsApp",
+              "Réservation simple et rapide en ligne — confirmation rapide",
               "Disponible selon vos dates — réponse rapide garantie",
             ].map((point) => (
               <div key={point} className="flex items-start gap-3">
@@ -162,7 +158,6 @@ export default function HebergementsPage() {
               </div>
             ))}
           </div>
-
         </div>
       </section>
 
@@ -192,66 +187,88 @@ export default function HebergementsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {apts.map((apt) => {
-                    const waUrl = getApartmentWAUrl(apt.waMessage)
                     return (
                       <div
                         key={apt.id}
-                        className="bg-palm-cream rounded-sm p-6 flex flex-col gap-4 border border-palm-gold/10"
+                        className="bg-palm-cream rounded-sm flex flex-col border border-palm-gold/10 overflow-hidden"
                       >
-                        {/* Header */}
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-display font-light italic text-xl md:text-2xl text-palm-blue leading-tight">
-                            {apt.name}
-                          </h3>
-                          <div className="shrink-0 text-right">
-                            <p className="text-2xl font-medium text-palm-gold tabular-nums">{apt.price}</p>
-                            <p className="text-[9px] tracking-[0.15em] uppercase text-palm-blue/40">DH / nuit</p>
+                        {/* Cover photo — shown only when client has validated photos for this apt */}
+                        {apt.coverImage && (
+                          <div className="relative aspect-4/3 w-full shrink-0">
+                            <Image
+                              src={apt.coverImage.src}
+                              alt={apt.coverImage.alt}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 480px"
+                              loading="lazy"
+                            />
                           </div>
-                        </div>
+                        )}
 
-                        <div className="h-px bg-palm-gold/20" />
-
-                        {/* Composition chambres */}
-                        <div className="flex flex-col gap-1.5">
-                          {apt.beds.map((bed) => (
-                            <div key={bed} className="flex items-center gap-2">
-                              <span className="text-palm-gold text-[8px]">✦</span>
-                              <span className="text-sm text-palm-blue/70">{bed}</span>
+                        {/* Content */}
+                        <div className="p-6 flex flex-col gap-4">
+                          {/* Header */}
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="font-display font-light italic text-xl md:text-2xl text-palm-blue leading-tight">
+                              {apt.name}
+                            </h3>
+                            <div className="shrink-0 text-right">
+                              <p className="text-2xl font-medium text-palm-gold tabular-nums">{apt.price}</p>
+                              <p className="text-[9px] tracking-[0.15em] uppercase text-palm-blue/40">DH / nuit</p>
                             </div>
-                          ))}
+                          </div>
+
+                          <div className="h-px bg-palm-gold/20" />
+
+                          {/* Composition chambres */}
+                          <div className="flex flex-col gap-1.5">
+                            {apt.beds.map((bed) => (
+                              <div key={bed} className="flex items-center gap-2">
+                                <span className="text-palm-gold text-[8px]">✦</span>
+                                <span className="text-sm text-palm-blue/70">{bed}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Short description — shown only when available */}
+                          {apt.shortDescription && (
+                            <p className="text-sm text-palm-blue/60 leading-relaxed">
+                              {apt.shortDescription}
+                            </p>
+                          )}
+
+                          {/* Espaces communs */}
+                          <p className="text-[10px] tracking-[0.12em] text-palm-blue/40 uppercase">
+                            Salon · Salle à manger · Cuisine · Salle de bain
+                          </p>
+
+                          {/* Capacité */}
+                          <p className="text-[10px] tracking-widest text-palm-blue/35">
+                            {apt.capacity}
+                          </p>
+
+                          {/* CTA primary: detail page */}
+                          <Link
+                            href={`/hebergements/${apt.id}`}
+                            className="flex items-center justify-center
+                              border border-palm-blue/25 text-palm-blue hover:bg-palm-blue hover:text-white
+                              text-[11px] tracking-[0.14em] uppercase font-medium
+                              px-7 py-3.5 rounded-full transition-all duration-300 mt-auto"
+                          >
+                            Voir l&apos;appartement
+                          </Link>
+
+                          {/* CTA secondary: direct booking form */}
+                          <a
+                            href={`?apt=${apt.id}#contact`}
+                            className="text-center text-[10px] tracking-[0.15em] uppercase
+                              text-palm-blue/35 hover:text-palm-blue/60 transition-colors duration-200"
+                          >
+                            Réserver directement
+                          </a>
+
                         </div>
-
-                        {/* Espaces communs */}
-                        <p className="text-[10px] tracking-[0.12em] text-palm-blue/40 uppercase">
-                          Salon · Salle à manger · Cuisine · Salle de bain
-                        </p>
-
-                        {/* Capacité */}
-                        <p className="text-[10px] tracking-[0.1em] text-palm-blue/35">
-                          {apt.capacity}
-                        </p>
-
-                        {/* CTA primary: scroll to form with pre-fill */}
-                        <a
-                          href={`?apt=${apt.id}#contact`}
-                          className="flex items-center justify-center
-                            border border-palm-blue/25 text-palm-blue hover:bg-palm-blue hover:text-white
-                            text-[11px] tracking-[0.14em] uppercase font-medium
-                            px-7 py-3.5 rounded-full transition-all duration-300 mt-auto"
-                        >
-                          Réserver cet appartement
-                        </a>
-
-                        {/* CTA secondary: WA direct */}
-                        <WhatsAppButton
-                          href={waUrl}
-                          className="flex items-center justify-center gap-1.5
-                            text-[10px] text-[#1a9e51] hover:text-[#25D366]
-                            tracking-widest uppercase transition-colors duration-200"
-                        >
-                          <WhatsAppIcon className="w-3 h-3 shrink-0" />
-                          ou WhatsApp direct
-                        </WhatsAppButton>
                       </div>
                     )
                   })}

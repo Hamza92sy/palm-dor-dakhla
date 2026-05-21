@@ -2,33 +2,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import SectionLabel from '@/components/ui/SectionLabel'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
-
-const rooms = [
-  {
-    type: 'Appartement Standard',
-    detail: '1 chambre · à partir de 500 DH / nuit',
-    image: '/assets/photos-client/chambre-double.jpg',
-    alt: 'Chambre avec grand lit — Appartement Standard Palm d\'Or Dakhla',
-  },
-  {
-    type: 'Appartement 2 chambres',
-    detail: '2 chambres · à partir de 650 DH / nuit',
-    image: '/assets/photos-client/de (199).jpg',
-    alt: 'Chambre avec 2 lits d\'un appartement Palm d\'Or Dakhla',
-  },
-  {
-    type: 'Grande capacité',
-    detail: '2 chambres · à partir de 750 DH / nuit',
-    image: '/assets/photos-client/de (218).jpg',
-    alt: 'Chambre grande capacité d\'un appartement Palm d\'Or Dakhla',
-  },
-]
+import { APARTMENTS } from '@/lib/apartments'
 
 const amenities = [
   { icon: '✦', label: '6 appartements disponibles' },
   { icon: '✦', label: 'Cuisine équipée' },
   { icon: '✦', label: 'Dès 500 DH / nuit' },
-  { icon: '✦', label: 'Réservation WhatsApp' },
+  { icon: '✦', label: 'Réservation en ligne ou WhatsApp' },
 ]
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -52,29 +32,33 @@ export default function AccommodationSection() {
           </h2>
         </div>
 
-        {/* Room cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-14">
-          {rooms.map((room) => (
+        {/* Apartment cards — source: apartments.ts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-14">
+          {APARTMENTS.map((apt) => (
             <Link
-              key={room.type}
-              href="/hebergements"
+              key={apt.id}
+              href={`/hebergements/${apt.id}`}
               className="group block"
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-sm mb-4">
-                <Image
-                  src={room.image}
-                  alt={room.alt}
-                  fill
-                  className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+                {apt.coverImage ? (
+                  <Image
+                    src={apt.coverImage.src}
+                    alt={apt.coverImage.alt}
+                    fill
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-palm-blue/10" />
+                )}
                 {/* Bottom label overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-palm-blue/70 to-transparent">
                   <p className="font-display font-light italic text-white text-xl leading-tight">
-                    {room.type}
+                    {apt.name}
                   </p>
                   <p className="text-[10px] tracking-[0.15em] text-white/65 mt-0.5">
-                    {room.detail}
+                    {apt.bedrooms === 1 ? '1 chambre' : `${apt.bedrooms} chambres`} · {apt.price} DH / nuit · {apt.floor}e étage
                   </p>
                 </div>
               </div>
@@ -95,7 +79,15 @@ export default function AccommodationSection() {
         </div>
 
         {/* CTA */}
-        <div className="flex justify-center">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            href="/hebergements"
+            className="flex items-center gap-2.5 bg-palm-blue hover:bg-palm-blue/85 text-white
+              text-[11px] tracking-[0.14em] uppercase font-medium
+              px-7 py-3.5 rounded-full transition-all duration-300"
+          >
+            Voir nos appartements
+          </Link>
           <WhatsAppButton className="group flex items-center gap-2.5 border border-[#25D366] text-[#1a9e51] hover:bg-[#25D366] hover:text-white
               text-[11px] tracking-[0.14em] uppercase font-medium
               px-7 py-3.5 rounded-full transition-all duration-300">

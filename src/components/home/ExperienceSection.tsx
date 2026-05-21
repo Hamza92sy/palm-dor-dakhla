@@ -4,11 +4,18 @@ import SectionLabel from '@/components/ui/SectionLabel'
 
 const experiences = [
   {
+    label: 'Hébergements',
+    tagline: 'Appartements meublés dès 500 DH/nuit à Dakhla',
+    href: '/hebergements',
+    image: '/assets/photos-client/apartments/apt-5/apt-5-salon.jpg',
+    alt: 'Salon appartement Palm d\'Or Dakhla — canapé vert émeraude',
+  },
+  {
     label: 'Restaurant',
     tagline: 'Cuisine savoureuse au cœur de Dakhla',
     href: '/restaurant',
-    image: '/assets/photos-client/restaurant-salle.jpg',
-    alt: 'Salle du restaurant Palm d\'Or Dakhla',
+    image: '/assets/photos-client/restaurant-salle-branded.jpg',
+    alt: 'Salle du restaurant Palm d\'Or Dakhla — enseigne PALMDOR',
   },
   {
     label: 'Café',
@@ -17,18 +24,11 @@ const experiences = [
     image: '/assets/photos-client/cafe-crepes.jpg',
     alt: 'Crêpes et desserts au Café Palm d\'Or Dakhla',
   },
-  {
-    label: 'Hébergements',
-    tagline: 'Appartements complets pour tous vos séjours',
-    href: '/hebergements',
-    image: '/assets/photos-client/de (175).jpg',
-    alt: 'Salon principal d\'un appartement Palm d\'Or Dakhla',
-  },
 ]
 
 export default function ExperienceSection() {
   return (
-    <section id="experience" className="bg-palm-cream py-20 md:py-28">
+    <section id="experience" className="bg-palm-cream py-24 md:py-36">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
 
         {/* Header */}

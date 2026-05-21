@@ -9,6 +9,7 @@ export const BUSINESS_ADDRESS_FULL = `${BUSINESS_NAME}, ${BUSINESS_ADDRESS_LINE_
 export const BUSINESS_LATITUDE = 23.7022636
 export const BUSINESS_LONGITUDE = -15.9284674
 export const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${BUSINESS_LATITUDE},${BUSINESS_LONGITUDE}`
+export const GOOGLE_BUSINESS_URL = 'https://maps.app.goo.gl/TxngU7XTec4SD2zX9'
 export const GOOGLE_MAPS_EMBED_URL = `https://www.google.com/maps?q=${BUSINESS_LATITUDE},${BUSINESS_LONGITUDE}&z=16&output=embed`
 
 // Format display : 212661931317 → +212 661 931 317 (12 digits: country 3 + 3 + 3 + 3)

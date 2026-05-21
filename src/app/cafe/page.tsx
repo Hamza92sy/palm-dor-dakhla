@@ -71,8 +71,16 @@ export default function CafePage() {
         ]}
         images={[
           {
+            src: '/assets/photos-client/cafe-interieur-bar.jpg',
+            alt: "Intérieur du Café Palm d'Or Dakhla — bar marbre, chaises velours vert, lumières dorées",
+          },
+          {
+            src: '/assets/photos-client/cafe-terrasse-palmiers.jpg',
+            alt: "Terrasse du Café Palm d'Or Dakhla — vue sur l'avenue et les palmiers",
+          },
+          {
             src: '/assets/photos-client/cafe-salle.jpg',
-            alt: "Intérieur du Café Palm d'Or Dakhla — salon fauteuils velours verts",
+            alt: "Salle du Café Palm d'Or Dakhla — fauteuils velours verts et bar",
           },
           {
             src: '/assets/photos-client/de (136).jpg',

@@ -6,13 +6,13 @@ import { restaurantSchema, faqSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: "Restaurant à Dakhla — Palm d'Or",
-  description: "Cuisine savoureuse dans une ambiance conviviale à Dakhla. Spécialités locales et internationales, produits frais, service rapide. Réservez votre table via WhatsApp.",
+  description: "Cuisine savoureuse dans une ambiance conviviale à Dakhla. Spécialités locales et internationales, produits frais, service rapide. Réservation en ligne ou via WhatsApp.",
   alternates: {
     canonical: '/restaurant',
   },
   openGraph: {
     title: "Restaurant à Dakhla — Palm d'Or",
-    description: "Cuisine savoureuse à Dakhla. Spécialités locales et internationales, produits frais. Réservation rapide via WhatsApp.",
+    description: "Cuisine savoureuse à Dakhla. Spécialités locales et internationales, produits frais. Réservation rapide.",
     url: '/restaurant',
     siteName: "Palm d'Or Dakhla",
     locale: 'fr_MA',
@@ -34,7 +34,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Comment réserver une table au restaurant Palm d'Or Dakhla ?",
-    answer: "La réservation se fait simplement via WhatsApp. Envoyez un message pour indiquer votre date et le nombre de personnes, et nous confirmons rapidement.",
+    answer: "La réservation se fait simplement via WhatsApp ou le formulaire en ligne. Envoyez un message pour indiquer votre date et le nombre de personnes, et nous confirmons rapidement.",
   },
   {
     question: "Le restaurant accueille-t-il les familles et les groupes ?",
@@ -45,8 +45,8 @@ const FAQ_ITEMS = [
     answer: "Oui, le restaurant est intégré à la résidence Palm d'Or Dakhla, sur AV Al Walaa. Vous pouvez vous y rendre pour un repas sans nécessairement séjourner dans la résidence.",
   },
   {
-    question: "Peut-on consulter le menu complet avant de venir ?",
-    answer: "Oui, demandez le menu complet directement via WhatsApp. Nous vous le transmettons avec plaisir avant votre visite.",
+    question: "Peut-on consulter le menu avant de venir ?",
+    answer: "Oui, notre carte est affichée directement sur cette page. Pour toute question ou information complémentaire, contactez-nous via le formulaire ou WhatsApp.",
   },
 ]
 
@@ -72,29 +72,31 @@ export default function RestaurantPage() {
         ]}
         images={[
           {
-            src: '/assets/photos-client/restaurant-salle.jpg',
-            alt: "Salle du restaurant Palm d'Or Dakhla",
+            src: '/assets/photos-client/restaurant-salle-branded.jpg',
+            alt: "Salle du restaurant Palm d'Or Dakhla — enseigne PALMDOR",
+          },
+          {
+            src: '/assets/photos-client/restaurant-salle-nuit.jpg',
+            alt: "Table réservée au restaurant Palm d'Or Dakhla — ambiance nocturne",
           },
           {
             src: '/assets/photos-client/restaurant-seafood.jpg',
             alt: "Plateau de fruits de mer au restaurant Palm d'Or Dakhla — crevettes et calamars",
           },
           {
-            src: '/assets/photos-client/restaurant-burger.jpg',
-            alt: "Burger maison et frites au restaurant Palm d'Or Dakhla",
-          },
-          {
             src: '/assets/photos-client/restaurant-salade.jpg',
             alt: "Salade fraîche crevettes avocat mangue au restaurant Palm d'Or Dakhla",
           },
           {
-            src: '/assets/photos-client/restaurant-table.jpg',
-            alt: "Table dressée au restaurant Palm d'Or Dakhla",
+            src: '/assets/photos-client/restaurant-detail.jpg',
+            alt: "Détail table et ambiance du restaurant Palm d'Or Dakhla",
           },
         ]}
         service="restaurant"
         ctaLabel="Réserver une table"
+        primaryCta="form"
         menuSection={<MenuSection />}
+        menuPdfPath="/assets/menu-restaurant-palm-dor.pdf"
         faqSection={<FAQSection items={FAQ_ITEMS} />}
       />
     </>

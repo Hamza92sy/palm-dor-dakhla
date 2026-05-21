@@ -17,8 +17,8 @@ export default function Hero() {
 
       {/* Background image */}
       <Image
-        src="/assets/photos-client/restaurant-palmdor.jpg"
-        alt="Salle du restaurant Palm d'Or Dakhla — ambiance et branding"
+        src="/assets/photos-client/hebergement-hero.jpg"
+        alt="Appartement meublé Palm d'Or Dakhla — intérieur élégant"
         fill
         priority
         className="object-cover object-center"
@@ -29,7 +29,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-palm-blue/55" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center text-white px-5 gap-4 md:gap-5">
+      <div className="relative z-10 flex flex-col items-center text-center text-white px-5 gap-5 md:gap-7">
 
         {/* Location */}
         <p className="text-[9px] tracking-[0.6em] uppercase text-white/50 font-sans">
@@ -37,17 +37,17 @@ export default function Hero() {
         </p>
 
         {/* Brand name */}
-        <h1 className="font-display font-light italic text-[clamp(4rem,12vw,9rem)] leading-none tracking-tight text-white">
+        <p className="font-display font-light italic text-[clamp(4rem,12vw,9rem)] leading-none tracking-tight text-white">
           Palm d&apos;Or
-        </h1>
+        </p>
 
         {/* Gold rule */}
         <div className="w-10 h-px bg-palm-gold opacity-80" />
 
-        {/* Value proposition */}
-        <h2 className="font-display font-light italic text-2xl md:text-3xl text-white/90 leading-snug">
-          Votre séjour complet à Dakhla
-        </h2>
+        {/* Value proposition — H1 sémantique avec signal hébergement + géo */}
+        <h1 className="font-display font-light italic text-2xl md:text-3xl text-white/90 leading-snug">
+          Appartements meublés &amp; séjour complet à Dakhla
+        </h1>
 
         {/* Services */}
         <p className="text-[10px] tracking-[0.25em] uppercase text-white/50">
@@ -62,7 +62,7 @@ export default function Hero() {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 mt-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-6">
           <Link
             href="#reservation"
             className="flex items-center gap-2.5 border border-white/60 text-white hover:border-white hover:bg-white/10

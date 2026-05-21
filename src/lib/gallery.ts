@@ -6,17 +6,23 @@ export interface GalleryImage {
 }
 
 export const GALLERY_IMAGES: GalleryImage[] = [
-  // ── Hébergement ──────────────────────────────────────────────
+  // ── Accueil / Identité Palm d'Or ─────────────────────────────
   {
-    src: '/assets/photos-client/chambre-double.jpg',
-    alt: "Chambre avec grand lit — Appartement Standard Palm d'Or Dakhla",
+    src: '/assets/photos-client/reception-lobby.jpg',
+    alt: "Réception et lobby Palm d'Or Dakhla — accueil de la résidence",
     service: 'hebergement',
     featured: true,
   },
-  // ── Restaurant — plats & salle ────────────────────────────────
+  // ── Hébergements ──────────────────────────────────────────────
   {
-    src: '/assets/photos-client/restaurant-seafood-gros-plan.jpg',
-    alt: "Fruits de mer frais — crevettes et calamars grillés au restaurant Palm d'Or Dakhla",
+    src: '/assets/photos-client/apartments/apt-4/apt-4-chambre-1.jpg',
+    alt: "Chambre principale avec lit king-size — Appartement 4 Palm d'Or Dakhla",
+    service: 'hebergement',
+  },
+  // ── Restaurant ────────────────────────────────────────────────
+  {
+    src: '/assets/photos-client/restaurant-salle-branded.jpg',
+    alt: "Salle du restaurant Palm d'Or Dakhla — enseigne PALMDOR",
     service: 'restaurant',
   },
   // ── Café ─────────────────────────────────────────────────────
@@ -25,32 +31,21 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     alt: "Intérieur du Café Palm d'Or Dakhla — fauteuils velours verts et bar",
     service: 'cafe',
   },
-  // ── Restaurant (suite) ────────────────────────────────────────
+  {
+    src: '/assets/photos-client/restaurant-seafood-gros-plan.jpg',
+    alt: "Fruits de mer frais — crevettes et calamars grillés au restaurant Palm d'Or Dakhla",
+    service: 'restaurant',
+  },
+  // ── slice(0,5) above = homepage gallery ──────────────────────
+  {
+    src: '/assets/photos-client/apartments/apt-5/apt-5-salon.jpg',
+    alt: "Salon avec canapé vert émeraude — Appartement 5 Palm d'Or Dakhla",
+    service: 'hebergement',
+  },
   {
     src: '/assets/photos-client/restaurant-salade.jpg',
     alt: "Salade fraîche crevettes avocat mangue au restaurant Palm d'Or Dakhla",
     service: 'restaurant',
-  },
-  {
-    src: '/assets/photos-client/de (175).jpg',
-    alt: "Salon d'un appartement Palm d'Or Dakhla",
-    service: 'hebergement',
-  },
-  // ── slice(0,5) above = homepage gallery ──────────────────────
-  {
-    src: '/assets/photos-client/restaurant-salle.jpg',
-    alt: "Salle du restaurant Palm d'Or Dakhla",
-    service: 'restaurant',
-  },
-  {
-    src: '/assets/photos-client/restaurant-burger.jpg',
-    alt: "Burger maison et frites au restaurant Palm d'Or Dakhla",
-    service: 'restaurant',
-  },
-  {
-    src: '/assets/photos-client/de (136).jpg',
-    alt: "Petit-déjeuner servi au Café Palm d'Or Dakhla",
-    service: 'cafe',
   },
   {
     src: '/assets/photos-client/cafe-terrasse.jpg',
@@ -58,8 +53,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     service: 'cafe',
   },
   {
-    src: '/assets/photos-client/de (199).jpg',
-    alt: "Chambre avec 2 lits — Appartement 2 chambres Palm d'Or Dakhla",
-    service: 'hebergement',
+    src: '/assets/photos-client/de (136).jpg',
+    alt: "Petit-déjeuner servi au Café Palm d'Or Dakhla",
+    service: 'cafe',
   },
 ]

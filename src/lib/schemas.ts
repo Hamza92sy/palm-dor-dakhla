@@ -7,9 +7,11 @@ import {
   BUSINESS_LATITUDE,
   BUSINESS_LONGITUDE,
   GOOGLE_MAPS_URL,
+  GOOGLE_BUSINESS_URL,
   INSTAGRAM_URL,
   WHATSAPP_PHONE_DISPLAY,
 } from './config'
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from './google-reviews'
 
 const address = {
   '@type': 'PostalAddress',
@@ -25,13 +27,15 @@ const geo = {
   longitude: BUSINESS_LONGITUDE,
 }
 
+const sameAsUrls = [INSTAGRAM_URL, ...(GOOGLE_BUSINESS_URL ? [GOOGLE_BUSINESS_URL] : [])]
+
 const sharedContact = {
   telephone: WHATSAPP_PHONE_DISPLAY,
   email: BUSINESS_EMAIL,
   address,
   geo,
-  hasMap: GOOGLE_MAPS_URL,
-  sameAs: [INSTAGRAM_URL],
+  hasMap: GOOGLE_BUSINESS_URL || GOOGLE_MAPS_URL,
+  sameAs: sameAsUrls,
 }
 
 // /hebergements — LodgingBusiness with per-tier Offers
@@ -46,6 +50,14 @@ export const lodgingSchema = {
   ...sharedContact,
   image: `${SITE_URL}/assets/photos-client/chambre-double.jpg`,
   priceRange: 'DH 500–750',
+  openingHours: 'Mo-Su 00:00-23:59',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: GOOGLE_RATING,
+    bestRating: 5,
+    worstRating: 1,
+    reviewCount: parseInt(GOOGLE_REVIEW_COUNT, 10),
+  },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: `Appartements ${BUSINESS_FULL_NAME}`,
@@ -87,6 +99,7 @@ export const restaurantSchema = {
   ...sharedContact,
   image: `${SITE_URL}/assets/photos-client/restaurant-palmdor.jpg`,
   servesCuisine: ['Cuisine marocaine', 'Cuisine internationale'],
+  openingHours: 'Mo-Su 08:00-23:30',
 }
 
 // /cafe — CafeOrCoffeeShop
@@ -101,6 +114,7 @@ export const cafeSchema = {
   ...sharedContact,
   image: `${SITE_URL}/assets/photos-client/cafe-salle.jpg`,
   servesCuisine: ['Café', 'Thé', 'Petit-déjeuner', 'Boissons fraîches'],
+  openingHours: 'Mo-Su 08:00-23:30',
 }
 
 // FAQPage schema — accepts items from FAQSection

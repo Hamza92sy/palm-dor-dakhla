@@ -4,19 +4,19 @@ import SectionLabel from '@/components/ui/SectionLabel'
 export default function SignatureSection() {
   return (
     <section className="bg-palm-cream-dark py-20 md:py-0 overflow-hidden">
-      <div className="max-w-7xl mx-auto md:grid md:grid-cols-[3fr_2fr] md:min-h-[640px]">
+      <div className="max-w-7xl mx-auto md:grid md:grid-cols-[3fr_2fr] md:min-h-[720px]">
 
         {/* Image — left */}
-        <div className="relative h-72 md:h-auto">
+        <div className="relative h-[400px] md:h-auto">
           <Image
-            src="/assets/photos-client/de (171).jpg"
-            alt="Salon d'un appartement Palm d'Or Dakhla"
+            src="/assets/photos-client/reception-lobby.jpg"
+            alt="Réception et lobby de la résidence Palm d'Or Dakhla"
             fill
-            className="object-cover object-center"
+            className="object-cover object-[65%_50%]"
             sizes="(max-width: 768px) 100vw, 60vw"
           />
-          {/* Subtle right fade on desktop */}
-          <div className="absolute inset-0 md:bg-gradient-to-r md:from-transparent md:to-palm-cream-dark" />
+          {/* Fade to blend with text column — via-transparent keeps PALM D'OR sign visible */}
+          <div className="absolute inset-0 md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-palm-cream-dark" />
         </div>
 
         {/* Text — right */}

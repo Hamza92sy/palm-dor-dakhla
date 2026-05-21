@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { WHATSAPP_URL } from '@/lib/config'
@@ -11,13 +12,13 @@ const navLinks = [
   { label: 'Restaurant', href: '/restaurant' },
   { label: 'Café', href: '/cafe' },
   { label: 'Location', href: '/location-voiture' },
-  { label: 'Galerie', href: '/galerie' },
   { label: 'Contact', href: '/contact' },
 ]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -36,22 +37,12 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20 md:h-24">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <Link href="/" className="group shrink-0">
             <img
-              src="/assets/logo-light.svg"
+              src="/assets/branding/palm-dor-logo-transparent.png"
               alt="Palm d'Or Dakhla"
-              width={40}
-              height={40}
-              className="w-9 h-9 md:w-10 md:h-10 shrink-0 transition-opacity duration-300 group-hover:opacity-75"
+              className="h-12 md:h-14 w-auto shrink-0 transition-opacity duration-300 group-hover:opacity-75"
             />
-            <div className="flex flex-col leading-none">
-              <span className="font-display text-xl md:text-2xl font-light italic tracking-wide text-palm-blue group-hover:text-palm-gold transition-colors duration-300">
-                Palm d&apos;Or
-              </span>
-              <span className="font-sans text-[9px] tracking-[0.45em] text-palm-gold uppercase mt-0.5 font-medium">
-                Dakhla
-              </span>
-            </div>
           </Link>
 
           {/* Desktop nav */}
@@ -60,10 +51,13 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative text-[11px] tracking-[0.18em] uppercase text-palm-blue/60 hover:text-palm-blue transition-colors duration-300
+                className={`relative text-[11px] tracking-[0.18em] uppercase transition-colors duration-300
                   after:absolute after:bottom-[-3px] after:left-0 after:h-px after:w-full
-                  after:bg-palm-gold after:scale-x-0 after:origin-left
-                  hover:after:scale-x-100 after:transition-transform after:duration-300"
+                  after:bg-palm-gold after:origin-left after:transition-transform after:duration-300
+                  ${pathname === link.href
+                    ? 'text-palm-blue after:scale-x-100'
+                    : 'text-palm-blue/60 hover:text-palm-blue after:scale-x-0 hover:after:scale-x-100'
+                  }`}
               >
                 {link.label}
               </Link>
@@ -139,9 +133,9 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`font-display text-2xl font-light italic text-palm-blue/70 hover:text-palm-blue
-                    py-4 transition-colors duration-200
-                    ${i < navLinks.length - 1 ? 'border-b border-palm-gold/10' : ''}`}
+                  className={`font-display text-2xl font-light italic py-4 transition-colors duration-200
+                    ${i < navLinks.length - 1 ? 'border-b border-palm-gold/10' : ''}
+                    ${pathname === link.href ? 'text-palm-blue' : 'text-palm-blue/70 hover:text-palm-blue'}`}
                 >
                   {link.label}
                 </Link>

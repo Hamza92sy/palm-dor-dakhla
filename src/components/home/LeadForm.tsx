@@ -170,6 +170,7 @@ export default function LeadForm() {
         </div>
 
         {/* Form / Success */}
+        <div className="bg-white/70 border border-palm-gold/15 rounded-sm p-7 md:p-10">
         {success ? (
           <div className="flex flex-col items-center text-center gap-6 py-8">
             <div className="w-14 h-14 rounded-full bg-palm-gold/10 flex items-center justify-center">
@@ -420,6 +421,7 @@ export default function LeadForm() {
           </p>
         </form>
         )}
+        </div>
       </div>
     </section>
   )

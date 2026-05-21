@@ -1,8 +1,8 @@
 # Palm d'Or Dakhla — Project Progress & Technical Reference
 
-> **Version :** V2.3 — Request-Based Booking Management System
-> **Dernière mise à jour :** 2026-05-09
-> **Build :** ✓ Clean — 0 erreurs TypeScript — 20 pages
+> **Version :** V3.6 — Favicon haute qualité depuis logo officiel (mark centré sur les palms, fond vert foncé)
+> **Dernière mise à jour :** 2026-05-21
+> **Build :** ✓ Clean — 0 erreurs TypeScript — 28 routes
 
 ---
 
@@ -15,13 +15,14 @@ Services : hébergement (6 appartements), restaurant, café, location de voiture
 
 Convertir les visiteurs Google en réservations confirmées via un workflow structuré :
 
-```
+```text
 Google → Site → Formulaire → Supabase → Dashboard admin → Accept/Refuse → Email client
 ```
 
 ### Ce que le système est maintenant
 
 Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking management system** :
+
 - Les clients soumettent des demandes structurées (nom, téléphone, email, appartement, dates)
 - L'admin reçoit une notification email immédiate
 - L'admin gère les leads depuis un dashboard sécurisé
@@ -38,7 +39,7 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 | Base de données | Supabase PostgreSQL 17 (eu-central-1)             |
 | Email           | Resend (domaine palmdordakhla.com vérifié)        |
 | Déploiement     | Vercel                                            |
-| URL production  | https://palmdordakhla.com                         |
+| URL production  | <https://palmdordakhla.com>                       |
 
 ---
 
@@ -48,17 +49,19 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 
 - [x] Homepage 7 sections (Hero, Services, Hébergements, Expérience, Galerie, Témoignages, CTA)
 - [x] Pages service : `/hebergements`, `/restaurant`, `/cafe`, `/location-voiture`
-- [x] Page galerie `/galerie`
+- [x] Page galerie `/galerie` avec cross-links vers toutes les pages de conversion
 - [x] Page contact `/contact` avec Google Maps
 - [x] Formulaire lead structuré (homepage + chaque page service)
 - [x] Formulaire hébergement : email obligatoire + arrivée + nuitées
 - [x] Appartements groupés par étage sur `/hebergements` (2e/3e/4e)
+- [x] Pages détail appartement `/hebergements/[aptId]` — 6 routes SSG, apt-4 avec galerie photos
 - [x] Pages bilingues `/fr` et `/en` (EN = stub, non traduit)
-- [x] Sitemap XML + robots.txt
-- [x] Structured data (FAQ schema)
+- [x] Sitemap XML + robots.txt (`/admin` et `/api/` exclus)
+- [x] Structured data complet : `LodgingBusiness` + `OfferCatalog` + `FAQPage` + `aggregateRating` + `openingHours`
 - [x] Meta Pixel + GA4 (structure prête, conditionnels sur env vars)
 - [x] WhatsApp secondaire (bouton flottant + success state)
 - [x] Design system : `palm-cream / palm-blue / palm-gold`, Cormorant Garamond + Geist
+- [x] **SEO Sprint (2026-05-16)** — voir §16
 
 ### ✅ Système de réservation (public)
 
@@ -121,7 +124,7 @@ Le projet n'est **pas** un simple site vitrine. C'est un **request-based booking
 
 ## 3. Reservation Workflow
 
-```
+```text
 CLIENT
   └── Remplit le formulaire (hébergement : email + appartement + arrivée + nuitées)
         └── POST /api/lead
@@ -184,6 +187,7 @@ Audit complet réalisé suite au problème "email Delivered mais client ne voit 
 ### Source unique : `src/lib/apartments.ts`
 
 **Ce fichier est la seule source de vérité pour les appartements.** Il alimente :
+
 - Formulaires publics (select appartement)
 - API `/api/lead` et `/api/admin/leads/[id]` (validation)
 - Dashboard admin `ApartmentSelect.tsx`
@@ -193,14 +197,62 @@ Audit complet réalisé suite au problème "email Delivered mais client ne voit 
 
 ### Les 6 appartements réels
 
-| Appartement   | Étage | Prix      | Chambres | Capacité max |
-|---------------|-------|-----------|----------|--------------|
-| Appartement 1 | 2e    | 500 DH/nuit | 1      | 2 personnes  |
-| Appartement 2 | 2e    | 650 DH/nuit | 2      | 4 personnes  |
-| Appartement 3 | 3e    | 750 DH/nuit | 2      | 5 personnes  |
-| Appartement 4 | 3e    | 650 DH/nuit | 2      | 4 personnes  |
-| Appartement 5 | 4e    | 750 DH/nuit | 2      | 5 personnes  |
-| Appartement 6 | 4e    | 650 DH/nuit | 2      | 4 personnes  |
+| Appartement   | Étage | Prix      | Chambres | Capacité max | Groupe design     |
+|---------------|-------|-----------|----------|--------------|-------------------|
+| Appartement 1 | 2e    | 500 DH/nuit | 1      | 2 personnes  | **A — unique**    |
+| Appartement 2 | 2e    | 650 DH/nuit | 2      | 4 personnes  | **B — 2/4/6**     |
+| Appartement 3 | 3e    | 750 DH/nuit | 2      | 5 personnes  | **C — 3/5**       |
+| Appartement 4 | 3e    | 650 DH/nuit | 2      | 4 personnes  | **B — 2/4/6**     |
+| Appartement 5 | 4e    | 750 DH/nuit | 2      | 5 personnes  | **C — 3/5**       |
+| Appartement 6 | 4e    | 650 DH/nuit | 2      | 4 personnes  | **B — 2/4/6**     |
+
+### Groupes de ressemblance — règle audit photos
+
+**Groupe A — Appartement 1** : unique visuellement, risque faible, audit simple.
+
+**Groupe B — Appartements 2, 4, 6** : même design, très semblables. Risque élevé de mélange.
+
+- Ne jamais attribuer une photo sur simple ressemblance générale
+- Audit comparatif strict — règle du doute = exclusion
+- Ordre de traitement sécurisé : 4 (fait) → 2 (fait) → 6 (à faire, comparé aux deux précédents)
+
+**Groupe C — Appartements 3, 5** : identiques ou quasi identiques. Risque moyen à élevé.
+
+- Même règle que groupe B
+- Audit comparatif des deux lots en même temps
+
+**Descriptions** : base commune pour les appartements d'un même groupe — précision visuelle ajoutée seulement si confirmée par les photos validées du lot spécifique.
+
+### Stratégie éditoriale — groupes similaires
+
+**Principe :** ne pas cacher la similarité de design, la présenter comme cohérence de standing.
+
+**Galerie :** 5 à 7 photos fortes max par appartement — pas de galerie gonflée si les espaces se ressemblent trop. Ordre des photos différent entre unités du même groupe.
+
+**Structure description :** base commune + variation courte sur le point distinctif réel.
+
+#### Groupe B — Apt 2 / 4 / 6
+
+Base commune : *"Appartement confortable avec espace salon, cuisine équipée et chambres adaptées à un séjour agréable à Dakhla."*
+
+| Appartement | Point distinctif | Variation description |
+|-------------|------------------|-----------------------|
+| Apt-2 | 2e étage, grand lit double, salon lumineux | "Idéal pour un séjour en famille ou entre amis, avec une ambiance lumineuse et fonctionnelle." |
+| Apt-4 | Lit king-size, salle de bain premium (vasque dorée) | "Avec une belle harmonie intérieure et une salle de bain particulièrement soignée." |
+| Apt-6 | 4e étage, calme | "Pensé pour un séjour reposant, avec la même qualité de confort que les autres hébergements de la résidence." |
+
+#### Groupe C — Apt 3 / 5
+
+Base commune : *"Appartement spacieux 2 chambres pour 5 personnes. Salon, cuisine équipée, chambres généreusement configurées."*
+
+| Appartement | Point distinctif | Variation description |
+|-------------|------------------|-----------------------|
+| Apt-3 | 3e étage, capacité familiale | "Idéal pour les grandes familles ou groupes, avec une bonne luminosité." |
+| Apt-5 | 4e étage, même configuration | "Au 4e étage, même confort avec une belle hauteur." |
+
+#### Mention optionnelle fiche détail (groupes B et C)
+
+> *Appartement au design harmonisé avec les autres hébergements de la résidence, avec sa propre disposition et son ambiance.*
 
 ### IDs et exports
 
@@ -229,12 +281,14 @@ ALL_VALID_APARTMENT_IDS  // apt-1..apt-6 + legacy — pour validation API
 ### Frontend (UX client)
 
 Les formulaires publics (`LeadForm.tsx`, `ServiceContactForm.tsx`) collectent :
+
 - **Arrivée** (`check_in`) — date picker
 - **Nombre de nuitées** (`nights`) — input number, requis, min 1
 
 ### Backend / DB (stockage)
 
 L'API et la DB stockent :
+
 - `check_in` — date ISO YYYY-MM-DD
 - `check_out` — date ISO YYYY-MM-DD (**calculé** = check_in + nights)
 
@@ -279,12 +333,14 @@ Ce calcul est dupliqué dans : `email.ts`, `export/route.ts`, `DateRangePicker.t
 ### Modèle statut — deux axes séparés dans l'UI
 
 **Suivi opérationnel** (colonne Statut, `StatusSelect`) :
-```
+
+```text
 new → contacted → confirmed → cancelled
 ```
 
 **Décision finale** (colonne Actions, `DecisionPanel`) :
-```
+
+```text
 (non décidé) → accepted → (terminal, non réversible via UI)
              → rejected → (terminal, non réversible via UI)
 ```
@@ -305,7 +361,7 @@ Le mode compact envoie toujours `decision_note: null`. Pour ajouter une note, ut
 
 ### Export CSV — 15 colonnes
 
-```
+```text
 Date · Nom · Téléphone · Email · Service · Message · Statut · Langue
 · Appartement · Arrivée · Départ · Nuitées · Notes · Décision · Date décision
 ```
@@ -420,7 +476,7 @@ ALTER TABLE leads ADD CONSTRAINT leads_apartment_type_check
 
 ### Logique métier — ne pas modifier sans audit
 
-```
+```text
 src/lib/apartments.ts          Source unique appartements (6 apts + legacy fallback)
 src/lib/email.ts               Emails admin + client — Resend SDK v6 pattern Result
 src/lib/services.ts            Types ServiceType + messages WhatsApp
@@ -430,7 +486,7 @@ src/lib/supabase/server.ts     Client supabaseAdmin (service_role)
 
 ### API routes
 
-```
+```text
 src/app/api/lead/route.ts                 POST — soumission formulaire public
 src/app/api/admin/leads/[id]/route.ts     PATCH — modifications dashboard (runtime nodejs)
 src/app/api/admin/export/route.ts         GET — CSV export
@@ -440,7 +496,7 @@ src/app/api/webhooks/resend/route.ts      POST — webhook Resend delivery event
 
 ### Dashboard admin
 
-```
+```text
 src/app/admin/page.tsx                    Server Component — liste leads + filtres
 src/app/admin/components/LeadRow.tsx      Client — ligne table + expansion + inline actions
 src/app/admin/components/DecisionPanel.tsx Client — accept/refuse (compact + full)
@@ -453,14 +509,14 @@ src/app/admin/components/AdminFilters.tsx  Client — filtres URL
 
 ### Formulaires publics
 
-```
+```text
 src/components/home/LeadForm.tsx           Formulaire homepage
 src/components/service/ServiceContactForm.tsx  Formulaire pages service
 ```
 
 ### Migrations DB
 
-```
+```text
 src/lib/supabase/migrations/001_leads.sql      Table initiale + RLS
 src/lib/supabase/migrations/002_leads_v1.5.sql Notes + dates + appartement legacy
 src/lib/supabase/migrations/003_leads_v2.sql   Email + décision + statuts accepted/rejected
@@ -468,7 +524,7 @@ src/lib/supabase/migrations/003_leads_v2.sql   Email + décision + statuts accep
 
 ### Infrastructure
 
-```
+```text
 middleware.ts                  Edge Runtime — auth cookie admin_token
 src/app/layout.tsx             Fonts + tracking global + metadata root
 next.config.ts                 Config Next.js
@@ -481,11 +537,12 @@ next.config.ts                 Config Next.js
 | Élément                       | État                                        |
 |-------------------------------|---------------------------------------------|
 | Vercel deployment             | ✅ READY — palmdordakhla.com                |
-| Domaine principal             | ✅ www.palmdordakhla.com                    |
+| Domaine principal             | ✅ <www.palmdordakhla.com>                  |
 | Resend domaine                | ✅ palmdordakhla.com vérifié                |
 | Supabase                      | ✅ ACTIVE_HEALTHY — eu-central-1            |
 | Build TypeScript              | ✅ 0 erreurs                                |
-| Pages générées                | ✅ 20/20                                    |
+| Pages générées                | ✅ 21/21                                    |
+| SEO on-site                   | ✅ metadata, schemas, GBP, openingHours     |
 | Formulaire public             | ✅ Lead → Supabase + email admin            |
 | Dashboard admin               | ✅ Login + leads + accept/refuse            |
 | Email décision client         | ✅ accept → email acceptation / refuse → email refus |
@@ -504,7 +561,12 @@ next.config.ts                 Config Next.js
 - ❌ **Inbox visibility non garantie** — un statut `Delivered` dans Resend confirme l'acceptation par le serveur destinataire, pas l'affichage en boîte principale (Outlook : spam, focused/other, archive, règles, filtrage fournisseur)
 - ❌ **Tracking analytics actif** — Meta Pixel et GA4 sont câblés mais env vars non configurées
 - ❌ **Version anglaise** — pages `/en` existent comme stubs, contenu non traduit
-- ❌ **Photos appartements** — pages hébergements sans photos individuelles par apt
+- ✅ **Photos apt-4** — 12 photos, galerie interactive (2026-05-18)
+- ✅ **Photos apt-2** — 7 photos validées intégrées (2026-05-18), galerie interactive
+- ✅ **Photos apt-3** — 5 photos validées intégrées (2026-05-19), cover salon gris + galerie
+- ✅ **Photos apt-5** — 5 photos validées intégrées (2026-05-19), cover salon vert + galerie
+- ✅ **Photos apt-1** — 4 photos validées intégrées (2026-05-19), cover chambre vue nocturne + galerie
+- ✅ **Descriptions appartements** — `shortDescription` tous les 6 appartements (2026-05-19) — série complète
 - ❌ **Dashboard mobile** — table horizontale avec scroll sur mobile, pas de vue cards
 - ❌ **Paiements** — aucune intégration
 - ❌ **Multi-utilisateur** — un seul compte admin
@@ -515,28 +577,35 @@ next.config.ts                 Config Next.js
 
 ## 13. Recommended Next Priorities
 
-### P1 — Impact conversion immédiat
+### P1 — Acquisition locale (off-site, hors code)
 
-- **Photos appartements** : ajouter photos individuelles sur `/hebergements` (1 photo par apt minimum)
-- **UI premium hébergements** : galerie lightbox, capacité, équipements par appartement
+- **Google Search Console** : ✅ sitemap soumis, indexation demandée pour 7 pages — en attente de recrawl (2–6 semaines)
+- **Google Business Profile** : ✅ catégorie principale = Résidence hôtelière, catégories secondaires confirmées, GBP URL liée — en attente : validation nom "Palm d'Or Dakhla" + ajout photos
+- **Photos GBP** : uploader 5 photos minimum (façade, salon, restaurant, café) — smartphone suffit
+- **Photos appartements site** : Apt 4 ✅ intégré (2026-05-18) — att. photos apt 1/2/3/5/6 côté client
 
-### P2 — Dashboard mobile
+### P2 — Impact conversion côté code
+
+- **Photos par appartement** : ✅ Apt-1/2/3/4/5/6 tous intégrés — série complète (2026-05-19)
+- **UI premium hébergements** : galerie lightbox (P2+), équipements par appartement
+
+### P3 — Dashboard mobile
 
 - **LeadCard.tsx** : layout card pour mobile (`block md:hidden`, table reste pour desktop)
 - Boutons WA / Accepter / Refuser visibles sur carte mobile sans scroll horizontal
 
-### P3 — Disponibilités lecture seule
+### P4 — Disponibilités lecture seule
 
 - Calendrier read-only par appartement (marquer dates réservées depuis leads accepted)
 - Aucune intégration automatique requise — admin marque manuellement
 
-### P4 — Version EN complète
+### P5 — Version EN complète
 
 - Traduction contenu toutes pages
 - `language` dans formulaires (`fr`/`en` auto-détecté ou sélectionné)
 - Emails Resend bilingues
 
-### P5 — Analytics
+### P6 — Analytics
 
 - Configurer `NEXT_PUBLIC_GA_ID` et `NEXT_PUBLIC_META_PIXEL_ID` sur Vercel
 - Tester événements `Lead`, `Contact`, page views
@@ -561,6 +630,306 @@ next.config.ts                 Config Next.js
 | `src/lib/services.ts`                     | Types ServiceType + messages WA — stable                   |
 | `src/lib/tracking.ts`                     | Tracking Meta Pixel + GA4                                  |
 | `src/app/layout.tsx`                      | Fonts + tracking global + metadata root                    |
+
+---
+
+## 28. Favicon haute qualité — mark centré, fond vert foncé — 2026-05-21
+
+**Problème identifié :**
+
+- `icon.png` (§27) : crop 237×237 depuis transparent PNG basse résolution → upscale 3× → flou, peu lisible
+- Les palms dans le mark circulaire sont à gauche du centre du crop → favicon déséquilibré
+
+**Pipeline final :**
+
+- Crop 500×800+206+80 depuis `palm-dor-logo.png` 1491×1055 (source haute résolution)
+- Palm trunk 1 : x≈143, Palm trunk 2 : x≈358 — centre des palms = x=250.5 (≈ centre crop 500px)
+- Crop Center 500×550 pour centrer verticalement (inclut fronds + troncs)
+- Flood-fill fond crème → transparent (fuzz 8% depuis 4 coins)
+- Remplacement couleurs opaques → cream #F8F5EC (silhouette unifiée)
+- Composite sur cercle 512×512 dark green #1C3A28
+- Arc or #B8922E (strokewidth 12, arc -82° → 22°)
+- Scale DOWN (aucun upscale) → rendu net
+
+**Fait :**
+
+- `src/app/icon.png` : régénéré — 512×512, 72K, fond vert foncé, palms cream centrés
+- `src/app/favicon.ico` : régénéré — 16/32/48/256px depuis icon.png
+- `src/app/apple-icon.png` : régénéré — 180×180 depuis icon.png
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 27. Favicon dérivé du logo officiel — 2026-05-21
+
+**Problème identifié :**
+
+- `icon.svg` était une composition **dessinée à la main** (cercle vert + palms cream), visuellement différente du logo officiel PNG navbar
+- Source master du favicon ≠ source master de la navbar = branding incohérent
+
+**Analyse du logo officiel (`palm-dor-logo-transparent.png` 400×283) :**
+
+- Bounding box contenu : (64, 20), taille 276×237
+- Mark circulaire : x=78–250, y=28–252 (172×224px)
+- Gap transparent à x=252–265 entre le mark et le texte "PALM D'OR" / "DAKHLA"
+- Interior partiellement transparent (flood-fill antérieur depuis les coins)
+
+**Fait :**
+
+- Mark circulaire extrait : crop 237×237 depuis (40, 20) → 512×512 via Lanczos
+- `src/app/icon.svg` : supprimé (source hand-crafted)
+- `src/app/icon.png` : nouveau — 512×512 depuis le mark officiel (197K)
+- `src/app/favicon.ico` : régénéré depuis `icon.png` (16/32/48/256px, 89K)
+- `src/app/apple-icon.png` : régénéré depuis `icon.png` (180×180, 44K)
+- Navbar (`palm-dor-logo-transparent.png`) : inchangée
+- Route `/icon.svg` remplacée par `/icon.png` dans le build
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 26. Favicon centré + PROGRESS.md markdownlint — 2026-05-21
+
+**Problèmes identifiés :**
+
+- `icon.svg` : palms positionnés dans la moitié gauche du cercle (héritage logo-light.svg avec texte à droite) → favicon décentré
+- `favicon.ico` + `apple-icon.png` : générés depuis le SVG décentré → incohérents
+- `PROGRESS.md` : warnings markdownlint actifs (MD040 code sans langage, MD032 listes sans ligne vide, MD034 URLs nues)
+
+**Fait :**
+
+- `src/app/icon.svg` : palms centrés via `transform="translate(35, -10)"` sur le groupe palmiers+dune — composition horizontalement centrée dans le cercle vert
+- `src/app/favicon.ico` : régénéré depuis `icon.svg` corrigé (16/32/48/256px)
+- `src/app/apple-icon.png` : régénéré depuis `icon.svg` corrigé (180×180)
+- `PROGRESS.md` : MD040 (code language), MD032 (blanks around lists), MD034 (bare URLs), MD031 (blanks around fences) — tous corrigés dans le fichier
+- `.markdownlint.json` : créé pour désactiver MD013 (line-length, impraticable sur tables/code) et MD060 (table alignment, impraticable sur tables à cellules longues)
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 25. Correction branding — fond transparent + favicon cohérent — 2026-05-21
+
+**Problème identifié :**
+
+- `palm-dor-logo.png` était en mode RGB (pas RGBA) → fond crème opaque visible dans la navbar = halo rectangle
+- `favicon.ico` était le Next.js par défaut (triangle Vercel)
+- `apple-icon.png` absent (iOS home screen sans icône branding)
+
+**Fait :**
+
+- `public/assets/branding/palm-dor-logo-transparent.png` : fond supprimé par flood-fill ImageMagick (fuzz 8%) depuis les 4 coins → mode TrueColorAlpha, redimensionné 400×283, 69K
+- `src/components/layout/Navbar.tsx` : logo src → `palm-dor-logo-transparent.png`
+- `src/app/favicon.ico` : remplacé le Vercel default par favicon Palm d'Or multi-taille (16/32/48/256px) générés depuis `icon.svg`
+- `src/app/apple-icon.png` : nouveau — 180×180px depuis `icon.svg` (Next.js l'expose automatiquement en `/apple-icon.png`)
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes (27 + `/apple-icon.png`)
+
+---
+
+## 24. Branding officiel — favicon + logo navbar — 2026-05-21
+
+**Fait :**
+
+- `src/app/icon.svg` : remplacé le cercle vert + "P" doré par le mark palm tree complet (viewBox 400×400, fond #1C3A28, troncs+frondes cream #F8F5EC, cercle arc doré) — favicon désormais identique au mark circulaire du logo officiel
+- `src/components/layout/Navbar.tsx` : remplacé logo-light.svg + texte HTML par PNG officiel `palm-dor-logo.png` (`h-12 md:h-14 w-auto`) — logo officiel remplace le logotype reconstruit
+- `public/assets/branding/palm-dor-logo.png` : copié depuis `~/Desktop/LogoPalm.png` (1491×1055 PNG, mark circulaire + "Palm D'Or" + "DAKHLA")
+- Footer et logo-dark.svg inchangés (fond sombre incompatible avec PNG fond crème)
+
+**Build :** ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 23. Bugfixes pré-déploiement — 2026-05-20
+
+**Fait :**
+
+- `src/lib/apartments.ts` apt-2 : `coverImage` rétabli à `apt-2-chambre-vue-mer.jpg` (chambre principale vue Dakhla — différenciateur validé PROGRESS.md §18+§20) — `apt-2-vue-ensemble.jpg` replacé en 4e position galerie
+- `src/lib/services.ts` : message WA `accommodation` purgé des noms legacy ("Standard", "2 chambres", "grande capacité") → remplacé par "de 500 à 750 DH/nuit"
+
+**Build :** ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 22. Photos apt-1 + description — 2026-05-19 — Série complète
+
+**Fait :**
+
+- Audit visuel des 10 photos `Desktop/palmdor_appart1`
+- 2 doublons certifiés exclus par MD5 : `IMG_0128.jpg` (cuisine apt-3/5) + `IMG_6597 - Copie (2).jpg` (SDB apt-3/5)
+- 3 photos supplémentaires écartées : `37CD5629.jpg` (détail recadré 134KB), `de (91) - Copie.jpg` (3e angle salon redondant), `image00079 - Copie.jpeg` (SDB trop similaire visuellement apt-3/5, doute = exclusion)
+- 4 photos retenues et copiées dans `public/assets/photos-client/apartments/apt-1/` avec noms sémantiques
+- `apartments.ts` apt-1 : `coverImage` → `apt-1-chambre-vue-nuit.jpg` (chambre grand lit, vue nocturne Dakhla — image premium) + `gallery` 3 photos + `shortDescription`
+- **Série photos appartements complète** : apt-1/2/3/4/5/6 tous intégrés
+
+**État groupe A (apt-1) après V3.0 :**
+
+| Apt | Cover | Différenciateur | Galerie |
+|---|---|---|---|
+| 1 | chambre vue nocturne Dakhla | canapé doré, vue nuit, 1 chambre | salon · cuisine · salle de bain |
+
+**Photos écartées apt-1 (raison) :**
+
+- `IMG_0128.jpg` — cuisine apt-3/5 (MD5 identique confirmé)
+- `IMG_6597 - Copie (2).jpg` — SDB apt-3/5 (MD5 identique confirmé)
+- `37CD5629.jpg` — détail coiffeuse recadré, trop partiel, 134KB
+- `de (91) - Copie.jpg` — 3e angle du même salon, redondant avec de(79)
+- `image00079 - Copie.jpeg` — SDB rideau rose / carrelage gris, visuellement trop proche apt-3/5
+
+**État :** Build ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 21. Photos apt-3 et apt-5 + descriptions — 2026-05-19
+
+**Fait :**
+
+- Audit comparatif simultané des 8 photos `Desktop/palmdor_appart3` et 9 photos `Desktop/palmdor_appart5`
+- Analyse MD5 : 6 fichiers identiques entre les deux lots (IMG_0100/0128/0586/6597/9798/9862)
+- 2 photos uniques apt-3 (IMG_0036 salon gris, IMG_0214 chambre turquoise)
+- 3 photos uniques apt-5 (97F6E1FD salon vert, IMG_9585 chambre turquoise, de(1) chambre verte)
+- Exclusions : IMG_0100 + IMG_0128 (redondants cuisine), IMG_0586 (vasque dorée — confusion apt-4), de(1)-Copie (doublonne IMG_9585)
+- 5 photos copiées dans `public/assets/photos-client/apartments/apt-3/` avec noms sémantiques
+- 5 photos copiées dans `public/assets/photos-client/apartments/apt-5/` avec noms sémantiques
+- `apartments.ts` apt-3 : `coverImage` → `apt-3-salon.jpg` (canapé gris, mur décor feuilles) + `gallery` 4 photos + `shortDescription`
+- `apartments.ts` apt-5 : `coverImage` → `apt-5-salon.jpg` (canapé vert émeraude, différenciateur clé) + `gallery` 4 photos + `shortDescription`
+
+**Différenciateur groupe C après V2.9 :**
+
+| Apt | Cover | Différenciateur visuel | Étage |
+|---|---|---|---|
+| 3 | salon canapé gris + décor mural | canapé gris, feuilles dorées | 3e |
+| 5 | salon canapé vert émeraude | canapé vert, table basse dorée | 4e |
+
+**Photos écartées apt-3/5 (raison) :**
+
+- `IMG_0100` + `IMG_0128` — cuisine sous deux angles redondants avec `IMG_9862`
+- `IMG_0586` — vasque dorée déjà utilisée comme différenciateur apt-4, doute = exclusion
+- `de (1) - Copie.jpg` — chambre similaire à `IMG_9585`, redondante
+
+**État :** Build ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 20. Galerie groupe B rationalisée — 2026-05-18
+
+**Fait :**
+
+- `ApartmentGallery.tsx` : suppression de `key={active.src}` sur l'image principale — React met à jour `src` en place sans remount DOM → transition fluide au clic sans flash
+- `ApartmentGallery.tsx` : grille miniatures passe de `grid-cols-6` fixe à `grid-cols-4/5/6` calculé selon le nombre réel de photos — plus de colonnes vides
+- `apartments.ts` apt-2 : gallery réduite de 6 à 4 photos (suppression salon-2 et salon-3 redondants)
+- `apartments.ts` apt-4 : gallery réduite de 11 à 4 photos — sélection : salon, chambre-1 (king), salle-de-bain-vasque (différenciateur clé), cuisine
+- `apartments.ts` apt-6 : inchangé (déjà 3 photos gallery, cohérent)
+
+**État groupe B après V2.8 :**
+
+| Apt | Cover | Gallery | Total | Différenciateur |
+|---|---|---|---|---|
+| 2 | chambre vue mer | salon · salle à manger · chambre 2 · vue ensemble | 5 | canapé beige, 2e étage |
+| 4 | chambre king nuit | salon · chambre king · vasque dorée · cuisine | 5 | vasque dorée, vue nocturne |
+| 6 | salon canapé blanc | vue dakhla · chambre 1 · salle à manger | 4 | canapé blanc, 4e étage |
+
+**État :** Build ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 19. Photos apt-6 + description — 2026-05-18
+
+**Fait :**
+
+- Audit visuel des 13 photos `Desktop/palmdor_appart6` — 9 écartées (6 doublons apt-2 canapé beige, 2 hors-sujet réception/restaurant, 1 chambre indiscernable apt-4)
+- 4 photos retenues et copiées dans `public/assets/photos-client/apartments/apt-6/` avec noms sémantiques
+- `apartments.ts` apt-6 : `coverImage` → `apt-6-salon.jpg` (canapé blanc, différenciateur visuel clé vs apt-2 beige et apt-4 jaune) + `gallery` → 3 photos (vue-dakhla, chambre-1, salle-a-manger)
+- `shortDescription` : "Deux chambres au 4e étage pour 4 personnes. Lit king-size, cuisine équipée, salon avec vue sur la ville."
+
+**Photos écartées apt-6 (raison) :**
+
+- `IMG_0095.jpg`, `IMG_0063.jpg`, `IMG_0066.jpg`, `IMG_0082.jpg`, `IMG_0086.jpg`, `IMG_9572.jpg` — canapé beige / espace identique à apt-2
+- `IMG_9864.jpg` — chambre 2 lits indiscernable de apt-4
+- `IMG_0003.jpg` — hall d'entrée / réception (hors-sujet)
+- `IMG_0010.jpg` — salle de restaurant (hors-sujet)
+
+**Différenciateur apt-6 vs groupe B :**
+
+- Apt-2 (2e étage) : canapé beige → cover chambre vue mer
+- Apt-4 (3e étage) : canapé jaune → cover chambre king nuit
+- Apt-6 (4e étage) : canapé blanc → cover salon + vue panoramique
+
+**État :** Build ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 18. Photos apt-2 + descriptions appartements — 2026-05-18
+
+**Fait :**
+
+- Audit visuel des 13 photos `Desktop/palmdor_appart2` — 6 écartées (3 doublons exacts avec apt-4, 2 duplicates internes, 1 salle de bain ambiguë)
+- 7 photos retenues et copiées dans `public/assets/photos-client/apartments/apt-2/` avec noms sémantiques
+- `apartments.ts` apt-2 : `coverImage` → `apt-2-chambre-vue-mer.jpg` + `gallery` → 6 photos (salon ×3, vue ensemble, salle à manger, chambre 2 lits)
+- Nouveau champ `shortDescription?: string` ajouté à l'interface `Apartment`
+- `shortDescription` renseignée pour apt-2 et apt-4 (factuelle, basée sur données confirmées)
+- Listing `/hebergements` : affichage conditionnel de `shortDescription` entre la composition et les espaces communs
+- Page détail `/hebergements/[aptId]` : affichage de `shortDescription` dans la fiche, après nom/prix
+
+**Photos écartées apt-2 (raison) :**
+
+- `IMG_0487.jpg` + `IMG_0487 - Copie.jpg` — chambre 2 lits identique à `apt-4-chambre-2.jpg`
+- `IMG_0214.jpg` — chambre double indiscernable de `apt-4-chambre-1.jpg`
+- `image00079 - Copie.jpeg` — douche avec même rideau que `apt-4-salle-de-bain-douche.jpg`
+- `IMG_0044 - Copie.jpg` — doublon de `IMG_0044.jpg`
+- `IMG_0044.jpg` — redondant avec les 3 autres photos salon déjà retenues
+
+**État :** Build ✓ 0 erreurs TypeScript — 27 routes
+
+---
+
+## 17. Galerie photos apt-4 complète — 2026-05-18
+
+**Fait :**
+
+- 12 photos validées copiées depuis `Desktop/palmdor_appart4` vers `public/assets/photos-client/apartments/apt-4/` avec noms sémantiques
+- `apartments.ts` apt-4 : `coverImage` → `apt-4-chambre-vue-nuit.jpg` (chambre king, vue nocturne Dakhla) + `gallery` → 11 photos (salon ×2, salle à manger ×2, cuisine ×2, chambre king ×2, chambre 2 lits, salle de bain ×2)
+- Nouveau composant `src/components/hebergements/ApartmentGallery.tsx` (Client Component) : grande image principale + 12 miniatures cliquables — clic miniature change l'image principale — badge compteur (X/12)
+- Page `/hebergements/[apartmentId]` : remplace l'ancien grid 3 colonnes statique par `<ApartmentGallery>` interactive
+- `/hebergements` listing non modifié — reste léger
+- CTA "Réserver cet appartement" préservé (hero + fiche)
+
+**État :**
+
+- Build : ✓ 0 erreurs TypeScript — 27 routes
+- Apt 1/2/3/5/6 : en attente photos client (architecture `coverImage`/`gallery` déjà en place)
+
+---
+
+## 16. SEO Sprint — 2026-05-16
+
+**Fait :**
+
+- Mode maintenance retiré de toutes les pages publiques (Sprints successifs)
+- `robots.ts` : `disallow: ['/admin', '/api/']` ajouté
+- `sitemap.ts` : priorités corrigées (hébergements 0.9 > restaurant 0.8 > café 0.75 > ...), `lastModified` dynamique
+- `layout.tsx` + tous les titres/descriptions : repositionnement hébergement-first
+- `Hero.tsx` : H1 sémantique = "Appartements meublés & séjour complet à Dakhla" (marque en `<p>`)
+- `ExperienceSection.tsx` : Hébergements en 1re position (était Restaurant-first)
+- `galerie/page.tsx` : bande "Découvrez nos services" avec 4 liens de conversion
+- `AccommodationSection.tsx` : CTA primaire → `/hebergements`, WhatsApp secondaire
+- `Footer.tsx` : description et navigation hébergement-first
+- `schemas.ts` + `layout.tsx` : `aggregateRating` (5★ / 180 avis), `openingHours` (lodging 24h/24, resto + café Mo-Su 08:00-23:30)
+- `config.ts` : `GOOGLE_BUSINESS_URL = 'https://maps.app.goo.gl/TxngU7XTec4SD2zX9'` → `sameAs` + `hasMap` actifs dans tous les schemas
+
+**État SEO on-site :**
+
+- Schemas valides : `LodgingBusiness`, `Restaurant`, `CafeOrCoffeeShop`, `AutoRental`, `FAQPage` × 5, `aggregateRating`, `openingHours`
+- Liaison GBP active via `sameAs` et `hasMap`
+- Aucune valeur inventée
+
+**Dépendances off-site restantes :**
+
+- GSC : ✅ sitemap soumis, indexation demandée pour 7 pages — en attente recrawl Google (2–6 semaines)
+- GBP : ✅ catégorie principale = Résidence hôtelière, catégories secondaires ok, GBP URL liée au site — en attente : validation nom court "Palm d'Or Dakhla" (appel en cours) + photos à uploader
+- Photos appartements (GBP + site) : mapping `apt-1..apt-6` → fichier photo à fournir par le client
+- `openingHours` café : à re-vérifier si les heures diffèrent du restaurant en pratique
 
 ---
 

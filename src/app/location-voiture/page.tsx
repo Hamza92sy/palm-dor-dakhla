@@ -5,7 +5,7 @@ import { autoRentalSchema, faqSchema } from '@/lib/schemas'
 
 export const metadata: Metadata = {
   title: "Location de voitures à Dakhla — Palm d'Or",
-  description: "Louez une voiture propre et fiable à Dakhla. Location à la journée ou à la semaine. Process simple, disponible rapidement. Contactez Palm d'Or via WhatsApp.",
+  description: "Louez une voiture propre et fiable à Dakhla. Location à la journée ou à la semaine. Process simple, disponible rapidement. Contactez Palm d'Or Dakhla.",
   alternates: {
     canonical: '/location-voiture',
   },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 const FAQ_ITEMS = [
   {
     question: "Comment louer une voiture à Dakhla via Palm d'Or ?",
-    answer: "Envoyez un message via WhatsApp en précisant vos dates et vos besoins. Nous confirmeons la disponibilité et les modalités rapidement, sans paperasse excessive.",
+    answer: "Envoyez un message via WhatsApp ou le formulaire en ligne en précisant vos dates et vos besoins. Nous confirmons la disponibilité et les modalités rapidement, sans paperasse excessive.",
   },
   {
     question: "Peut-on louer une voiture à la journée ou à la semaine ?",
@@ -45,7 +45,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Y a-t-il beaucoup de démarches pour louer une voiture ?",
-    answer: "Non, le process est simple. Contactez-nous via WhatsApp, nous vous guidons directement sans formalités excessives.",
+    answer: "Non, le process est simple. Contactez-nous via WhatsApp ou le formulaire, nous vous guidons directement sans formalités excessives.",
   },
 ]
 
@@ -72,7 +72,6 @@ export default function LocationVoiturePage() {
         images={[]}
         service="car_rental"
         ctaLabel="Demander disponibilité"
-        heroNotice="Photos des véhicules disponibles prochainement"
         faqSection={<FAQSection items={FAQ_ITEMS} />}
       />
     </>

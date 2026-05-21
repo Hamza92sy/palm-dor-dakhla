@@ -13,10 +13,12 @@ import {
   BUSINESS_LATITUDE,
   BUSINESS_LONGITUDE,
   GOOGLE_MAPS_URL,
+  GOOGLE_BUSINESS_URL,
   INSTAGRAM_URL,
   SITE_URL,
   WHATSAPP_PHONE_DISPLAY,
 } from '@/lib/config'
+import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT } from '@/lib/google-reviews'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,17 +36,20 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Palm d'Or Dakhla — Restaurant, Café & Hébergements",
+  title: "Palm d'Or Dakhla — Hébergements, Restaurant & Café à Dakhla",
   description:
-    "Palm d'Or Dakhla sur AV Al Walaa à Dakhla : résidence, restaurant et café. Réservation simple via WhatsApp.",
+    "Palm d'Or Dakhla — 6 appartements meublés dès 500 DH/nuit, restaurant et café, au cœur de Dakhla (AV Al Walaa). Réservation en ligne.",
   keywords: [
     "Palm d'Or Dakhla",
     'Dakhla',
     'AV Al Walaa',
+    'hébergement Dakhla',
+    'appartement Dakhla',
+    'appartement meublé Dakhla',
+    'location appartement Dakhla',
     'résidence Dakhla',
     'restaurant Dakhla',
     'café Dakhla',
-    'hébergement Dakhla',
   ],
   alternates: {
     canonical: '/',
@@ -53,9 +58,9 @@ export const metadata: Metadata = {
     google: '4r6l05c_AQIeAeAm7K1OGJZ5gD8VZNGNa8wYNwoQHss',
   },
   openGraph: {
-    title: "Palm d'Or Dakhla — Restaurant, Café & Hébergements",
+    title: "Palm d'Or Dakhla — Hébergements, Restaurant & Café à Dakhla",
     description:
-      "Palm d'Or Dakhla sur AV Al Walaa à Dakhla : résidence, restaurant et café. Réservation simple via WhatsApp.",
+      "Palm d'Or Dakhla — 6 appartements meublés dès 500 DH/nuit, restaurant et café, au cœur de Dakhla (AV Al Walaa). Réservation en ligne.",
     url: '/',
     siteName: BUSINESS_FULL_NAME,
     locale: 'fr_MA',
@@ -71,9 +76,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Palm d'Or Dakhla — Restaurant, Café & Hébergements",
+    title: "Palm d'Or Dakhla — Hébergements, Restaurant & Café à Dakhla",
     description:
-      "Palm d'Or Dakhla sur AV Al Walaa à Dakhla : résidence, restaurant et café. Réservation simple via WhatsApp.",
+      "Palm d'Or Dakhla — 6 appartements meublés dès 500 DH/nuit, restaurant et café, au cœur de Dakhla (AV Al Walaa). Réservation en ligne.",
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -96,7 +101,7 @@ const localBusinessSchema = {
   '@type': ['LodgingBusiness', 'FoodEstablishment'],
   name: BUSINESS_FULL_NAME,
   description:
-    "Résidence, restaurant et café à Dakhla. Réservation et demandes via WhatsApp.",
+    "Résidence proposant 6 appartements meublés dès 500 DH/nuit, un restaurant et un café à Dakhla (AV Al Walaa). Réservation par formulaire en ligne.",
   url: SITE_URL,
   telephone: WHATSAPP_PHONE_DISPLAY,
   email: BUSINESS_EMAIL,
@@ -112,13 +117,20 @@ const localBusinessSchema = {
     latitude: BUSINESS_LATITUDE,
     longitude: BUSINESS_LONGITUDE,
   },
-  hasMap: GOOGLE_MAPS_URL,
+  hasMap: GOOGLE_BUSINESS_URL || GOOGLE_MAPS_URL,
   areaServed: 'Dakhla',
   knowsLanguage: ['fr', 'ar'],
   keywords: 'Dakhla, AV Al Walaa, résidence, restaurant, café',
-  sameAs: [INSTAGRAM_URL],
+  sameAs: [INSTAGRAM_URL, ...(GOOGLE_BUSINESS_URL ? [GOOGLE_BUSINESS_URL] : [])],
   priceRange: 'DH 500–750',
   image: `${SITE_URL}/og-image.jpg`,
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: GOOGLE_RATING,
+    bestRating: 5,
+    worstRating: 1,
+    reviewCount: parseInt(GOOGLE_REVIEW_COUNT, 10),
+  },
 }
 
 export default function RootLayout({

@@ -1,5 +1,3 @@
-import { getServiceWhatsAppUrl } from '@/lib/services'
-
 const dishes = [
   {
     name: "Salade Palm d'Or",
@@ -28,11 +26,9 @@ const dishes = [
   },
 ]
 
-const waUrl = getServiceWhatsAppUrl('restaurant')
-
 export default function MenuSection() {
   return (
-    <section className="bg-palm-cream-dark py-16 md:py-24">
+    <section id="menu" className="bg-palm-cream-dark py-16 md:py-24">
       <div className="max-w-3xl mx-auto px-5 sm:px-8 lg:px-10">
 
         {/* Header */}
@@ -69,18 +65,14 @@ export default function MenuSection() {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Réserver */}
         <div className="flex justify-center mt-10">
           <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue
-              hover:bg-palm-gold hover:border-palm-gold hover:text-white
-              text-[11px] tracking-[0.18em] uppercase font-medium
-              px-7 py-3.5 rounded-full transition-all duration-300"
+            href="#contact"
+            className="text-[10px] tracking-[0.18em] uppercase text-palm-blue/40
+              hover:text-palm-blue/70 transition-colors duration-200"
           >
-            Demander le menu complet
+            Réserver une table ↓
           </a>
         </div>
 

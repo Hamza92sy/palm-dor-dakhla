@@ -35,8 +35,10 @@ export interface ServicePageConfig {
   images: Array<{ src: string; alt: string }>
   service: ServiceType
   ctaLabel: string
+  primaryCta?: 'form' | 'whatsapp'
   heroNotice?: string
   menuSection?: ReactNode
+  menuPdfPath?: string
   faqSection?: ReactNode
 }
 
@@ -63,8 +65,10 @@ export default function ServicePage({
   images,
   service,
   ctaLabel,
+  primaryCta = 'whatsapp',
   heroNotice,
   menuSection,
+  menuPdfPath,
   faqSection,
 }: ServicePageConfig) {
   const waUrl = getServiceWhatsAppUrl(service)
@@ -114,23 +118,68 @@ export default function ServicePage({
             </div>
           )}
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
-            <WhatsAppButton
-              href={waUrl}
-              className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
-                text-[11px] tracking-[0.14em] uppercase font-medium
-                px-7 py-3.5 rounded-full transition-colors duration-300"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-              {ctaLabel}
-            </WhatsAppButton>
-            <a
-              href="#contact"
-              className="flex items-center gap-2.5 border border-white/30 text-white/75 hover:border-white/60 hover:text-white
-                text-[11px] tracking-[0.14em] uppercase font-medium
-                px-7 py-3.5 rounded-full transition-all duration-300"
-            >
-              Envoyer un message
-            </a>
+            {primaryCta === 'form' ? (
+              <>
+                <a
+                  href="#contact"
+                  className="flex items-center gap-2.5 bg-white hover:bg-palm-cream text-palm-blue
+                    text-[11px] tracking-[0.14em] uppercase font-medium
+                    px-7 py-3.5 rounded-full transition-colors duration-300"
+                >
+                  {ctaLabel}
+                </a>
+                {menuPdfPath ? (
+                  <a
+                    href={menuPdfPath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 border border-white/30 text-white/75 hover:border-white/60 hover:text-white
+                      text-[11px] tracking-[0.14em] uppercase font-medium
+                      px-7 py-3.5 rounded-full transition-all duration-300"
+                  >
+                    Consulter le menu PDF
+                  </a>
+                ) : menuSection ? (
+                  <a
+                    href="#menu"
+                    className="flex items-center gap-2.5 border border-white/30 text-white/75 hover:border-white/60 hover:text-white
+                      text-[11px] tracking-[0.14em] uppercase font-medium
+                      px-7 py-3.5 rounded-full transition-all duration-300"
+                  >
+                    Voir notre carte ↓
+                  </a>
+                ) : null}
+                <WhatsAppButton
+                  href={waUrl}
+                  className="flex items-center gap-1.5
+                    text-[10px] tracking-[0.18em] uppercase text-white/50 hover:text-white/80
+                    transition-colors duration-200"
+                >
+                  <WhatsAppIcon className="w-3 h-3 shrink-0" />
+                  Question via WhatsApp
+                </WhatsAppButton>
+              </>
+            ) : (
+              <>
+                <WhatsAppButton
+                  href={waUrl}
+                  className="flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1DAF57] text-white
+                    text-[11px] tracking-[0.14em] uppercase font-medium
+                    px-7 py-3.5 rounded-full transition-colors duration-300"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
+                  {ctaLabel}
+                </WhatsAppButton>
+                <a
+                  href="#contact"
+                  className="flex items-center gap-2.5 border border-white/30 text-white/75 hover:border-white/60 hover:text-white
+                    text-[11px] tracking-[0.14em] uppercase font-medium
+                    px-7 py-3.5 rounded-full transition-all duration-300"
+                >
+                  Envoyer un message
+                </a>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -149,15 +198,26 @@ export default function ServicePage({
 
           {/* Repeat CTA */}
           <div className="flex justify-center mt-12">
-            <WhatsAppButton
-              href={waUrl}
-              className="group flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
-                text-[11px] tracking-[0.14em] uppercase font-medium
-                px-7 py-3.5 rounded-full transition-all duration-300"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-              {ctaLabel}
-            </WhatsAppButton>
+            {primaryCta === 'form' ? (
+              <a
+                href="#contact"
+                className="group flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
+                  text-[11px] tracking-[0.14em] uppercase font-medium
+                  px-7 py-3.5 rounded-full transition-all duration-300"
+              >
+                {ctaLabel}
+              </a>
+            ) : (
+              <WhatsAppButton
+                href={waUrl}
+                className="group flex items-center gap-2.5 border border-palm-gold/60 text-palm-blue hover:bg-palm-gold hover:border-palm-gold hover:text-white
+                  text-[11px] tracking-[0.14em] uppercase font-medium
+                  px-7 py-3.5 rounded-full transition-all duration-300"
+              >
+                <WhatsAppIcon className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                {ctaLabel}
+              </WhatsAppButton>
+            )}
           </div>
         </div>
       </section>
@@ -196,22 +256,44 @@ export default function ServicePage({
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/35">
             Disponible 7j/7 &middot; Sans engagement &middot; Réponse rapide
           </p>
-          <WhatsAppButton
-            href={waUrl}
-            className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
-              text-[11px] tracking-[0.18em] uppercase font-medium
-              px-8 py-4 rounded-full transition-all duration-300
-              shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
-          >
-            <WhatsAppIcon className="w-4 h-4 shrink-0 text-[#25D366] transition-transform duration-300 group-hover:scale-110" />
-            {ctaLabel}
-          </WhatsAppButton>
-          <a
-            href="#contact"
-            className="text-[10px] tracking-[0.15em] uppercase text-white/25 hover:text-white/50 transition-colors duration-200"
-          >
-            ou envoyez un message ↓
-          </a>
+          {primaryCta === 'form' ? (
+            <>
+              <a
+                href="#contact"
+                className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
+                  text-[11px] tracking-[0.18em] uppercase font-medium
+                  px-8 py-4 rounded-full transition-all duration-300
+                  shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
+              >
+                {ctaLabel}
+              </a>
+              <WhatsAppButton
+                href={waUrl}
+                className="text-[10px] tracking-[0.15em] uppercase text-white/25 hover:text-white/50 transition-colors duration-200"
+              >
+                ou renseignez-vous via WhatsApp ↗
+              </WhatsAppButton>
+            </>
+          ) : (
+            <>
+              <WhatsAppButton
+                href={waUrl}
+                className="group flex items-center gap-3 bg-white hover:bg-palm-cream text-palm-blue
+                  text-[11px] tracking-[0.18em] uppercase font-medium
+                  px-8 py-4 rounded-full transition-all duration-300
+                  shadow-[0_8px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.2)]"
+              >
+                <WhatsAppIcon className="w-4 h-4 shrink-0 text-[#25D366] transition-transform duration-300 group-hover:scale-110" />
+                {ctaLabel}
+              </WhatsAppButton>
+              <a
+                href="#contact"
+                className="text-[10px] tracking-[0.15em] uppercase text-white/25 hover:text-white/50 transition-colors duration-200"
+              >
+                ou envoyez un message ↓
+              </a>
+            </>
+          )}
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-palm-gold/50 to-transparent mt-16" />
       </section>

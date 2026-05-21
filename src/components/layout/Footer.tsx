@@ -13,11 +13,12 @@ import {
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 
 const navLinks = [
-  { label: 'Restaurant',   href: '/restaurant' },
-  { label: 'Café',         href: '/cafe' },
-  { label: 'Hébergements', href: '/hebergements' },
-  { label: 'Galerie',      href: '/galerie' },
-  { label: 'Contact',      href: '/contact' },
+  { label: 'Hébergements',    href: '/hebergements' },
+  { label: 'Restaurant',      href: '/restaurant' },
+  { label: 'Café',            href: '/cafe' },
+  { label: 'Location voiture', href: '/location-voiture' },
+  { label: 'Galerie',         href: '/galerie' },
+  { label: 'Contact',         href: '/contact' },
 ]
 
 export default function Footer() {
@@ -53,8 +54,8 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-sm text-white/45 leading-[1.85] max-w-[260px]">
-              Restaurant, café & hébergements au cœur de Dakhla.
-              Réservation simple et rapide via WhatsApp.
+              Hébergements, restaurant & café au cœur de Dakhla.
+              Réservation en ligne ou via WhatsApp.
             </p>
           </div>
 
