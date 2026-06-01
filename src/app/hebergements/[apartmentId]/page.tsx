@@ -179,7 +179,7 @@ export default async function ApartmentDetailPage({ params }: Props) {
       </section>
 
       {/* ── Formulaire de réservation ────────────────────────────────── */}
-      <ServiceContactForm service="accommodation" />
+      <ServiceContactForm service="accommodation" initialApartmentId={apt.id} />
     </>
   )
 }

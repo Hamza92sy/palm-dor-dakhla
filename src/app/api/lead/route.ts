@@ -47,6 +47,14 @@ const VALID_SERVICES        = ['accommodation', 'restaurant', 'cafe', 'car_renta
 const VALID_LANGUAGES       = ['fr', 'en'] as const
 const DATE_RE               = /^\d{4}-\d{2}-\d{2}$/
 const EMAIL_RE              = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_RE              = /^\+?[0-9\s\-\.\(\)]{7,20}$/
+
+function isValidDate(str: string): boolean {
+  if (!DATE_RE.test(str)) return false
+  const [y, m, d] = str.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d
+}
 
 type Service       = (typeof VALID_SERVICES)[number]
 type Language      = (typeof VALID_LANGUAGES)[number]
@@ -142,8 +150,16 @@ export async function POST(req: NextRequest) {
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
     return NextResponse.json({ error: 'name est requis (min 2 caractères)' }, { status: 400 })
   }
-  if (!phone || typeof phone !== 'string' || phone.trim().length < 8) {
-    return NextResponse.json({ error: 'phone est requis (min 8 caractères)' }, { status: 400 })
+  if (!phone || typeof phone !== 'string') {
+    return NextResponse.json({ error: 'Numéro de téléphone requis' }, { status: 400 })
+  }
+  const phoneStr    = phone.trim()
+  const phoneDigits = phoneStr.replace(/\D/g, '')
+  if (!PHONE_RE.test(phoneStr) || phoneDigits.length < 7 || phoneDigits.length > 15) {
+    return NextResponse.json(
+      { error: 'Numéro de téléphone invalide. Format accepté : +212 6XX XXX XXX' },
+      { status: 400 }
+    )
   }
   if (!service || !VALID_SERVICES.includes(service as Service)) {
     return NextResponse.json(
@@ -186,22 +202,22 @@ export async function POST(req: NextRequest) {
   if (service === 'accommodation') {
     const { check_in, check_out, apartment_type } = body
 
-    if (!check_in || typeof check_in !== 'string' || !DATE_RE.test(check_in)) {
+    if (!check_in || typeof check_in !== 'string' || !isValidDate(check_in as string)) {
       return NextResponse.json(
-        { error: 'check_in est requis pour les réservations hébergement (format YYYY-MM-DD)' },
+        { error: "Date d'arrivée invalide (format requis : YYYY-MM-DD)" },
         { status: 400 }
       )
     }
-    cleanCheckIn = check_in
+    cleanCheckIn = check_in as string
 
     if (check_out != null) {
-      if (typeof check_out !== 'string' || !DATE_RE.test(check_out)) {
+      if (typeof check_out !== 'string' || !isValidDate(check_out as string)) {
         return NextResponse.json(
-          { error: 'check_out doit être une date YYYY-MM-DD' },
+          { error: 'Date de départ invalide (format requis : YYYY-MM-DD)' },
           { status: 400 }
         )
       }
-      cleanCheckOut = check_out
+      cleanCheckOut = check_out as string
     }
 
     if (cleanCheckIn && cleanCheckOut && cleanCheckOut < cleanCheckIn) {
@@ -223,7 +239,7 @@ export async function POST(req: NextRequest) {
   const lang          = language      as Language
   const svc           = service       as Service
   const cleanName     = (name as string).trim()
-  const cleanPhone    = (phone as string).trim()
+  const cleanPhone    = phoneStr
   const cleanMessage  = typeof message === 'string' ? message.trim() || null : null
 
   const { error } = await supabaseAdmin.from('leads').insert({
@@ -240,8 +256,17 @@ export async function POST(req: NextRequest) {
   })
 
   if (error) {
-    console.error('[api/lead] insert error:', error.message)
-    return NextResponse.json({ error: 'Erreur lors de la sauvegarde' }, { status: 500 })
+    console.error('[api/lead] insert error — code:', error.code, '— message:', error.message, '— details:', error.details)
+    // 42P01 = table not found (DB not initialised), 57P03 = DB starting up
+    const isDbUnavailable = error.code === '42P01' || error.code === '57P03' || error.code === '08000' || error.code === '08006'
+    // 23514 = CHECK constraint violation (bad apartment_type, bad date range…)
+    const isConstraintViolation = error.code === '23514' || error.code === '23502' || error.code === '23503'
+    const userMessage = isDbUnavailable
+      ? 'Service temporairement indisponible. Veuillez réessayer dans quelques minutes.'
+      : isConstraintViolation
+        ? 'Données invalides. Vérifiez les champs et réessayez.'
+        : 'Erreur lors de la sauvegarde. Veuillez réessayer.'
+    return NextResponse.json({ error: userMessage }, { status: 500 })
   }
 
   // Fire-and-forget — email failure never blocks the lead or the redirect

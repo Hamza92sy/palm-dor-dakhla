@@ -19,27 +19,42 @@ const INPUT_CLASS = `
   disabled:opacity-50 disabled:cursor-not-allowed
 `.trim()
 
+const INPUT_ERR = `
+  w-full bg-white border border-red-400 rounded-sm px-4 py-3.5
+  text-sm text-palm-blue placeholder:text-palm-blue/25
+  focus:outline-none focus:border-red-400 transition-colors duration-200
+  focus-visible:ring-2 focus-visible:ring-red-400/40 focus-visible:ring-offset-1
+  disabled:opacity-50 disabled:cursor-not-allowed
+`.trim()
+
 interface Props {
   service: ServiceType
+  initialApartmentId?: string
 }
 
-export default function ServiceContactForm({ service }: Props) {
+export default function ServiceContactForm({ service, initialApartmentId }: Props) {
+  const _initApt = initialApartmentId && VALID_APARTMENT_IDS.includes(initialApartmentId)
+    ? initialApartmentId : ''
   const [name,          setName]          = useState('')
   const [phone,         setPhone]         = useState('')
   const [message,       setMessage]       = useState('')
   const [checkIn,       setCheckIn]       = useState('')
   const [nights,        setNights]        = useState<number | ''>('')
-  const [apartmentType, setApartmentType] = useState('')
+  const [apartmentType, setApartmentType] = useState(_initApt)
   const [email,         setEmail]         = useState('')
   const [loading,       setLoading]       = useState(false)
-  const [error,         setError]         = useState<string | null>(null)
+  const [errors,        setErrors]        = useState<Record<string, string>>({})
   const [success,       setSuccess]       = useState(false)
   const [whatsappUrl,   setWhatsappUrl]   = useState<string | null>(null)
-  const [aptLocked,        setAptLocked]        = useState(false)
+  const [aptLocked,        setAptLocked]        = useState(Boolean(_initApt))
   const [emailSuggestion,  setEmailSuggestion]  = useState<string | null>(null)
 
   const today = new Date().toISOString().split('T')[0]
   const isAccommodation = service === 'accommodation'
+
+  function clearErr(field: string) {
+    setErrors(p => ({ ...p, [field]: '' }))
+  }
 
   const DOMAIN_CORRECTIONS: Record<string, string> = {
     'gmial.com':   'gmail.com', 'gmal.com':    'gmail.com',
@@ -54,6 +69,7 @@ export default function ServiceContactForm({ service }: Props) {
 
   function handleEmailChange(val: string) {
     setEmail(val)
+    clearErr('email')
     const domain = val.split('@')[1]?.toLowerCase()
     setEmailSuggestion(domain && DOMAIN_CORRECTIONS[domain]
       ? val.split('@')[0] + '@' + DOMAIN_CORRECTIONS[domain]
@@ -71,37 +87,40 @@ export default function ServiceContactForm({ service }: Props) {
   }, [])
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const PHONE_RE = /^\+?[0-9\s\-\.\(\)]{7,20}$/
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    const errs: Record<string, string> = {}
+
     if (!name.trim() || name.trim().length < 2) {
-      setError('Votre nom est requis.')
-      return
+      errs.name = 'Votre nom est requis.'
     }
-    if (!phone.trim() || phone.trim().length < 8) {
-      setError('Votre numéro de téléphone est requis.')
-      return
+    const p = phone.trim()
+    const digits = p.replace(/\D/g, '')
+    if (!p || !PHONE_RE.test(p) || digits.length < 7 || digits.length > 15) {
+      errs.phone = 'Entrez un numéro de téléphone valide. Ex. 06 12 34 56 78 ou +212 612 345 678'
     }
     if (isAccommodation && !EMAIL_RE.test(email.trim())) {
-      setError('Email requis pour les réservations hébergement.')
-      return
+      errs.email = 'Email requis pour les réservations hébergement.'
+    } else if (!isAccommodation && email.trim() && !EMAIL_RE.test(email.trim())) {
+      errs.email = 'Format email invalide.'
     }
     if (isAccommodation && !apartmentType) {
-      setError('Veuillez sélectionner un appartement.')
-      return
+      errs.apartmentType = 'Veuillez sélectionner un appartement.'
     }
     if (isAccommodation && !checkIn) {
-      setError('La date d\'arrivée est requise pour les réservations hébergement.')
-      return
+      errs.checkIn = "Date d'arrivée requise."
     }
     if (isAccommodation && (nights === '' || nights < 1)) {
-      setError('Le nombre de nuitées doit être au moins 1.')
-      return
+      errs.nights = 'Le nombre de nuitées doit être au moins 1.'
     }
 
+    setErrors(errs)
+    if (Object.keys(errs).length > 0) return
+
     setLoading(true)
-    setError(null)
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 8000)
@@ -129,7 +148,7 @@ export default function ServiceContactForm({ service }: Props) {
       const data: { success?: boolean; whatsappUrl?: string; error?: string } = await res.json()
 
       if (!res.ok || !data.success) {
-        setError(data.error ?? 'Une erreur est survenue, veuillez réessayer.')
+        setErrors({ api: data.error ?? 'Une erreur est survenue, veuillez réessayer.' })
         return
       }
 
@@ -138,9 +157,9 @@ export default function ServiceContactForm({ service }: Props) {
       setSuccess(true)
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        setError('La requête a pris trop de temps. Vérifiez votre connexion et réessayez.')
+        setErrors({ api: 'La requête a pris trop de temps. Vérifiez votre connexion et réessayez.' })
       } else {
-        setError('Connexion impossible. Vérifiez votre connexion et réessayez.')
+        setErrors({ api: 'Connexion impossible. Vérifiez votre connexion et réessayez.' })
       }
     } finally {
       clearTimeout(timeout)
@@ -215,11 +234,12 @@ export default function ServiceContactForm({ service }: Props) {
               minLength={2}
               autoComplete="name"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={e => { setName(e.target.value); clearErr('name') }}
               disabled={loading}
               placeholder="Prénom et nom"
-              className={INPUT_CLASS}
+              className={errors.name ? INPUT_ERR : INPUT_CLASS}
             />
+            {errors.name && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.name}</p>}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -234,11 +254,12 @@ export default function ServiceContactForm({ service }: Props) {
               autoComplete="tel"
               inputMode="tel"
               value={phone}
-              onChange={e => setPhone(e.target.value)}
+              onChange={e => { setPhone(e.target.value); clearErr('phone') }}
               disabled={loading}
               placeholder="+212 6XX XXX XXX"
-              className={INPUT_CLASS}
+              className={errors.phone ? INPUT_ERR : INPUT_CLASS}
             />
+            {errors.phone && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.phone}</p>}
           </div>
 
           {/* Email */}
@@ -260,8 +281,9 @@ export default function ServiceContactForm({ service }: Props) {
               onChange={e => handleEmailChange(e.target.value)}
               disabled={loading}
               placeholder="votre@email.com"
-              className={INPUT_CLASS}
+              className={errors.email ? INPUT_ERR : INPUT_CLASS}
             />
+            {errors.email && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.email}</p>}
             {emailSuggestion && (
               <p className="text-[10px] text-amber-600/80 flex items-center gap-1 mt-0.5">
                 Voulez-vous dire
@@ -281,46 +303,50 @@ export default function ServiceContactForm({ service }: Props) {
 
               {/* Apartment type */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="contact-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
-                  Type d&apos;appartement{' '}
-                  {aptLocked && apartmentType
-                    ? null
-                    : <span className="text-palm-gold">*</span>
-                  }
-                </label>
                 {aptLocked && apartmentType ? (
-                  <div className="flex items-center justify-between bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5">
-                    <span className="text-sm text-palm-blue">
-                      {APARTMENTS.find(a => a.id === apartmentType)?.name ?? apartmentType}
-                      {' '}
-                      <span className="text-palm-blue/40 text-xs">
-                        — {APARTMENTS.find(a => a.id === apartmentType)?.price} DH/nuit
+                  <>
+                    <p className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                      Appartement sélectionné
+                    </p>
+                    <div className="flex items-center justify-between bg-white border border-palm-gold/25 rounded-sm px-4 py-3.5">
+                      <span className="text-sm text-palm-blue">
+                        {APARTMENTS.find(a => a.id === apartmentType)?.name ?? apartmentType}
+                        {' '}
+                        <span className="text-palm-blue/40 text-xs">
+                          — {APARTMENTS.find(a => a.id === apartmentType)?.price} DH/nuit
+                        </span>
                       </span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setAptLocked(false)}
-                      disabled={loading}
-                      className="text-[10px] tracking-[0.1em] uppercase text-palm-blue/35
-                        hover:text-palm-blue transition-colors disabled:opacity-40 shrink-0 ml-3"
-                    >
-                      Modifier
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => setAptLocked(false)}
+                        disabled={loading}
+                        className="text-[10px] tracking-widest uppercase text-palm-blue/35
+                          hover:text-palm-blue transition-colors disabled:opacity-40 shrink-0 ml-3"
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  </>
                 ) : (
-                  <select
-                    id="contact-apt-type"
-                    autoComplete="off"
-                    value={apartmentType}
-                    onChange={e => setApartmentType(e.target.value)}
-                    disabled={loading}
-                    className={`${INPUT_CLASS} cursor-pointer`}
-                  >
-                    <option value="">Type non précisé</option>
-                    {APARTMENTS.map(a => (
-                      <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
-                    ))}
-                  </select>
+                  <>
+                    <label htmlFor="contact-apt-type" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
+                      Type d&apos;appartement <span className="text-palm-gold">*</span>
+                    </label>
+                    <select
+                      id="contact-apt-type"
+                      autoComplete="off"
+                      value={apartmentType}
+                      onChange={e => { setApartmentType(e.target.value); clearErr('apartmentType') }}
+                      disabled={loading}
+                      className={`${errors.apartmentType ? INPUT_ERR : INPUT_CLASS} cursor-pointer`}
+                    >
+                      <option value="">Type non précisé</option>
+                      {APARTMENTS.map(a => (
+                        <option key={a.id} value={a.id}>{a.name} — {a.price} DH/nuit</option>
+                      ))}
+                    </select>
+                    {errors.apartmentType && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.apartmentType}</p>}
+                  </>
                 )}
               </div>
 
@@ -336,10 +362,11 @@ export default function ServiceContactForm({ service }: Props) {
                     required
                     min={today}
                     value={checkIn}
-                    onChange={e => setCheckIn(e.target.value)}
+                    onChange={e => { setCheckIn(e.target.value); clearErr('checkIn') }}
                     disabled={loading}
-                    className={INPUT_CLASS}
+                    className={errors.checkIn ? INPUT_ERR : INPUT_CLASS}
                   />
+                  {errors.checkIn && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.checkIn}</p>}
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="contact-nights" className="text-[10px] tracking-[0.25em] uppercase text-palm-blue/50 font-medium">
@@ -353,11 +380,12 @@ export default function ServiceContactForm({ service }: Props) {
                     max={60}
                     step={1}
                     value={nights}
-                    onChange={e => setNights(e.target.value === '' ? '' : Math.floor(Number(e.target.value)))}
+                    onChange={e => { setNights(e.target.value === '' ? '' : Math.floor(Number(e.target.value))); clearErr('nights') }}
                     disabled={loading}
                     placeholder="ex. 3"
-                    className={INPUT_CLASS}
+                    className={errors.nights ? INPUT_ERR : INPUT_CLASS}
                   />
+                  {errors.nights && <p role="alert" className="text-xs text-red-500 mt-0.5">{errors.nights}</p>}
                 </div>
               </div>
             </div>
@@ -380,9 +408,10 @@ export default function ServiceContactForm({ service }: Props) {
             />
           </div>
 
-          {error && (
+          {/* API / network error */}
+          {errors.api && (
             <p role="alert" className="text-xs text-red-500/80 text-center tracking-wide py-1">
-              {error}
+              {errors.api}
             </p>
           )}
 

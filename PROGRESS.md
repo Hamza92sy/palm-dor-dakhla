@@ -1,7 +1,7 @@
 # Palm d'Or Dakhla — Project Progress & Technical Reference
 
-> **Version :** V3.8 — Rate limiting /api/lead
-> **Dernière mise à jour :** 2026-05-21
+> **Version :** V4.2 — Restauration DB + messages d'erreur améliorés
+> **Dernière mise à jour :** 2026-06-01
 > **Build :** ✓ Clean — 0 erreurs TypeScript — 28 routes
 > **⚠ Dépôt GitHub actif (temporaire) :** `Hamza92sy/palm-dor-dakhla` — voir §29
 
@@ -631,6 +631,116 @@ next.config.ts                 Config Next.js
 | `src/lib/services.ts`                     | Types ServiceType + messages WA — stable                   |
 | `src/lib/tracking.ts`                     | Tracking Meta Pixel + GA4                                  |
 | `src/app/layout.tsx`                      | Fonts + tracking global + metadata root                    |
+
+---
+
+## 35. Incident DB — Supabase INACTIVE + restauration — 2026-06-01
+
+**Cause racine :**
+
+Le projet Supabase (`mkpiriemezuzqkcupdqs`) était en état `INACTIVE` (paused). Le free tier Supabase pause automatiquement tout projet sans activité API depuis > 7 jours. Quand le projet est pausé, **tous les appels Supabase échouent** (including INSERT). La route `POST /api/lead` catchait l'erreur Supabase et retournait le message générique "Erreur lors de la sauvegarde".
+
+**Symptôme observé :**
+
+Formulaire hébergement — champs apparemment valides — soumission échoue avec "Erreur lors de la sauvegarde". (Tous les services étaient également impactés mais l'accommodation était le plus testé.)
+
+**État DB au moment de l'incident :**
+
+- Table `leads` : ✅ présente avec toutes les colonnes
+- Migrations 001–005 : ✅ déjà appliquées (schéma intact après pause)
+- Contraintes : ✅ correctes (y compris `apt-1..apt-6` via migration 004)
+- INSERT `apartment_type = 'apt-1'` : ✅ validé post-restauration
+
+**Correctifs appliqués :**
+
+- **Supabase** : projet restauré de INACTIVE → ACTIVE via MCP (`restore_project`)
+- **`src/lib/supabase/migrations/004_leads_apartment_ids.sql`** : fichier créé (migration existait en DB mais sans fichier local)
+- **`src/app/api/lead/route.ts`** : messages d'erreur catégorisés par code Supabase :
+  - `42P01 / 57P03 / 08000 / 08006` → "Service temporairement indisponible. Veuillez réessayer dans quelques minutes."
+  - `23514 / 23502 / 23503` → "Données invalides. Vérifiez les champs et réessayez."
+  - Autres → "Erreur lors de la sauvegarde. Veuillez réessayer."
+  - Logging étendu : `error.code + error.message + error.details` dans `console.error`
+
+**Limite connue — free tier :**
+
+Supabase free tier pause après 7 jours d'inactivité. Si le site reçoit peu de trafic, le projet peut se pauser entre deux visites. Solutions :
+
+1. **Recommandé :** Upgrade Supabase Pro (8$/mois) — pas de pause automatique
+2. **Alternative :** Keep-alive via cron Vercel (`/api/healthcheck` → SELECT 1) — voir §P7
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 34. Validation par champ — bordure rouge + message inline — 2026-06-01
+
+**Problème corrigé :**
+
+Un seul message d'erreur global s'affichait en haut du formulaire, sans indiquer quel champ était invalide. Les erreurs étaient séquentielles (premier champ invalide seulement).
+
+**Correctif appliqué — LeadForm.tsx + ServiceContactForm.tsx :**
+
+- `error: string | null` → `errors: Record<string, string>` (suppression complète de `setError`)
+- `INPUT_ERR` constant ajoutée (bordure rouge, focus rouge)
+- `clearErr(field)` helper — efface l'erreur du champ dès que l'utilisateur le modifie
+- Validation bulk dans `handleSubmit` — tous les champs invalides collectés avant `setErrors(errs)`
+- Chaque champ invalide : `className={errors.X ? INPUT_ERR : INPUT_CLASS}` + `<p role="alert">` sous le champ
+- Erreurs réseau/API → `errors.api` (message global centré, inchangé visuellement)
+- `handleEmailChange` appelle `clearErr('email')` — suggestion de domaine conservée
+
+**Champs couverts (les deux formulaires) :** nom, téléphone, email, type d'appartement, arrivée, nuitées
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 33. UX appartement pré-sélectionné — pages détail — 2026-06-01
+
+**Problème corrigé :**
+
+Sur `/hebergements/apt-X`, le formulaire affichait un select vide par défaut. L'appartement n'était verrouillé qu'après clic sur le CTA "Réserver cet appartement" (qui injecte `?apt=apt-X` dans l'URL via `useEffect`).
+
+**Correctif appliqué :**
+
+- `ServiceContactForm.tsx` : ajout prop `initialApartmentId?: string`
+  - `apartmentType` et `aptLocked` initialisés depuis la prop dès le premier rendu (zéro flash)
+  - Validation contre `VALID_APARTMENT_IDS` à l'init — aucun ID invalide ne peut être injecté
+  - `useEffect` URL-param conservé tel quel (override si `?apt=` présent)
+- `hebergements/[apartmentId]/page.tsx` : `<ServiceContactForm initialApartmentId={apt.id} />`
+
+**Comportement après :**
+
+- `/hebergements/apt-1` : formulaire affiche "Appartement 1 — 500 DH/nuit" + bouton "Modifier" dès le chargement
+- Homepage, restaurant, café, location : comportement inchangé (select visible par défaut)
+- Clic CTA "Réserver cet appartement" : URL param pris en compte normalement
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
+
+---
+
+## 32. Validation formulaires — téléphone + dates — 2026-06-01
+
+**Correctifs appliqués :**
+
+- `src/app/api/lead/route.ts` : validation téléphone renforcée
+  - `PHONE_RE = /^\+?[0-9\s\-\.\(\)]{7,20}$/` + comptage chiffres (7–15)
+  - Rejette tout texte avec lettres ("Filet Espadon" → 400)
+  - Accepte tous formats réalistes : `+212 612 345 678`, `0612345678`, `+33 6 12 34 56 78`
+  - Message d'erreur French UX : "Numéro de téléphone invalide. Format accepté : +212 6XX XXX XXX"
+- `src/app/api/lead/route.ts` : validité calendaire des dates
+  - `isValidDate()` remplace `DATE_RE.test()` pour `check_in` et `check_out`
+  - Rejette les dates impossibles : `2024-02-30`, `2024-13-01`
+- `src/components/home/LeadForm.tsx` + `ServiceContactForm.tsx` : miroir frontend
+  - Même `PHONE_RE` + digit count dans `handleSubmit`
+  - Validation email facultatif ajoutée pour services non-hébergement (cohérence avec backend)
+
+**Comportement avant/après :**
+
+- "Filet Espadon" comme téléphone → bloqué frontend ET backend (était accepté)
+- `2024-02-30` comme date → bloqué backend (était accepté)
+- Email invalide sur formulaire restaurant/café/location → bloqué frontend (était renvoyé backend seulement)
+
+**Build :** ✓ 0 erreurs TypeScript — 28 routes
 
 ---
 
